@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías de Videojuegos 2D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-light));
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .category-card.active {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-light));
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+
+        .category-title {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .category-card.active .category-content {
+            max-height: 1000px;
+        }
+
+        .mechanics {
+            margin: 20px 0;
+        }
+
+        .mechanics h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .mechanics h4::before {
+            content: '⚙️';
+            margin-right: 8px;
+        }
+
+        .mechanics ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .mechanics li {
+            margin: 5px 0;
+            position: relative;
+        }
+
+        .mechanics li::before {
+            content: '•';
+            color: var(--accent-color);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .examples {
+            margin: 20px 0;
+        }
+
+        .examples h4 {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .examples h4::before {
+            content: '🎮';
+            margin-right: 8px;
+        }
+
+        .game-example {
+            background: rgba(0,0,0,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .category-card.active .game-example {
+            background: rgba(255,255,255,0.2);
+            border-left-color: white;
+        }
+
+        .game-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .popularity {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .popularity-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .stars {
+            display: flex;
+        }
+
+        .star {
+            color: #ffd700;
+            margin-right: 2px;
+            font-size: 1.2em;
+        }
+
+        .popularity-text {
+            margin-left: 10px;
+            font-style: italic;
+        }
+
+        /* Colores específicos por categoría */
+        .platformer { --accent-color: #e74c3c; --accent-color-light: #f39c12; }
+        .shooter { --accent-color: #9b59b6; --accent-color-light: #8e44ad; }
+        .rpg { --accent-color: #3498db; --accent-color-light: #2980b9; }
+        .puzzle { --accent-color: #f39c12; --accent-color-light: #e67e22; }
+        .fighting { --accent-color: #e67e22; --accent-color-light: #d35400; }
+        .strategy { --accent-color: #27ae60; --accent-color-light: #2ecc71; }
+        .metroidvania { --accent-color: #34495e; --accent-color-light: #2c3e50; }
+        .roguelike { --accent-color: #95a5a6; --accent-color-light: #7f8c8d; }
+
+        .instructions {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Categorías de Videojuegos 2D</h1>
+            <p>Explora las diferentes categorías, mecánicas y ejemplos populares</p>
+        </div>
+
+        <div class="instructions">
+            <p>👆 Haz clic en cualquier categoría para ver sus mecánicas, ejemplos y nivel de popularidad</p>
+        </div>
+
+        <div class="categories-grid">
+            <div class="category-card platformer" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🏃‍♂️</div>
+                    <div class="category-title">Plataformas</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Salto y movimiento horizontal</li>
+                            <li>Navegación vertical por niveles</li>
+                            <li>Colisiones con plataformas</li>
+                            <li>Colección de objetos</li>
+                            <li>Evitar obstáculos y enemigos</li>
+                            <li>Física de gravedad</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Super Mario Bros.</div>
+                            <div>El rey indiscutible de los plataformeros, definió el género</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Celeste</div>
+                            <div>Plataformero moderno con mecánicas precisas y narrativa emotiva</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Shovel Knight</div>
+                            <div>Homenaje nostálgico con mecánicas innovadoras</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="popularity-text">Extremadamente popular, base del gaming 2D</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card shooter" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🔫</div>
+                    <div class="category-title">Shoot 'em Up</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Disparo continuo de proyectiles</li>
+                            <li>Esquivar patrones de balas</li>
+                            <li>Scroll automático o controlado</li>
+                            <li>Power-ups y mejoras</li>
+                            <li>Oleadas de enemigos</li>
+                            <li>Jefes con patrones complejos</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Gradius</div>
+                            <div>Serie clásica que definió el género horizontal</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Touhou Project</div>
+                            <div>Serie indie famosa por sus bullet hell extremos</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Enter the Gungeon</div>
+                            <div>Roguelike shooter con humor y mecánicas únicas</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <span class="popularity-text">Alta, especialmente en nicho arcade</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card rpg" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">⚔️</div>
+                    <div class="category-title">RPG 2D</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Sistema de experiencia y niveles</li>
+                            <li>Gestión de inventario</li>
+                            <li>Combate por turnos o tiempo real</li>
+                            <li>Narrativa ramificada</li>
+                            <li>Desarrollo de personajes</li>
+                            <li>Exploración de mundos abiertos</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Final Fantasy VI</div>
+                            <div>Considerado por muchos el mejor JRPG 2D de todos los tiempos</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Undertale</div>
+                            <div>RPG indie revolucionario con mecánicas de combate únicas</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Stardew Valley</div>
+                            <div>RPG de simulación agrícola con elementos sociales</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="popularity-text">Muy alta, género atemporal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card puzzle" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🧩</div>
+                    <div class="category-title">Puzzle</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Resolución de acertijos lógicos</li>
+                            <li>Manipulación de objetos</li>
+                            <li>Patrones y secuencias</li>
+                            <li>Tiempo limitado (opcional)</li>
+                            <li>Combinación de elementos</li>
+                            <li>Progresión de dificultad</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Tetris</div>
+                            <div>El puzzle game más influyente e icónico de la historia</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Portal 2D</div>
+                            <div>Mecánicas de portales en perspectiva 2D</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Baba Is You</div>
+                            <div>Puzzle innovador donde cambias las reglas del juego</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <span class="popularity-text">Alta, especialmente en móviles</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card fighting" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">👊</div>
+                    <div class="category-title">Lucha</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Combate uno contra uno</li>
+                            <li>Comandos de movimiento complejos</li>
+                            <li>Sistema de combos</li>
+                            <li>Barra de vida y energía especial</li>
+                            <li>Bloqueo y contraataque</li>
+                            <li>Movimientos especiales únicos</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Street Fighter II</div>
+                            <div>El fighting game que definió el género moderno</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Guilty Gear</div>
+                            <div>Serie conocida por sus animaciones fluidas y mecánicas complejas</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Mortal Kombat (2D)</div>
+                            <div>Famoso por sus Fatalities y estilo brutal</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <span class="popularity-text">Alta en comunidades competitivas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card strategy" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🏰</div>
+                    <div class="category-title">Estrategia</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Gestión de recursos</li>
+                            <li>Construcción de base</li>
+                            <li>Control de unidades múltiples</li>
+                            <li>Planificación táctica</li>
+                            <li>Combate táctico</li>
+                            <li>Investigación y desarrollo</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Command & Conquer (2D)</div>
+                            <div>Pionero del género RTS con vista isométrica</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Fire Emblem (clásicos)</div>
+                            <div>SRPG por turnos con narrativa profunda</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Into the Breach</div>
+                            <div>Estrategia táctica en grid con mecánicas perfectas</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <span class="popularity-text">Media-alta, nicho especializado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card metroidvania" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🗺️</div>
+                    <div class="category-title">Metroidvania</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Exploración no lineal</li>
+                            <li>Habilidades que desbloquean áreas</li>
+                            <li>Backtracking significativo</li>
+                            <li>Mapa interconectado</li>
+                            <li>Progresión de poder gradual</li>
+                            <li>Secretos ocultos</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">Metroid: Zero Mission</div>
+                            <div>Perfección del diseño clásico de Metroid</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Hollow Knight</div>
+                            <div>Obra maestra indie que redefinió el género</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Castlevania: Symphony of the Night</div>
+                            <div>El otro pilar del género, con elementos RPG</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="popularity-text">Muy alta, especialmente entre indies</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-card roguelike" onclick="toggleCategory(this)">
+                <div class="category-header">
+                    <div class="category-icon">🎲</div>
+                    <div class="category-title">Roguelike/lite</div>
+                </div>
+                <div class="category-content">
+                    <div class="mechanics">
+                        <h4>Mecánicas Principales</h4>
+                        <ul>
+                            <li>Generación procedural de niveles</li>
+                            <li>Muerte permanente</li>
+                            <li>Elementos aleatorios</li>
+                            <li>Progresión meta (roguelite)</li>
+                            <li>Rejugabilidad alta</li>
+                            <li>Riesgo vs recompensa</li>
+                        </ul>
+                    </div>
+                    <div class="examples">
+                        <h4>Ejemplos Populares</h4>
+                        <div class="game-example">
+                            <div class="game-name">The Binding of Isaac</div>
+                            <div>Roguelike que popularizó el género en la era moderna</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">Dead Cells</div>
+                            <div>Metroidvania roguelite con combate fluido</div>
+                        </div>
+                        <div class="game-example">
+                            <div class="game-name">FTL: Faster Than Light</div>
+                            <div>Estrategia roguelike espacial innovador</div>
+                        </div>
+                    </div>
+                    <div class="popularity">
+                        <span class="popularity-label">Popularidad:</span>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <span class="popularity-text">Muy alta en la escena indie</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCategory(card) {
+            // Cerrar todas las demás categorías
+            document.querySelectorAll('.category-card').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('active');
+                }
+            });
+
+            // Toggle la categoría clickeada
+            card.classList.toggle('active');
+        }
+
+        // Animación de entrada
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.category-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    requestAnimationFrame(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    });
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
