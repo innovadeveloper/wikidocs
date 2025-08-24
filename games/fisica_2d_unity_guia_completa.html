@@ -1,0 +1,1217 @@
+                    <div class="physics-item">
+                        <h4 data-icon="↔️">SliderJoint2D</h4>
+                        <p>Permite movimiento en una línea recta, como un pistón o elevador.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Pistones, puertas corredizas, elevadores
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🎯">TargetJoint2D</h4>
+                        <p>Mueve un objeto hacia una posición específica en el mundo.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Objetos que siguen el mouse, magnetismo
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🌸">SpringJoint2D</h4>
+                        <p>Conecta objetos con un comportamiento elástico, como un resorte.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Resortes, cuerdas elásticas, amortiguadores
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="⚖️">RelativeJoint2D</h4>
+                        <p>Mantiene objetos en posiciones relativas pero permite cierta flexibilidad.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Conexiones flexibles, objetos que se mueven juntos
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🎡">WheelJoint2D</h4>
+                        <p>Simula una rueda con suspensión. Perfecto para vehículos 2D.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Coches, bicicletas, cualquier vehículo con ruedas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">Joint2D</div>
+                        <div class="api-item">connectedBody</div>
+                        <div class="api-item">anchor</div>
+                        <div class="api-item">connectedAnchor</div>
+                        <div class="api-item">breakForce</div>
+                        <div class="api-item">enableCollision</div>
+                        <div class="api-item">JointMotor2D</div>
+                        <div class="api-item">JointLimits2D</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateJoint(this)">🔗 Ver Conexión</button>
+                </div>
+            </div>
+
+            <!-- EFFECTORS -->
+            <div class="category-section effectors-cat special-highlight">
+                <div class="category-header">
+                    <div class="category-icon">⚡</div>
+                    <h2 class="category-title">Effectors</h2>
+                    <p class="category-subtitle">¡Los héroes de Snow Surfer! Aplican fuerzas automáticamente</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">🏂 Surface Effector en Acción</div>
+                    <div class="demo-area effector-demo"></div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        El snowboarder deslizándose automáticamente por la pendiente
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item special-highlight">
+                        <h4 data-icon="🏂">SurfaceEffector2D</h4>
+                        <p>¡EL PROTAGONISTA de Snow Surfer! Aplica fuerzas a objetos que tocan la superficie, simulando deslizamiento.</p>
+                        <div class="use-case">
+                            <strong>🏂 Perfecto para Snow Surfer:</strong>
+                            Hace que el personaje se deslice automáticamente por las montañas nevadas
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🌪️">AreaEffector2D</h4>
+                        <p>Aplica fuerzas a todos los objetos dentro de un área específica.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Viento, corrientes de agua, campos de gravedad
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="💨">PointEffector2D</h4>
+                        <p>Empuja o atrae objetos hacia/desde un punto central, como un imán.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Agujeros negros, imanes, explosiones
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🌊">BuoyancyEffector2D</h4>
+                        <p>Simula flotabilidad en líquidos. Los objetos flotan o se hunden según su densidad.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Agua, lava, cualquier líquido flotante
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🎯">PlatformEffector2D</h4>
+                        <p>Crea plataformas de una sola dirección. Los objetos pueden pasar por abajo pero no por arriba.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Plataformas de salto, suelos atravesables
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">Effector2D</div>
+                        <div class="api-item">useColliderMask</div>
+                        <div class="api-item">colliderMask</div>
+                        <div class="api-item">speed (Surface)</div>
+                        <div class="api-item">speedVariation</div>
+                        <div class="api-item">forceScale</div>
+                        <div class="api-item">useContactForce</div>
+                        <div class="api-item">useFriction</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateEffector(this)">🏂 Ver Surface Effector</button>
+                </div>
+            </div>
+
+            <!-- PHYSICS MATERIALS -->
+            <div class="category-section materials-cat">
+                <div class="category-header">
+                    <div class="category-icon">🧱</div>
+                    <h2 class="category-title">Physics Materials</h2>
+                    <p class="category-subtitle">Definen cómo se comportan las superficies: rebote, fricción, etc.</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">⚽ Diferentes Comportamientos</div>
+                    <div class="demo-area" style="background: linear-gradient(45deg, #1abc9c, #16a085); position: relative;">
+                        <div style="position: absolute; left: 20%; bottom: 10%; width: 20px; height: 20px; background: white; border-radius: 50%; animation: bounce1 2s ease-in-out infinite;"></div>
+                        <div style="position: absolute; left: 80%; bottom: 10%; width: 20px; height: 20px; background: rgba(255,255,255,0.7); border-radius: 50%; animation: bounce2 2s ease-in-out infinite;"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        Diferentes materiales = diferentes rebotes y fricción
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item">
+                        <h4 data-icon="⚽">PhysicsMaterial2D</h4>
+                        <p>Define las propiedades físicas de las superficies: fricción y rebote.</p>
+                        <div class="use-case">
+                            <strong>Componentes clave:</strong>
+                            Friction, Bounciness, Bounce Threshold
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🧊">Low Friction</h4>
+                        <p>Superficies resbaladizas como hielo. Los objetos se deslizarán fácilmente.</p>
+                        <div class="use-case">
+                            <strong>🏂 Perfecto para Snow Surfer:</strong>
+                            Nieve y hielo para que el snowboard se deslice
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🏀">High Bounce</h4>
+                        <p>Superficies que hacen rebotar mucho los objetos, como trampolines.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Pelotas, trampolines, superficies elásticas
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🪨">High Friction</h4>
+                        <p>Superficies rugosas que frenan el movimiento, como asfalto o tierra.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Suelos que deben detener objetos, superficies rugosas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">PhysicsMaterial2D</div>
+                        <div class="api-item">friction</div>
+                        <div class="api-item">bounciness</div>
+                        <div class="api-item">bounceThreshold</div>
+                        <div class="api-item">sharedMaterial</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateMaterials(this)">🧱 Ver Materiales</button>
+                </div>
+            </div>
+
+            <!-- FORCES & MOVEMENT -->
+            <div class="category-section forces-cat">
+                <div class="category-header">
+                    <div class="category-icon">💥</div>
+                    <h2 class="category-title">Forces & Movement</h2>
+                    <p class="category-subtitle">Diferentes formas de aplicar fuerzas y mover objetos</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">🚀 Aplicación de Fuerzas</div>
+                    <div class="demo-area" style="background: linear-gradient(45deg, #e91e63, #ad1457); position: relative;">
+                        <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 2em; color: white;">💥</div>
+                        <div style="position: absolute; left: 30%; top: 30%; color: white; animation: moveForce 2s ease-in-out infinite;">→</div>
+                        <div style="position: absolute; right: 30%; bottom: 30%; color: white; animation: moveForce 2s ease-in-out infinite reverse;">←</div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        Diferentes tipos de fuerzas actuando sobre objetos
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item">
+                        <h4 data-icon="🚀">AddForce</h4>
+                        <p>Aplica una fuerza gradual que acelera el objeto. Respeta la masa.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Motores, propulsión, aceleración realista
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="💥">AddForce Impulse</h4>
+                        <p>Aplica una fuerza instantánea, como un golpe o explosión.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Saltos, explosiones, impactos instantáneos
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🎯">MovePosition</h4>
+                        <p>Mueve el rigidbody a una posición específica respetando colisiones.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Movimiento controlado, objetos kinematic
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🌍">Gravity</h4>
+                        <p>La fuerza constante que atrae objetos hacia abajo. Configurable por objeto.</p>
+                        <div class="use-case">
+                            <strong>Personalizable:</strong>
+                            GravityScale para controlar cuánto afecta a cada objeto
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🌪️">Drag</h4>
+                        <p>Resistencia que frena gradualmente el movimiento, como fricción del aire.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Simular resistencia del aire o agua
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🔄">AddTorque</h4>
+                        <p>Aplica rotación al objeto. Como AddForce pero para girar.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Hacer girar ruedas, objetos que rotan
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">AddForce()</div>
+                        <div class="api-item">AddForceAtPosition()</div>
+                        <div class="api-item">AddTorque()</div>
+                        <div class="api-item">MovePosition()</div>
+                        <div class="api-item">MoveRotation()</div>
+                        <div class="api-item">ForceMode2D</div>
+                        <div class="api-item">gravityScale</div>
+                        <div class="api-item">drag</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateForces(this)">💥 Ver Fuerzas</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN ESPECIAL SNOW SURFER -->
+        <div class="snow-surfer-section">
+            <h2 style="text-align: center; margin-bottom: 40px; font-size: 2.5em; position: relative; z-index: 1;">
+                🏂 Surface Effector 2D: La Estrella de Snow Surfer
+            </h2>
+            <p style="text-align: center; font-size: 1.3em; margin-bottom: 50px; opacity: 0.9; position: relative; z-index: 1;">
+                El componente que hace posible el deslizamiento automático por las montañas nevadas
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; position: relative; z-index: 1;">
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 35px; border-radius: 20px; backdrop-filter: blur(15px);">
+                    <h4 style="margin-bottom: 25px; font-size: 1.8em; color: #ffd700;">🎿 Cómo Funciona</h4>
+                    <ul style="line-height: 1.8; font-size: 1.1em;">
+                        <li><strong>Speed:</strong> Velocidad constante del deslizamiento</li>
+                        <li><strong>Speed Variation:</strong> Aleatoriedad para naturalidad</li>
+                        <li><strong>Force Scale:</strong> Intensidad de la fuerza aplicada</li>
+                        <li><strong>Use Contact Force:</strong> Solo aplica fuerza donde hay contacto</li>
+                        <li><strong>Use Friction:</strong> Si usar o ignorar fricción del material</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 35px; border-radius: 20px; backdrop-filter: blur(15px);">
+                    <h4 style="margin-bottom: 25px; font-size: 1.8em; color: #00d4aa;">⚙️ Configuración Típica</h4>
+                    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; font-family: monospace; font-size: 1em;">
+                        <div style="margin: 8px 0;"><strong>Speed:</strong> 5.0</div>
+                        <div style="margin: 8px 0;"><strong>Speed Variation:</strong> 0.5</div>
+                        <div style="margin: 8px 0;"><strong>Force Scale:</strong> 1.0</div>
+                        <div style="margin: 8px 0;"><strong>Use Contact Force:</strong> ✓</div>
+                        <div style="margin: 8px 0;"><strong>Use Friction:</strong> ✗</div>
+                        <div style="margin: 8px 0;"><strong>Collider Mask:</strong> Player Layer</div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 35px; border-radius: 20px; backdrop-filter: blur(15px);">
+                    <h4 style="margin-bottom: 25px; font-size: 1.8em; color: #ff6b6b;">🎮 Ventajas en Snow Surfer</h4>
+                    <ul style="line-height: 1.8; font-size: 1.1em;">
+                        <li><strong>Automático:</strong> No necesita input del jugador</li>
+                        <li><strong>Natural:</strong> Sigue la forma del terreno</li>
+                        <li><strong>Físico:</strong> Respeta masa y otras fuerzas</li>
+                        <li><strong>Configurable:</strong> Diferentes velocidades por terreno</li>
+                        <li><strong>Eficiente:</strong> Muy poco costo computacional</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.15); padding: 35px; border-radius: 20px; backdrop-filter: blur(15px);">
+                    <h4 style="margin-bottom: 25px; font-size: 1.8em; color: #a29bfe;">🔧 Setup Paso a Paso</h4>
+                    <ol style="line-height: 1.8; font-size: 1.1em;">
+                        <li>EdgeCollider2D en el terreno</li>
+                        <li>Marcar "Used by Effector" ✓</li>
+                        <li>Añadir SurfaceEffector2D</li>
+                        <li>Configurar Speed y Force Scale</li>
+                        <li>Ajustar Collider Mask al jugador</li>
+                        <li>¡Listo para deslizarse! 🏂</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA COMPARATIVA -->
+        <div class="comparison-table">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 2.5em;">📊 Comparación de Sistemas Físicos</h2>
+            <p style="text-align: center; color: #7f8c8d; font-size: 1.2em; margin-bottom: 40px;">
+                ¿Cuál usar según tu tipo de juego?
+            </p>
+
+            <div class="table-grid">
+                <div class="table-header">Sistema</div>
+                <div class="table-header">Facilidad</div>
+                <div class="table-header">Performance</div>
+                <div class="table-header">Realismo</div>
+                <div class="table-header">Flexibilidad</div>
+
+                <div class="table-cell category-name" style="--cell-color: #3498db;">Rigidbody2D</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+
+                <div class="table-cell category-name" style="--cell-color: #e74c3c;">Colliders</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐☆☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+
+                <div class="table-cell category-name" style="--cell-color: #f39c12;">Joints</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐☆☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐☆☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+
+                <div class="table-cell category-name" style="--cell-color: #9b59b6;">Effectors</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+
+                <div class="table-cell category-name" style="--cell-color: #1abc9c;">Physics Materials</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐☆☆</div></div>
+
+                <div class="table-cell category-name" style="--cell-color: #e91e63;">Forces</div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐☆☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐☆</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+                <div class="table-cell"><div class="rating">⭐⭐⭐⭐⭐</div></div>
+            </div>
+        </div>
+
+        <!-- CASOS DE USO POR TIPO DE JUEGO -->
+        <div class="comparison-table">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 2.5em;">🎮 Sistemas por Tipo de Juego</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+                <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 50px rgba(102, 126, 234, 0.3);">
+                    <h3 style="margin-bottom: 25px; font-size: 1.8em;">🏂 Endless Runner (Snow Surfer)</h3>
+                    <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                        <h4 style="margin-bottom: 15px; color: #ffd700;">Componentes Principales:</h4>
+                        <ul style="line-height: 1.7;">
+                            <li><strong>Rigidbody2D:</strong> Personaje principal (Dynamic)</li>
+                            <li><strong>EdgeCollider2D:</strong> Contorno del terreno</li>
+                            <li><strong>SurfaceEffector2D:</strong> ¡El héroe! Deslizamiento automático</li>
+                            <li><strong>Physics Material:</strong> Nieve resbaladiza (Low Friction)</li>
+                            <li><strong>CircleCollider2D:</strong> Triggers para power-ups</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 50px rgba(231, 76, 60, 0.3);">
+                    <h3 style="margin-bottom: 25px; font-size: 1.8em;">🚗 Racing Game</h3>
+                    <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                        <h4 style="margin-bottom: 15px; color: #ffd700;">Componentes Principales:</h4>
+                        <ul style="line-height: 1.7;">
+                            <li><strong>WheelJoint2D:</strong> Sistema de ruedas con suspensión</li>
+                            <li><strong>Rigidbody2D:</strong> Chasis del vehículo</li>
+                            <li><strong>Physics Materials:</strong> Diferentes superficies de carrera</li>
+                            <li><strong>AddForce:</strong> Motor y aceleración</li>
+                            <li><strong>Drag:</strong> Resistencia aerodinámica</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 35px; border-radius: 20px; box-shadow: 0 15px 50px rgba(243, 156, 18, 0.3);">
+                    <h3 style="margin-bottom: 25px; font-size: 1.8em;">⚔️ Fighting Game</h3>
+                    <div style="background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 12px; margin: 15px 0;">
+                        <h4 style="margin-bottom: 15px; color: #ffd700;">Componentes Principales:</h4>
+                        <ul style="line-height: 1.7;">
+                            <li><strong>Rigidbody2D:</strong> Personajes (Kinematic para control)</li>
+                            <li><strong>BoxCollider2D:</strong> Hitboxes y hurtboxes</li>
+                            <li><strong>AddForce Impulse:</strong> Knockback de ataques</li>
+                            <li><strong>PlatformEffector2D:</strong> Plataformas atravesables</li>
+                            <li><strong>High Friction Material:</strong> Suelo que no resbala</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #9b59b6,<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Física 2D Unity - Guía Completa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #53a0fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            background: rgba(44, 62, 80, 0.95);
+            padding: 50px;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="2" fill="rgba(255,255,255,0.15)"/><circle cx="40" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: floatParticles 20s linear infinite;
+        }
+
+        @keyframes floatParticles {
+            0% { transform: translateY(100%) rotate(0deg); }
+            100% { transform: translateY(-100%) rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.5em;
+            opacity: 0.95;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .physics-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .category-section {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+
+        .category-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: var(--category-gradient);
+        }
+
+        .category-section:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 35px 100px rgba(0,0,0,0.25);
+            border-color: var(--category-color);
+        }
+
+        .category-header {
+            text-align: center;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .category-icon {
+            font-size: 5em;
+            margin-bottom: 15px;
+            filter: drop-shadow(3px 3px 8px rgba(0,0,0,0.2));
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .category-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--category-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .category-subtitle {
+            font-size: 1.3em;
+            color: #7f8c8d;
+            font-weight: 300;
+            line-height: 1.4;
+        }
+
+        .physics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .physics-item {
+            background: linear-gradient(135deg, var(--item-bg-start), var(--item-bg-end));
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .physics-item::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .physics-item:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .physics-item h4 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .physics-item h4::before {
+            content: attr(data-icon);
+            margin-right: 12px;
+            font-size: 1.3em;
+        }
+
+        .physics-item p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .use-case {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .use-case strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .visual-demo {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 3px dashed var(--category-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--category-color);
+            font-size: 1.4em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .demo-area {
+            height: 200px;
+            position: relative;
+            background: var(--demo-background);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .unity-apis {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 12px 35px rgba(231, 76, 60, 0.4);
+        }
+
+        .unity-apis h4 {
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .unity-apis h4::before {
+            content: '⚙️';
+            margin-right: 15px;
+            font-size: 1.5em;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .api-item {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            font-weight: bold;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .api-item:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+        }
+
+        /* Colores por categoría */
+        .rigidbody-cat { 
+            --category-color: #3498db; 
+            --category-gradient: linear-gradient(90deg, #3498db, #2980b9);
+            --item-bg-start: #3498db;
+            --item-bg-end: #2980b9;
+            --demo-background: linear-gradient(45deg, #ebf3fd, #d6eaf8);
+        }
+
+        .colliders-cat { 
+            --category-color: #e74c3c; 
+            --category-gradient: linear-gradient(90deg, #e74c3c, #c0392b);
+            --item-bg-start: #e74c3c;
+            --item-bg-end: #c0392b;
+            --demo-background: linear-gradient(45deg, #fdeaea, #fadbd8);
+        }
+
+        .joints-cat { 
+            --category-color: #f39c12; 
+            --category-gradient: linear-gradient(90deg, #f39c12, #e67e22);
+            --item-bg-start: #f39c12;
+            --item-bg-end: #e67e22;
+            --demo-background: linear-gradient(45deg, #fef5e7, #fcf3cf);
+        }
+
+        .effectors-cat { 
+            --category-color: #9b59b6; 
+            --category-gradient: linear-gradient(90deg, #9b59b6, #8e44ad);
+            --item-bg-start: #9b59b6;
+            --item-bg-end: #8e44ad;
+            --demo-background: linear-gradient(45deg, #f4ecf7, #e8daef);
+        }
+
+        .materials-cat { 
+            --category-color: #1abc9c; 
+            --category-gradient: linear-gradient(90deg, #1abc9c, #16a085);
+            --item-bg-start: #1abc9c;
+            --item-bg-end: #16a085;
+            --demo-background: linear-gradient(45deg, #e8f8f5, #d5f4e6);
+        }
+
+        .forces-cat { 
+            --category-color: #e91e63; 
+            --category-gradient: linear-gradient(90deg, #e91e63, #ad1457);
+            --item-bg-start: #e91e63;
+            --item-bg-end: #ad1457;
+            --demo-background: linear-gradient(45deg, #fce4ec, #f8bbd9);
+        }
+
+        .special-highlight {
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #ff9ff3, #54a0ff);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            border: 3px solid #fff;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .snow-surfer-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 50px;
+            border-radius: 25px;
+            margin: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .snow-surfer-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="2" fill="white" opacity="0.4"/><circle cx="75" cy="45" r="1.5" fill="white" opacity="0.3"/><circle cx="45" cy="75" r="1" fill="white" opacity="0.5"/></svg>');
+            animation: snowFall 15s linear infinite;
+        }
+
+        @keyframes snowFall {
+            0% { transform: translateY(-100%) rotate(0deg); }
+            100% { transform: translateY(100%) rotate(360deg); }
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 2px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #34495e;
+            color: white;
+            padding: 20px 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .table-cell {
+            background: white;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .table-cell:hover {
+            background: #f8f9fa;
+            transform: scale(1.02);
+        }
+
+        .table-cell.category-name {
+            background: var(--cell-color);
+            color: white;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .rating {
+            font-size: 1.2em;
+        }
+
+        .interactive-demo {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .demo-button {
+            background: var(--category-gradient);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            margin: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-5px) scale(1.08);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+        }
+
+        .tip-section {
+            background: rgba(255, 193, 7, 0.15);
+            border: 3px solid #ffc107;
+            border-radius: 20px;
+            padding: 35px;
+            margin: 40px 0;
+            box-shadow: 0 12px 35px rgba(255, 193, 7, 0.2);
+        }
+
+        .tip-section h4 {
+            color: #f39c12;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .tip-section h4::before {
+            content: '💡 ';
+            margin-right: 15px;
+            font-size: 1.4em;
+        }
+
+        /* Demos específicos */
+        .rigidbody-demo {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100"><circle cx="100" cy="50" r="20" fill="%233498db" opacity="0.8"/><path d="M100,70 L100,90 M90,80 L110,80" stroke="%232980b9" stroke-width="3"/></svg>') center/100px 50px no-repeat;
+            animation: fall 2s ease-in-out infinite;
+        }
+
+        @keyframes fall {
+            0%, 100% { background-position: center 20%; }
+            50% { background-position: center 80%; }
+        }
+
+        .collider-demo {
+            background: 
+                radial-gradient(circle at 30% 50%, #e74c3c 15px, transparent 15px),
+                radial-gradient(circle at 70% 50%, #c0392b 15px, transparent 15px);
+            position: relative;
+        }
+
+        .effector-demo {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            position: relative;
+        }
+
+        .effector-demo::after {
+            content: '⛷️';
+            position: absolute;
+            font-size: 2em;
+            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: slideDown 2s linear infinite;
+        }
+
+        @keyframes slideDown {
+            0% { left: 10%; }
+            100% { left: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Sistemas de Física 2D en Unity</h1>
+            <p>Guía visual completa de todos los componentes físicos</p>
+            <p style="font-size: 1.2em; margin-top: 20px;">
+                🏂 Desde Rigidbody básico hasta Surface Effector 2D para Snow Surfer
+            </p>
+        </div>
+
+        <!-- RIGIDBODY & CUERPOS RÍGIDOS -->
+        <div class="physics-categories">
+            <div class="category-section rigidbody-cat">
+                <div class="category-header">
+                    <div class="category-icon">🎯</div>
+                    <h2 class="category-title">Rigidbody</h2>
+                    <p class="category-subtitle">Los cuerpos físicos que pueden moverse y ser afectados por fuerzas</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">🌍 Simulación de Gravedad</div>
+                    <div class="demo-area rigidbody-demo"></div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        Objetos que caen por gravedad y responden a fuerzas
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item">
+                        <h4 data-icon="🎯">Rigidbody2D</h4>
+                        <p>El componente fundamental que permite que un objeto sea afectado por la física del motor de Unity.</p>
+                        <div class="use-case">
+                            <strong>🏂 Perfecto para Snow Surfer:</strong>
+                            El personaje principal que reacciona a gravedad y fuerzas del terreno
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🏃‍♂️">Dynamic</h4>
+                        <p>Modo completamente físico - se mueve por fuerzas, gravedad y colisiones.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Personajes, proyectiles, objetos que caen
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🔒">Kinematic</h4>
+                        <p>Se mueve por script pero puede interactuar con otros rigidbodies dinámicos.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Plataformas móviles, objetos controlados por animación
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="⛰️">Static</h4>
+                        <p>Completamente inmóvil, pero otros objetos pueden colisionar con él.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Terrenos, paredes, obstáculos fijos
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">Rigidbody2D</div>
+                        <div class="api-item">RigidbodyType2D</div>
+                        <div class="api-item">AddForce()</div>
+                        <div class="api-item">velocity</div>
+                        <div class="api-item">angularVelocity</div>
+                        <div class="api-item">mass</div>
+                        <div class="api-item">gravityScale</div>
+                        <div class="api-item">drag</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateRigidbody(this)">🎯 Ver Física</button>
+                </div>
+            </div>
+
+            <!-- COLLIDERS -->
+            <div class="category-section colliders-cat">
+                <div class="category-header">
+                    <div class="category-icon">🛡️</div>
+                    <h2 class="category-title">Colliders</h2>
+                    <p class="category-subtitle">Las formas invisibles que detectan colisiones y definen límites</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">💥 Detección de Colisiones</div>
+                    <div class="demo-area collider-demo"></div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        Formas invisibles que detectan cuando objetos se tocan
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item">
+                        <h4 data-icon="⭕">CircleCollider2D</h4>
+                        <p>Perfecto para objetos redondos. Muy eficiente computacionalmente.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Pelotas, ruedas, burbujas, objetos circulares
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="⬜">BoxCollider2D</h4>
+                        <p>Para objetos rectangulares. El más común y eficiente para formas cuadradas.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Plataformas, cajas, bloques, elementos de UI
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="📐">PolygonCollider2D</h4>
+                        <p>Se adapta automáticamente a la forma del sprite. Muy preciso pero más costoso.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Sprites complejos, terrenos irregulares
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="📏">EdgeCollider2D</h4>
+                        <p>Define líneas y contornos. Perfecto para superficies sin volumen.</p>
+                        <div class="use-case">
+                            <strong>🏂 Perfecto para Snow Surfer:</strong>
+                            Contornos de montañas y terrenos
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🎯">CompositeCollider2D</h4>
+                        <p>Combina múltiples colliders en uno solo para mejor rendimiento.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Tilemaps complejos, terrenos grandes
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🔍">Trigger</h4>
+                        <p>Detecta entrada/salida sin bloquear el movimiento. No es físico.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Zonas de detección, power-ups, checkpoints
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unity-apis">
+                    <h4>APIs de Unity</h4>
+                    <div class="api-grid">
+                        <div class="api-item">Collider2D</div>
+                        <div class="api-item">OnCollisionEnter2D</div>
+                        <div class="api-item">OnTriggerEnter2D</div>
+                        <div class="api-item">isTrigger</div>
+                        <div class="api-item">bounds</div>
+                        <div class="api-item">ClosestPoint()</div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <button class="demo-button" onclick="animateCollision(this)">💥 Ver Colisión</button>
+                </div>
+            </div>
+
+            <!-- JOINTS -->
+            <div class="category-section joints-cat">
+                <div class="category-header">
+                    <div class="category-icon">🔗</div>
+                    <h2 class="category-title">Joints</h2>
+                    <p class="category-subtitle">Conexiones que unen objetos con diferentes comportamientos</p>
+                </div>
+
+                <div class="visual-demo">
+                    <div class="demo-title">⛓️ Conexiones Físicas</div>
+                    <div class="demo-area" style="background: linear-gradient(45deg, #f39c12, #e67e22); position: relative;">
+                        <div style="position: absolute; left: 25%; top: 30%; width: 15px; height: 15px; background: white; border-radius: 50%;"></div>
+                        <div style="position: absolute; left: 75%; top: 70%; width: 15px; height: 15px; background: white; border-radius: 50%;"></div>
+                        <div style="position: absolute; left: 25%; top: 30%; width: 50%; height: 3px; background: white; transform-origin: left; transform: rotate(25deg);"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #7f8c8d;">
+                        Objetos conectados que mantienen relaciones específicas
+                    </p>
+                </div>
+
+                <div class="physics-grid">
+                    <div class="physics-item">
+                        <h4 data-icon="📍">FixedJoint2D</h4>
+                        <p>Une dos objetos como si fueran uno solo. Conexión completamente rígida.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Partes de un objeto, elementos que no se separan
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="📏">DistanceJoint2D</h4>
+                        <p>Mantiene dos objetos a una distancia específica, como conectados por una cuerda.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Cuerdas, cadenas, objetos colgantes
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                        <h4 data-icon="🔄">HingeJoint2D</h4>
+                        <p>Permite rotación alrededor de un punto, como una bisagra o puerta.</p>
+                        <div class="use-case">
+                            <strong>Ideal para:</strong>
+                            Puertas, péndulos, ruedas
+                        </div>
+                    </div>
+
+                    <div class="physics-item">
+                
