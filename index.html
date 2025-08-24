@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -23,98 +23,311 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .search-container {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #007bff;
+        }
+        .folder-section {
+            margin-bottom: 30px;
+        }
+        .folder-title {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            margin: 0;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .folder-title:hover {
+            background-color: #0056b3;
+        }
+        .folder-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+        .folder-content {
+            border: 2px solid #007bff;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            padding: 0;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .folder-content.collapsed {
+            max-height: 0;
+            border: none;
+        }
+        .folder-title.collapsed .folder-icon {
+            transform: rotate(-90deg);
+        }
         .file-list {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         .file-item {
-            margin: 10px 0;
-            padding: 15px;
+            margin: 0;
+            padding: 15px 20px;
             background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            border-radius: 4px;
+            border-bottom: 1px solid #e9ecef;
             transition: all 0.3s ease;
+        }
+        .file-item:last-child {
+            border-bottom: none;
         }
         .file-item:hover {
             background-color: #e9ecef;
             transform: translateX(5px);
+        }
+        .file-item.hidden {
+            display: none;
         }
         .file-link {
             text-decoration: none;
             color: #007bff;
             font-weight: 500;
             font-size: 16px;
+            display: block;
         }
         .file-link:hover {
             color: #0056b3;
+        }
+        .file-path {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
         }
         .loading {
             text-align: center;
             color: #666;
             font-style: italic;
         }
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📚 Documentación Wiki - Índice</h1>
-        <ul class="file-list" id="fileList">
-            <li class="loading">Cargando archivos...</li>
-        </ul>
+        
+        <div class="search-container">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="🔍 Buscar documentos..."
+            >
+        </div>
+        
+        <div id="contentArea">
+            <div class="loading">Cargando archivos...</div>
+        </div>
+        
+        <div class="no-results" id="noResults">
+            No se encontraron documentos que coincidan con la búsqueda
+        </div>
     </div>
 
     <script>
+        let allFiles = [];
+        let foldersData = {};
+
         async function loadHtmlFiles() {
-            const fileList = document.getElementById('fileList');
+            const contentArea = document.getElementById('contentArea');
             
             try {
                 // Intentar cargar el archivo files.json generado por el script
                 const response = await fetch('./files.json');
                 if (response.ok) {
-                    const files = await response.json();
-                    displayFiles(files);
+                    const filesData = await response.json();
+                    allFiles = filesData;
+                    organizeByFolders(filesData);
                 } else {
-                    // Si no existe files.json, usar lista estática
-                    const staticFiles = [
-                        "monetizacion_unity_google_play.html",
-                        "terrenos_montanas_snowball_visual.html",
-                        "terrenos_montanas_snowball_visual (1).html",
-                        "terrenos_pendientes_unity2d.html",
-                        "tipos_sprites_unity2d_guia.html",
-                        "videojuegos_2d_categorias.html"
-                    ];
-                    displayFiles(staticFiles);
+                    // Si no existe files.json, usar estructura de carpetas estática
+                    const staticFiles = {
+                        "games": [
+                            "games/monetizacion_unity_google_play.html",
+                            "games/terrenos_montanas_snowball_visual.html",
+                            "games/terrenos_pendientes_unity2d.html",
+                            "games/tipos_sprites_unity2d_guia.html",
+                            "games/videojuegos_2d_categorias.html"
+                        ]
+                    };
+                    allFiles = Object.values(staticFiles).flat();
+                    foldersData = staticFiles;
+                    displayFolders();
                 }
             } catch (error) {
-                fileList.innerHTML = '<li class="file-item">Error al cargar los archivos</li>';
+                contentArea.innerHTML = '<div class="file-item">Error al cargar los archivos</div>';
             }
         }
 
-        function displayFiles(files) {
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '';
+        function organizeByFolders(files) {
+            foldersData = {};
             
-            files.forEach(fileName => {
-                if (fileName === 'index.html') return; // Omitir el index
+            files.forEach(filePath => {
+                if (filePath === 'index.html') return;
                 
-                const li = document.createElement('li');
-                li.className = 'file-item';
-                
-                const title = fileName
-                    .replace('.html', '')
-                    .replace(/_/g, ' ')
-                    .replace(/\b\w/g, l => l.toUpperCase());
-                
-                li.innerHTML = `
-                    <a href="${fileName}" class="file-link" target="_blank">
-                        ${title}
-                    </a>
-                `;
-                
-                fileList.appendChild(li);
+                const parts = filePath.split('/');
+                if (parts.length > 1) {
+                    const folder = parts[0];
+                    if (!foldersData[folder]) {
+                        foldersData[folder] = [];
+                    }
+                    foldersData[folder].push(filePath);
+                } else {
+                    // Archivos en la raíz
+                    if (!foldersData['root']) {
+                        foldersData['root'] = [];
+                    }
+                    foldersData['root'].push(filePath);
+                }
+            });
+            
+            displayFolders();
+        }
+
+        function displayFolders() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '';
+            
+            Object.keys(foldersData).forEach(folderName => {
+                const folderSection = createFolderSection(folderName, foldersData[folderName]);
+                contentArea.appendChild(folderSection);
             });
         }
 
+        function createFolderSection(folderName, files) {
+            const section = document.createElement('div');
+            section.className = 'folder-section';
+            
+            const displayName = folderName === 'root' ? '📁 Archivos Principales' : `📁 ${folderName.charAt(0).toUpperCase() + folderName.slice(1)}`;
+            
+            const title = document.createElement('h3');
+            title.className = 'folder-title';
+            title.innerHTML = `
+                <span>${displayName}</span>
+                <span class="folder-icon">▼</span>
+            `;
+            
+            const content = document.createElement('div');
+            content.className = 'folder-content';
+            
+            const fileList = document.createElement('ul');
+            fileList.className = 'file-list';
+            
+            files.forEach(filePath => {
+                const li = createFileItem(filePath);
+                fileList.appendChild(li);
+            });
+            
+            content.appendChild(fileList);
+            section.appendChild(title);
+            section.appendChild(content);
+            
+            // Agregar funcionalidad de colapso
+            title.addEventListener('click', () => {
+                content.classList.toggle('collapsed');
+                title.classList.toggle('collapsed');
+            });
+            
+            return section;
+        }
+
+        function createFileItem(filePath) {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+            
+            const fileName = filePath.split('/').pop();
+            const title = fileName
+                .replace('.html', '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+            
+            li.innerHTML = `
+                <a href="${filePath}" class="file-link" target="_blank">
+                    ${title}
+                </a>
+                <div class="file-path">${filePath}</div>
+            `;
+            
+            li.dataset.filename = fileName.toLowerCase();
+            li.dataset.title = title.toLowerCase();
+            li.dataset.path = filePath.toLowerCase();
+            
+            return li;
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const fileItems = document.querySelectorAll('.file-item');
+            const folderSections = document.querySelectorAll('.folder-section');
+            const noResults = document.getElementById('noResults');
+            
+            let hasResults = false;
+            
+            if (searchTerm.trim() === '') {
+                // Mostrar todo si no hay búsqueda
+                fileItems.forEach(item => item.classList.remove('hidden'));
+                folderSections.forEach(section => section.style.display = 'block');
+                noResults.style.display = 'none';
+                return;
+            }
+            
+            folderSections.forEach(section => {
+                let hasVisibleItems = false;
+                const items = section.querySelectorAll('.file-item');
+                
+                items.forEach(item => {
+                    const filename = item.dataset.filename || '';
+                    const title = item.dataset.title || '';
+                    const path = item.dataset.path || '';
+                    
+                    if (filename.includes(searchTerm) || 
+                        title.includes(searchTerm) || 
+                        path.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        hasVisibleItems = true;
+                        hasResults = true;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+                
+                section.style.display = hasVisibleItems ? 'block' : 'none';
+            });
+            
+            noResults.style.display = hasResults ? 'none' : 'block';
+        }
+
+        // Configurar búsqueda
+        document.getElementById('searchInput').addEventListener('input', performSearch);
+
+        // Cargar archivos al cargar la página
         document.addEventListener('DOMContentLoaded', loadHtmlFiles);
     </script>
 </body>
