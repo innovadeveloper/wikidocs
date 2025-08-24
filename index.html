@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Wiki - Índice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        .file-item {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .file-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        .file-link {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .file-link:hover {
+            color: #0056b3;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Documentación Wiki - Índice</h1>
+        <ul class="file-list" id="fileList">
+            <li class="loading">Cargando archivos...</li>
+        </ul>
+    </div>
+
+    <script>
+        async function loadHtmlFiles() {
+            const fileList = document.getElementById('fileList');
+            
+            try {
+                // Intentar cargar el archivo files.json generado por el script
+                const response = await fetch('./files.json');
+                if (response.ok) {
+                    const files = await response.json();
+                    displayFiles(files);
+                } else {
+                    // Si no existe files.json, usar lista estática
+                    const staticFiles = [
+                        "monetizacion_unity_google_play.html",
+                        "terrenos_montanas_snowball_visual.html",
+                        "terrenos_montanas_snowball_visual (1).html",
+                        "terrenos_pendientes_unity2d.html",
+                        "tipos_sprites_unity2d_guia.html",
+                        "videojuegos_2d_categorias.html"
+                    ];
+                    displayFiles(staticFiles);
+                }
+            } catch (error) {
+                fileList.innerHTML = '<li class="file-item">Error al cargar los archivos</li>';
+            }
+        }
+
+        function displayFiles(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            files.forEach(fileName => {
+                if (fileName === 'index.html') return; // Omitir el index
+                
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                
+                const title = fileName
+                    .replace('.html', '')
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+                
+                li.innerHTML = `
+                    <a href="${fileName}" class="file-link" target="_blank">
+                        ${title}
+                    </a>
+                `;
+                
+                fileList.appendChild(li);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHtmlFiles);
+    </script>
+</body>
+</html>
