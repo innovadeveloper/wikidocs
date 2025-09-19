@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSIX en Diferentes Plataformas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.4;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .platform-card {
+            border: 2px solid #000000;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .platform-card:hover {
+            box-shadow: 8px 8px 0px #000000;
+            transform: translate(-4px, -4px);
+        }
+
+        .platform-header {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            fill: #ffffff;
+        }
+
+        .platform-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .platform-content {
+            padding: 25px;
+        }
+
+        .posix-layer {
+            background: #f8f8f8;
+            border: 1px solid #000000;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .posix-layer h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .posix-apis {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 0.85rem;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .implementation-details {
+            margin-top: 20px;
+        }
+
+        .implementation-details h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000000;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .detail-item::before {
+            content: "→";
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .differences-section {
+            margin-top: 60px;
+            border-top: 2px solid #000000;
+            padding-top: 40px;
+        }
+
+        .differences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .difference-card {
+            border: 1px solid #000000;
+            background: #ffffff;
+        }
+
+        .difference-header {
+            background: #000000;
+            color: #ffffff;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .difference-content {
+            padding: 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #000000;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #000000;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .legend {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #000000;
+            background: #f8f8f8;
+        }
+
+        .legend h4 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #000000;
+        }
+
+        .status-full { background: #000000; }
+        .status-partial { background: #666666; }
+        .status-modified { background: #ffffff; border: 2px solid #000000; }
+        .status-none { background: #ffffff; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .platforms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .posix-apis {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>POSIX en Diferentes Plataformas</h1>
+            <div class="subtitle">Portable Operating System Interface - Implementaciones y Diferencias</div>
+        </div>
+
+        <div class="platforms-grid">
+            <!-- Linux -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <svg class="platform-icon" viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"/>
+                    </svg>
+                    <div class="platform-name">Linux</div>
+                </div>
+                <div class="platform-content">
+                    <div class="posix-layer">
+                        <h4>POSIX APIs Disponibles</h4>
+                        <div class="posix-apis">
+                            <div>pthread_create()</div>
+                            <div>pthread_mutex_lock()</div>
+                            <div>fork(), exec()</div>
+                            <div>open(), read(), write()</div>
+                            <div>socket(), bind()</div>
+                            <div>mmap(), munmap()</div>
+                            <div>signal(), sigaction()</div>
+                            <div>sem_open(), sem_wait()</div>
+                        </div>
+                    </div>
+                    <div class="implementation-details">
+                        <h5>Implementación: glibc</h5>
+                        <div class="detail-item">Conformidad POSIX completa (IEEE 1003.1)</div>
+                        <div class="detail-item">Extensiones GNU adicionales</div>
+                        <div class="detail-item">Threading robusto con NPTL</div>
+                        <div class="detail-item">Filesystem POSIX completo</div>
+                        <div class="detail-item">Signals avanzados (real-time)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- macOS -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <svg class="platform-icon" viewBox="0 0 24 24">
+                        <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z"/>
+                    </svg>
+                    <div class="platform-name">macOS</div>
+                </div>
+                <div class="platform-content">
+                    <div class="posix-layer">
+                        <h4>POSIX APIs Disponibles</h4>
+                        <div class="posix-apis">
+                            <div>pthread_create()</div>
+                            <div>pthread_mutex_lock()</div>
+                            <div>fork(), exec()</div>
+                            <div>open(), read(), write()</div>
+                            <div>socket(), bind()</div>
+                            <div>mmap(), munmap()</div>
+                            <div>signal(), sigaction()</div>
+                            <div>dispatch_queue (ext)</div>
+                        </div>
+                    </div>
+                    <div class="implementation-details">
+                        <h5>Implementación: libSystem</h5>
+                        <div class="detail-item">Certificación POSIX oficial (SUSv3)</div>
+                        <div class="detail-item">BSD Unix base (Darwin kernel)</div>
+                        <div class="detail-item">Grand Central Dispatch (GCD)</div>
+                        <div class="detail-item">Mach microkernel underneath</div>
+                        <div class="detail-item">Framework-specific extensions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Android -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <svg class="platform-icon" viewBox="0 0 24 24">
+                        <path d="M17.6,9.48L16.69,8.57C16.3,8.18 15.67,8.18 15.28,8.57C14.89,8.96 14.89,9.59 15.28,9.98L16.19,10.89C16.58,11.28 17.21,11.28 17.6,10.89C17.99,10.5 17.99,9.87 17.6,9.48M6.4,9.48C6.01,9.87 6.01,10.5 6.4,10.89C6.79,11.28 7.42,11.28 7.81,10.89L8.72,9.98C9.11,9.59 9.11,8.96 8.72,8.57C8.33,8.18 7.7,8.18 7.31,8.57L6.4,9.48M12,3C12.39,3 12.75,3.15 13.03,3.42C13.3,3.7 13.45,4.05 13.45,4.45V6.05C13.45,6.45 13.3,6.8 13.03,7.08C12.75,7.35 12.39,7.5 12,7.5C11.61,7.5 11.25,7.35 10.97,7.08C10.7,6.8 10.55,6.45 10.55,6.05V4.45C10.55,4.05 10.7,3.7 10.97,3.42C11.25,3.15 11.61,3 12,3M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17Z"/>
+                    </svg>
+                    <div class="platform-name">Android</div>
+                </div>
+                <div class="platform-content">
+                    <div class="posix-layer">
+                        <h4>POSIX APIs Disponibles</h4>
+                        <div class="posix-apis">
+                            <div>pthread_create()</div>
+                            <div>pthread_mutex_lock()</div>
+                            <div>open(), read(), write()</div>
+                            <div>socket(), bind()</div>
+                            <div>mmap(), munmap()</div>
+                            <div>signal() (limitado)</div>
+                            <div>sem_open() (limitado)</div>
+                            <div>fork() (no disponible)</div>
+                        </div>
+                    </div>
+                    <div class="implementation-details">
+                        <h5>Implementación: Bionic libc</h5>
+                        <div class="detail-item">Subset POSIX optimizado para móviles</div>
+                        <div class="detail-item">No fork() - solo threads</div>
+                        <div class="detail-item">Startup optimizado</div>
+                        <div class="detail-item">Memory footprint reducido</div>
+                        <div class="detail-item">Thread-local storage optimizado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="differences-section">
+            <h2 style="font-size: 2rem; font-weight: 300; margin-bottom: 30px; text-align: center;">Diferencias Clave entre Plataformas</h2>
+            
+            <div class="differences-grid">
+                <div class="difference-card">
+                    <div class="difference-header">Threading & Procesos</div>
+                    <div class="difference-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>Funcionalidad</th>
+                                <th>Linux</th>
+                                <th>macOS</th>
+                                <th>Android</th>
+                            </tr>
+                            <tr>
+                                <td>pthread_create()</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>●</td>
+                            </tr>
+                            <tr>
+                                <td>fork()</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>○</td>
+                            </tr>
+                            <tr>
+                                <td>exec()</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>○</td>
+                            </tr>
+                            <tr>
+                                <td>GCD/Dispatch</td>
+                                <td>○</td>
+                                <td>●</td>
+                                <td>○</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="difference-card">
+                    <div class="difference-header">Signals & IPC</div>
+                    <div class="difference-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>Funcionalidad</th>
+                                <th>Linux</th>
+                                <th>macOS</th>
+                                <th>Android</th>
+                            </tr>
+                            <tr>
+                                <td>signal()</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>◐</td>
+                            </tr>
+                            <tr>
+                                <td>Real-time signals</td>
+                                <td>●</td>
+                                <td>○</td>
+                                <td>○</td>
+                            </tr>
+                            <tr>
+                                <td>POSIX semaphores</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>◐</td>
+                            </tr>
+                            <tr>
+                                <td>Message queues</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>○</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="difference-card">
+                    <div class="difference-header">File System</div>
+                    <div class="difference-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>Funcionalidad</th>
+                                <th>Linux</th>
+                                <th>macOS</th>
+                                <th>Android</th>
+                            </tr>
+                            <tr>
+                                <td>open(), read(), write()</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>●</td>
+                            </tr>
+                            <tr>
+                                <td>POSIX permissions</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>◐</td>
+                            </tr>
+                            <tr>
+                                <td>File locking</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>●</td>
+                            </tr>
+                            <tr>
+                                <td>Extended attributes</td>
+                                <td>●</td>
+                                <td>●</td>
+                                <td>◐</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="difference-card">
+                    <div class="difference-header">Implementación Específica</div>
+                    <div class="difference-content">
+                        <div style="font-size: 0.9rem; line-height: 1.6;">
+                            <strong>Linux (glibc):</strong><br>
+                            → Conformidad POSIX completa<br>
+                            → Extensiones GNU<br>
+                            → NPTL threading<br><br>
+                            
+                            <strong>macOS (libSystem):</strong><br>
+                            → Certificación POSIX oficial<br>
+                            → BSD Unix heritage<br>
+                            → Mach microkernel<br><br>
+                            
+                            <strong>Android (Bionic):</strong><br>
+                            → Subset POSIX<br>
+                            → Mobile-optimized<br>
+                            → No process model
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h4>Leyenda de Compatibilidad</h4>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="status-indicator status-full"></div>
+                    <span>● Soporte completo</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-partial"></div>
+                    <span>◐ Soporte parcial/limitado</span>
+                </div>
+                <div class="legend-item">
+                    <div class="status-indicator status-none"></div>
+                    <span>○ No disponible/no soportado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

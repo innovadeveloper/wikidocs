@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Memoria: malloc y Structs</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            margin: 20px;
+            background: white;
+            color: black;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            border: 1px solid #333;
+            padding: 15px;
+        }
+        
+        .section h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        
+        .memory-block {
+            border: 2px solid #000;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .memory-cell {
+            border: 1px solid #666;
+            display: inline-block;
+            width: 80px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 10px;
+            vertical-align: top;
+        }
+        
+        .memory-cell.header {
+            background: #f0f0f0;
+            font-weight: bold;
+            height: 20px;
+            line-height: 20px;
+        }
+        
+        .memory-cell.address {
+            background: #e0e0e0;
+            height: 20px;
+            line-height: 20px;
+        }
+        
+        .pointer-arrow {
+            font-size: 20px;
+            margin: 0 10px;
+            display: inline-block;
+        }
+        
+        .code-block {
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .stage {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 3px solid #000;
+        }
+        
+        .stage h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        
+        .memory-diagram {
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        
+        .heap-block {
+            border: 2px solid #000;
+            margin: 10px 0;
+            padding: 5px;
+        }
+        
+        .heap-block h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .field-row {
+            display: flex;
+            margin: 2px 0;
+        }
+        
+        .field-name {
+            width: 200px;
+            background: #f0f0f0;
+            border: 1px solid #666;
+            padding: 5px;
+            font-size: 11px;
+        }
+        
+        .field-offset {
+            width: 60px;
+            background: #e0e0e0;
+            border: 1px solid #666;
+            padding: 5px;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        .field-value {
+            width: 120px;
+            border: 1px solid #666;
+            padding: 5px;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .field-size {
+            width: 50px;
+            background: #f5f5f5;
+            border: 1px solid #666;
+            padding: 5px;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        .pointer-target {
+            border: 2px dashed #000;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        
+        .evolution-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .evolution-stage {
+            flex: 1;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+        
+        .evolution-stage h4 {
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #666;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Asignación de Memoria: malloc/g_malloc0 y Structs en C</h1>
+    
+    <div class="section">
+        <h2>1. Momento de la Reserva - g_malloc0()</h2>
+        
+        <div class="code-block">
+typedef struct _RTSPPlayerData {
+    GstElement *main_pipeline;        // 8 bytes (puntero)
+    GMainContext *main_context;       // 8 bytes (puntero)  
+    GMainLoop *main_loop;             // 8 bytes (puntero)
+    pthread_t main_thread;            // 8 bytes
+    // ... más campos
+    gchar *uri;                       // 8 bytes (puntero)
+    gchar *janus_ip;                  // 8 bytes (puntero)
+    gint video_port;                  // 4 bytes (int)
+    gint audio_port;                  // 4 bytes (int)
+    gboolean forwarding_active;       // 4 bytes (bool)
+} RTSPPlayerData;
+
+// Reserva memoria en el heap
+player_data = g_malloc0(sizeof(RTSPPlayerData));  // ~300+ bytes
+        </div>
+        
+        <div class="memory-diagram">
+            <p><strong>Stack (variable local):</strong></p>
+            <div class="memory-block">
+                <div class="memory-cell header">Variable</div>
+                <div class="memory-cell header">Dirección</div>
+                <div class="memory-cell header">Valor</div>
+            </div>
+            <br>
+            <div class="memory-block">
+                <div class="memory-cell">player_data</div>
+                <div class="memory-cell address">0x7fff1234</div>
+                <div class="memory-cell">0x600000abc000</div>
+            </div>
+            
+            <span class="pointer-arrow">→</span>
+            
+            <p><strong>Heap (memoria asignada):</strong></p>
+            <div class="heap-block">
+                <h4>Dirección: 0x600000abc000 - Tamaño: ~300 bytes</h4>
+                <p style="font-size: 11px; margin: 5px 0;">Inicializado con ceros por g_malloc0()</p>
+                <div style="background: #f0f0f0; padding: 10px; text-align: center; border: 1px solid #666;">
+                    [00 00 00 00 00 00 00 00 00 00 00 00 ... 300 bytes de ceros]
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Layout Interno del Struct</h2>
+        
+        <div class="heap-block">
+            <h4>RTSPPlayerData en 0x600000abc000</h4>
+            
+            <div style="display: flex; margin-bottom: 5px;">
+                <div style="width: 200px; background: #ddd; padding: 5px; font-size: 11px; font-weight: bold;">Campo</div>
+                <div style="width: 60px; background: #ddd; padding: 5px; font-size: 11px; font-weight: bold;">Offset</div>
+                <div style="width: 50px; background: #ddd; padding: 5px; font-size: 11px; font-weight: bold;">Bytes</div>
+                <div style="width: 120px; background: #ddd; padding: 5px; font-size: 11px; font-weight: bold;">Valor Inicial</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">main_pipeline</div>
+                <div class="field-offset">+0</div>
+                <div class="field-size">8</div>
+                <div class="field-value">NULL (0x0)</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">main_context</div>
+                <div class="field-offset">+8</div>
+                <div class="field-size">8</div>
+                <div class="field-value">NULL (0x0)</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">main_loop</div>
+                <div class="field-offset">+16</div>
+                <div class="field-size">8</div>
+                <div class="field-value">NULL (0x0)</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">main_thread</div>
+                <div class="field-offset">+24</div>
+                <div class="field-size">8</div>
+                <div class="field-value">0</div>
+            </div>
+            
+            <div style="margin: 10px 0; text-align: center; font-size: 11px; color: #666;">
+                ... [otros campos] ...
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">uri</div>
+                <div class="field-offset">+240</div>
+                <div class="field-size">8</div>
+                <div class="field-value">NULL (0x0)</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">janus_ip</div>
+                <div class="field-offset">+248</div>
+                <div class="field-size">8</div>
+                <div class="field-value">NULL (0x0)</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">video_port</div>
+                <div class="field-offset">+256</div>
+                <div class="field-size">4</div>
+                <div class="field-value">0</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">audio_port</div>
+                <div class="field-offset">+260</div>
+                <div class="field-size">4</div>
+                <div class="field-value">0</div>
+            </div>
+            
+            <div class="field-row">
+                <div class="field-name">forwarding_active</div>
+                <div class="field-offset">+264</div>
+                <div class="field-size">4</div>
+                <div class="field-value">FALSE (0)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Asignación de Valores</h2>
+        
+        <div class="code-block">
+// Asignación directa a un campo primitivo
+player_data->video_port = 5004;
+
+// Asignación con duplicación de string (nuevo bloque de memoria)
+player_data->uri = g_strdup("rtsp://192.168.1.100:554/stream");
+player_data->janus_ip = g_strdup("192.168.1.200");
+        </div>
+        
+        <div class="stage">
+            <h3>Resultado después de las asignaciones:</h3>
+            
+            <div class="heap-block">
+                <h4>RTSPPlayerData en 0x600000abc000</h4>
+                
+                <div class="field-row">
+                    <div class="field-name">video_port</div>
+                    <div class="field-offset">+256</div>
+                    <div class="field-size">4</div>
+                    <div class="field-value" style="background: #ffffcc;">5004</div>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-name">uri</div>
+                    <div class="field-offset">+240</div>
+                    <div class="field-size">8</div>
+                    <div class="field-value" style="background: #ffffcc;">0x600000def000</div>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-name">janus_ip</div>
+                    <div class="field-offset">+248</div>
+                    <div class="field-size">8</div>
+                    <div class="field-value" style="background: #ffffcc;">0x600000def100</div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <span class="pointer-arrow">↓</span>
+            </div>
+            
+            <div class="pointer-target">
+                <h4>Memoria apuntada por uri (0x600000def000):</h4>
+                <div style="font-family: monospace; background: #f8f8f8; padding: 10px; border: 1px solid #ccc;">
+                    ['r']['t']['s']['p'][':']['/'']['/']['1']['9']['2']['.']['1']['6']['8']['.']['1']['.']['1']['0']['0'][':']['5']['5']['4']['/']['s']['t']['r']['e']['a']['m']['\0']
+                    <br><span style="font-size: 10px; color: #666;">32 bytes total</span>
+                </div>
+            </div>
+            
+            <div class="pointer-target">
+                <h4>Memoria apuntada por janus_ip (0x600000def100):</h4>
+                <div style="font-family: monospace; background: #f8f8f8; padding: 10px; border: 1px solid #ccc;">
+                    ['1']['9']['2']['.']['1']['6']['8']['.']['1']['.']['2']['0']['0']['\0']
+                    <br><span style="font-size: 10px; color: #666;">14 bytes total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>4. Representación Visual Completa</h2>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="border: 2px solid #000; display: inline-block; padding: 10px; margin: 10px;">
+                <div><strong>STACK</strong></div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px;">
+                    player_data<br>
+                    <small>0x600000abc000</small>
+                </div>
+            </div>
+            
+            <span class="pointer-arrow">→</span>
+            
+            <div style="border: 2px solid #000; display: inline-block; padding: 10px; margin: 10px; vertical-align: top;">
+                <div><strong>HEAP - Struct Principal</strong></div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 10px;">0x600000abc000</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px;">main_pipeline: NULL</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px;">main_context: NULL</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px;">...</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px; background: #ffffcc;">uri: 0x600000def000 →</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px; background: #ffffcc;">janus_ip: 0x600000def100 →</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px; background: #ffffcc;">video_port: 5004</div>
+                <div style="border: 1px solid #666; padding: 2px; margin: 1px; font-size: 9px;">audio_port: 0</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="border: 2px dashed #000; display: inline-block; padding: 10px; margin: 10px;">
+                <div><strong>HEAP - String 1</strong></div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px; font-size: 10px;">
+                    0x600000def000<br>
+                    "rtsp://192.168.1.100:554/stream"
+                </div>
+            </div>
+            
+            <div style="border: 2px dashed #000; display: inline-block; padding: 10px; margin: 10px;">
+                <div><strong>HEAP - String 2</strong></div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px; font-size: 10px;">
+                    0x600000def100<br>
+                    "192.168.1.200"
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>5. Evolución en Runtime</h2>
+        
+        <div class="evolution-container">
+            <div class="evolution-stage">
+                <h4>ANTES: Inicialización</h4>
+                <div class="code-block" style="font-size: 10px;">
+player_data = g_malloc0(sizeof(RTSPPlayerData));
+                </div>
+                <div style="font-size: 11px;">
+                    <div>• Bloque de ~300 bytes asignado</div>
+                    <div>• Todos los bytes = 0</div>
+                    <div>• Todos los punteros = NULL</div>
+                    <div>• Todos los enteros = 0</div>
+                    <div>• Booleanos = FALSE</div>
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px; font-size: 10px; text-align: center;">
+                    [300 bytes de ceros]
+                </div>
+            </div>
+            
+            <div class="evolution-stage">
+                <h4>DURANTE: Asignaciones</h4>
+                <div class="code-block" style="font-size: 10px;">
+player_data->video_port = 5004;
+player_data->uri = g_strdup("...");
+player_data->janus_ip = g_strdup("...");
+                </div>
+                <div style="font-size: 11px;">
+                    <div>• Se escriben valores específicos</div>
+                    <div>• Se asignan nuevos bloques de memoria</div>
+                    <div>• Los punteros apuntan a direcciones válidas</div>
+                    <div>• Datos primitivos se almacenan directamente</div>
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px; font-size: 9px;">
+                    <div>uri → 0x600000def000</div>
+                    <div>janus_ip → 0x600000def100</div>
+                    <div>video_port = 5004</div>
+                    <div>resto = 0</div>
+                </div>
+            </div>
+            
+            <div class="evolution-stage">
+                <h4>DESPUÉS: Memoria Completa</h4>
+                <div class="code-block" style="font-size: 10px;">
+// Estructura completa en memoria
+// con múltiples bloques conectados
+                </div>
+                <div style="font-size: 11px;">
+                    <div>• Struct principal: 1 bloque</div>
+                    <div>• Strings: 2 bloques adicionales</div>
+                    <div>• Total: 3 bloques en heap</div>
+                    <div>• Conexiones via punteros</div>
+                    <div>• Acceso O(1) a todos los campos</div>
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 5px; font-size: 9px;">
+                    <div>Struct ← player_data</div>
+                    <div>String1 ← uri</div>
+                    <div>String2 ← janus_ip</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Puntos Clave</h2>
+        <div style="font-size: 14px; padding: 10px;">
+            <p><strong>1. Un puntero es solo una dirección:</strong> player_data contiene 0x600000abc000, no los datos en sí.</p>
+            
+            <p><strong>2. Los offsets son fijos:</strong> video_port siempre está en +256 bytes desde la base del struct.</p>
+            
+            <p><strong>3. Los strings necesitan memoria adicional:</strong> g_strdup() crea nuevos bloques, player_data->uri solo guarda la dirección.</p>
+            
+            <p><strong>4. g_malloc0() vs malloc():</strong> g_malloc0() inicializa todo a cero, malloc() deja basura.</p>
+            
+            <p><strong>5. Acceso directo:</strong> player_data->video_port se traduce a *(base_address + 256).</p>
+        </div>
+    </div>
+</body>
+</html>

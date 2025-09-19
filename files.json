@@ -1,8 +1,13 @@
 [
+  "cpp/glib_callbacks_thread_principal_secundario.html",
+  "cpp/jni_thread_principal_nativo.html",
+  "cpp/memory_allocation_asignacion_memoria.html",
   "games/fisica_2d_unity_guia_completa.html",
   "games/monetizacion_unity_google_play.html",
   "games/terrenos_montanas_snowball_visual.html",
   "games/terrenos_pendientes_unity2d.html",
   "games/tipos_sprites_unity2d_guia.html",
-  "games/videojuegos_2d_categorias.html"
+  "games/videojuegos_2d_categorias.html",
+  "posix/posix_platforms_comparison.html",
+  "posix/unix_posix_history.html"
 ]

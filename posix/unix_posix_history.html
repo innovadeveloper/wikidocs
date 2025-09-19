@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia de Unix y POSIX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 3px solid #000000;
+            padding-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 300;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            border-left: 5px solid #000000;
+            padding-left: 20px;
+        }
+
+        .unix-definition {
+            background: #f8f8f8;
+            border: 2px solid #000000;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .unix-definition h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .definition-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .point-item {
+            display: flex;
+            align-items: flex-start;
+            font-size: 1rem;
+        }
+
+        .point-item::before {
+            content: "•";
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .timeline {
+            border: 2px solid #000000;
+            background: #ffffff;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .timeline h3 {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timeline-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .timeline-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border: 1px solid #000000;
+            background: #ffffff;
+        }
+
+        .timeline-year {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timeline-event {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .unix-family {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .original-unix {
+            border: 3px solid #000000;
+            background: #000000;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .original-unix h4 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .original-unix p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .unix-derivatives {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .derivative-item {
+            border: 1px solid #000000;
+            padding: 20px;
+            text-align: center;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .derivative-item:hover {
+            background: #f8f8f8;
+            transform: translate(-2px, -2px);
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .derivative-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .derivative-vendor {
+            font-size: 0.9rem;
+            color: #666666;
+        }
+
+        .problem-section {
+            background: #ffffff;
+            border: 2px solid #000000;
+            margin-bottom: 40px;
+        }
+
+        .problem-header {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .problem-content {
+            padding: 30px;
+        }
+
+        .api-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .api-example {
+            border: 1px solid #000000;
+            background: #f8f8f8;
+        }
+
+        .api-header {
+            background: #000000;
+            color: #ffffff;
+            padding: 15px;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
+        }
+
+        .api-code {
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .architecture-comparison {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .architecture-diagram {
+            border: 2px solid #000000;
+            background: #ffffff;
+        }
+
+        .diagram-title {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .diagram-content {
+            padding: 30px;
+        }
+
+        .layer-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .layer {
+            border: 2px solid #000000;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .layer.app {
+            background: #f0f0f0;
+        }
+
+        .layer.api {
+            background: #e0e0e0;
+        }
+
+        .layer.impl {
+            background: #d0d0d0;
+        }
+
+        .layer.kernel {
+            background: #c0c0c0;
+        }
+
+        .multi-stack {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stack-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .problems-list {
+            background: #f8f8f8;
+            border: 1px solid #000000;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .problems-list h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .problems-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .problems-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .problems-list li::before {
+            content: "×";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .benefits-list {
+            background: #f8f8f8;
+            border: 1px solid #000000;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .benefits-list h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .benefits-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .benefits-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .posix-solution {
+            background: #f8f8f8;
+            border: 2px solid #000000;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .posix-solution h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .posix-explanation {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .posix-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .benefit-item {
+            background: #ffffff;
+            border: 1px solid #000000;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .benefit-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .benefit-item span {
+            font-size: 0.8rem;
+            color: #666666;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .unix-family {
+                grid-template-columns: 1fr;
+            }
+            
+            .multi-stack {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Historia de Unix y POSIX</h1>
+            <div class="subtitle">De la Fragmentación al Estándar Universal</div>
+        </div>
+
+        <div class="section">
+            <div class="unix-definition">
+                <h3>¿Qué es Unix?</h3>
+                <div class="definition-content">
+                    <strong>Unix</strong> no es un solo sistema operativo, sino una <strong>familia de sistemas operativos</strong> que comparten una filosofía de diseño y una API común en lo esencial.
+                </div>
+                <div class="key-points">
+                    <div class="point-item">Nació en los laboratorios <strong>Bell Labs (AT&T)</strong> en los años 70</div>
+                    <div class="point-item">Diseñado para ser <strong>multitarea</strong> (varios procesos a la vez)</div>
+                    <div class="point-item">Diseñado para ser <strong>multiusuario</strong> (varias personas usando el sistema)</div>
+                    <div class="point-item">De Unix derivaron <strong>Linux, macOS, BSD, AIX, HP-UX, Solaris, Android</strong></div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3>Línea de Tiempo Unix</h3>
+                <div class="timeline-content">
+                    <div class="timeline-item">
+                        <div class="timeline-year">1970</div>
+                        <div class="timeline-event">Unix original<br>Bell Labs</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">1977</div>
+                        <div class="timeline-event">BSD Unix<br>Berkeley</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">1983</div>
+                        <div class="timeline-event">System V<br>AT&T</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">1988</div>
+                        <div class="timeline-event">POSIX<br>Estándar IEEE</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">1991</div>
+                        <div class="timeline-event">Linux<br>Linus Torvalds</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="unix-family">
+                <div class="original-unix">
+                    <h4>Unix Original</h4>
+                    <p>Bell Labs (AT&T)<br>Años 1970s<br><br>El "abuelo" de todos los sistemas Unix modernos</p>
+                </div>
+                
+                <div class="unix-derivatives">
+                    <div class="derivative-item">
+                        <div class="derivative-name">IBM AIX</div>
+                        <div class="derivative-vendor">IBM</div>
+                    </div>
+                    <div class="derivative-item">
+                        <div class="derivative-name">Sun Solaris</div>
+                        <div class="derivative-vendor">Sun Microsystems</div>
+                    </div>
+                    <div class="derivative-item">
+                        <div class="derivative-name">HP-UX</div>
+                        <div class="derivative-vendor">Hewlett-Packard</div>
+                    </div>
+                    <div class="derivative-item">
+                        <div class="derivative-name">BSD Unix</div>
+                        <div class="derivative-vendor">Berkeley</div>
+                    </div>
+                    <div class="derivative-item">
+                        <div class="derivative-name">macOS</div>
+                        <div class="derivative-vendor">Apple (BSD-based)</div>
+                    </div>
+                    <div class="derivative-item">
+                        <div class="derivative-name">Linux</div>
+                        <div class="derivative-vendor">Unix-like</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="problem-section">
+                <div class="problem-header">🔹 ¿Por qué "cada Unix tenía APIs diferentes"?</div>
+                <div class="problem-content">
+                    <p style="font-size: 1.1rem; margin-bottom: 20px;">
+                        Aunque todos eran "Unix" o "Unix-like", <strong>cada fabricante</strong> (IBM, HP, Sun, Apple, etc.) fue creando <strong>su propia versión de Unix</strong>.
+                    </p>
+                    
+                    <p style="margin-bottom: 20px;">
+                        Cada uno tenía el <strong>mismo núcleo de ideas</strong> (procesos, archivos, permisos, etc.), pero exponían sus <strong>propias APIs para operaciones básicas</strong> como:
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <div style="text-align: center; padding: 15px; border: 1px solid #000; background: #f8f8f8;">
+                            <strong>Manejo de procesos</strong><br>
+                            <code>fork, exec, wait</code>
+                        </div>
+                        <div style="text-align: center; padding: 15px; border: 1px solid #000; background: #f8f8f8;">
+                            <strong>Manejo de redes</strong><br>
+                            <code>socket, bind, listen</code>
+                        </div>
+                        <div style="text-align: center; padding: 15px; border: 1px solid #000; background: #f8f8f8;">
+                            <strong>Señales</strong><br>
+                            <code>kill, signal</code>
+                        </div>
+                        <div style="text-align: center; padding: 15px; border: 1px solid #000; background: #f8f8f8;">
+                            <strong>Entrada/Salida</strong><br>
+                            <code>read, write</code>
+                        </div>
+                    </div>
+
+                    <p style="background: #f0f0f0; padding: 15px; border: 1px solid #000; margin: 20px 0;">
+                        <strong>Resultado:</strong> Un programa escrito para Solaris podía no compilar en AIX, aunque ambos fueran "Unix".
+                    </p>
+                </div>
+            </div>
+
+            <div class="api-examples">
+                <div class="api-example">
+                    <div class="api-header">System V (AT&T)</div>
+                    <div class="api-code">#include &lt;fcntl.h&gt;
+int fd = open("/etc/passwd", O_RDONLY);
+if (fd == -1) {
+    perror("open failed");
+}</div>
+                </div>
+                
+                <div class="api-example">
+                    <div class="api-header">BSD Unix (Berkeley)</div>
+                    <div class="api-code">#include &lt;sys/file.h&gt;
+int fd = open("/etc/passwd", O_RDONLY, 0);
+if (fd &lt; 0) {
+    fprintf(stderr, "Cannot open file\n");
+}</div>
+                </div>
+                
+                <div class="api-example">
+                    <div class="api-header">XENIX (Microsoft)</div>
+                    <div class="api-code">#include &lt;xenix.h&gt;
+int fd = xopen("/etc/passwd", X_READ);
+if (fd == XERR) {
+    xerror("File open failed");
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Arquitectura Pre-POSIX: El Caos</h2>
+            
+            <div class="architecture-diagram">
+                <div class="diagram-title">Antes de POSIX (1980s)</div>
+                <div class="diagram-content">
+                    <div class="multi-stack">
+                        <div class="stack-item">
+                            <div class="layer app">Application<br>(System V)</div>
+                            <div class="layer api">#ifdef SYSV<br>sysv_calls()<br>#endif</div>
+                            <div class="layer impl">System V API</div>
+                            <div class="layer kernel">System V Kernel</div>
+                        </div>
+                        
+                        <div class="stack-item">
+                            <div class="layer app">Application<br>(BSD)</div>
+                            <div class="layer api">#ifdef BSD<br>bsd_calls()<br>#endif</div>
+                            <div class="layer impl">BSD API</div>
+                            <div class="layer kernel">BSD Kernel</div>
+                        </div>
+                        
+                        <div class="stack-item">
+                            <div class="layer app">Application<br>(XENIX)</div>
+                            <div class="layer api">#ifdef XENIX<br>xenix_calls()<br>#endif</div>
+                            <div class="layer impl">XENIX API</div>
+                            <div class="layer kernel">XENIX Kernel</div>
+                        </div>
+                    </div>
+                    
+                    <div class="problems-list">
+                        <h5>Problemas:</h5>
+                        <ul>
+                            <li>Código lleno de #ifdefs</li>
+                            <li>Testing en múltiples plataformas</li>
+                            <li>Mantenimiento complicado</li>
+                            <li>Bugs específicos por plataforma</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="posix-solution">
+                <h3>🔹 La solución: POSIX</h3>
+                <div class="posix-explanation">
+                    Para resolver el caos, en los 80s se creó <strong>POSIX</strong> (<em>Portable Operating System Interface</em>), un estándar que definía <strong>una API común para sistemas tipo Unix</strong>.
+                </div>
+                
+                <div class="posix-benefits">
+                    <div class="benefit-item">
+                        <strong>Código Portable</strong>
+                        <span>El mismo código en C compilable en Linux, macOS, BSD, etc.</span>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>APIs Estándar</strong>
+                        <span>pthread_create, fork, open, read, write son parte de POSIX</span>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>Reducción de Costos</strong>
+                        <span>Menos tiempo de desarrollo y testing</span>
+                    </div>
+                    <div class="benefit-item">
+                        <strong>Mantenimiento Simple</strong>
+                        <span>Un solo código base para múltiples plataformas</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 40px;">Arquitectura Post-POSIX: Orden Universal</h2>
+            
+            <div class="architecture-diagram">
+                <div class="diagram-title">Después de POSIX (1990s+)</div>
+                <div class="diagram-content">
+                    <div class="layer-stack">
+                        <div class="layer app">Application<br>(Código portable universal)</div>
+                        <div class="layer api">POSIX API<br>pthread_create(), open(), read(), write(), sigaction()</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div class="layer impl">Linux<br>(glibc)</div>
+                            <div class="layer impl">macOS<br>(libSystem)</div>
+                            <div class="layer impl">Solaris<br>(libc)</div>
+                            <div class="layer impl">AIX<br>(libc)</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div class="layer kernel">Linux Kernel</div>
+                            <div class="layer kernel">Darwin/XNU</div>
+                            <div class="layer kernel">Solaris Kernel</div>
+                            <div class="layer kernel">AIX Kernel</div>
+                        </div>
+                    </div>
+                    
+                    <div class="benefits-list">
+                        <h5>Beneficios:</h5>
+                        <ul>
+                            <li>Código limpio sin #ifdefs</li>
+                            <li>Write once, run everywhere</li>
+                            <li>Testing simplificado</li>
+                            <li>Mantenimiento centralizado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔹 Diferencia clave</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="border: 2px solid #000; padding: 20px; background: #f8f8f8;">
+                    <h4 style="margin-bottom: 15px; font-weight: 600;">Unix original (AT&T Unix)</h4>
+                    <p>El "abuelo" de todos los sistemas Unix modernos</p>
+                </div>
+                
+                <div style="border: 2px solid #000; padding: 20px; background: #f8f8f8;">
+                    <h4 style="margin-bottom: 15px; font-weight: 600;">Unix comerciales</h4>
+                    <p>AIX, HP-UX, Solaris, etc. - "hijos modificados" del original</p>
+                </div>
+                
+                <div style="border: 2px solid #000; padding: 20px; background: #f8f8f8;">
+                    <h4 style="margin-bottom: 15px; font-weight: 600;">Unix-like</h4>
+                    <p>Linux, BSD, macOS - no son "Unix certificados" pero se comportan igual</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

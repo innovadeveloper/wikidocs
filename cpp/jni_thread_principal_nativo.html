@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads en JNI: Principal vs Nativo</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            margin: 20px;
+            background: white;
+            color: black;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #333;
+            padding: 15px;
+        }
+        
+        .section h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        
+        .code-block {
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            overflow-x: auto;
+        }
+        
+        .java-code {
+            border-left: 3px solid #d73027;
+        }
+        
+        .c-code {
+            border-left: 3px solid #1a9850;
+        }
+        
+        .flow-diagram {
+            border: 2px solid #000;
+            margin: 15px 0;
+            padding: 15px;
+        }
+        
+        .flow-step {
+            border: 1px solid #666;
+            margin: 10px 0;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .flow-step h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            background: #f0f0f0;
+            padding: 5px;
+            text-align: center;
+        }
+        
+        .thread-box {
+            border: 2px solid #000;
+            margin: 10px;
+            padding: 15px;
+            display: inline-block;
+            vertical-align: top;
+            width: 300px;
+        }
+        
+        .thread-box h3 {
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-size: 16px;
+            border-bottom: 1px solid #666;
+            padding-bottom: 5px;
+        }
+        
+        .main-thread {
+            background: #f0f8ff;
+        }
+        
+        .native-thread {
+            background: #fff8f0;
+        }
+        
+        .arrow {
+            font-size: 20px;
+            margin: 0 10px;
+            display: inline-block;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        
+        .comparison-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            border: 2px solid #000;
+            background: #fff;
+            padding: 15px;
+            margin: 15px 0;
+            border-style: dashed;
+        }
+        
+        .warning-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .sequence-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 20px 0;
+        }
+        
+        .sequence-column {
+            width: 30%;
+            border: 1px solid #666;
+            padding: 10px;
+        }
+        
+        .sequence-column h4 {
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-size: 12px;
+            background: #f0f0f0;
+            padding: 5px;
+        }
+        
+        .sequence-step {
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin: 5px 0;
+            font-size: 10px;
+        }
+        
+        .highlight {
+            background: #ffffcc;
+            font-weight: bold;
+        }
+        
+        .error {
+            background: #ffcccc;
+            color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tipos de Threads en JNI: Principal vs Nativo</h1>
+    
+    <div class="section">
+        <h2>1. Código Java (MyActivity)</h2>
+        
+        <div class="code-block java-code">
+<strong>// MyActivity.java</strong>
+public class MyActivity extends Activity {
+    static {
+        // 1. Carga la librería nativa (dispara JNI_OnLoad)
+        System.loadLibrary("mynative");
+    }
+
+    // 2. Método nativo declarado
+    private native void startNativeWork();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        // 3. Llamada desde UI thread → ya está attached
+        startNativeWork();
+    }
+
+    // 4. Método Java que será invocado desde C
+    public void showMessage(String msg) {
+        runOnUiThread(() -> {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
+    }
+}
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Código C (Librería Nativa)</h2>
+        
+        <div class="code-block c-code">
+<strong>// Variables globales para JNI</strong>
+static JavaVM *g_jvm = NULL;           // Referencia al JVM
+static pthread_t g_main_thread;        // ID del thread principal
+static jobject g_activity_ref;         // Referencia global a la Activity
+
+<strong>// 1. Se ejecuta automáticamente al cargar la librería</strong>
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+    g_jvm = vm;  // ¡CRÍTICO! Guardar JVM para threads nativos
+    return JNI_VERSION_1_6;
+}
+
+<strong>// 2. Función del thread nativo (necesita attach)</strong>
+void* native_worker(void* arg) {
+    JNIEnv *env;
+    
+    // ¡OBLIGATORIO! Attach thread nativo al JVM
+    (*g_jvm)->AttachCurrentThread(g_jvm, &env, NULL);
+    
+    // Ahora podemos usar JNI normalmente
+    jclass cls = (*env)->GetObjectClass(env, g_activity_ref);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "showMessage", 
+                                        "(Ljava/lang/String;)V");
+    
+    jstring msg = (*env)->NewStringUTF(env, "Hola desde thread NATIVO!");
+    (*env)->CallVoidMethod(env, g_activity_ref, mid, msg);
+    (*env)->DeleteLocalRef(env, msg);
+    
+    // ¡OBLIGATORIO! Detach antes de terminar
+    (*g_jvm)->DetachCurrentThread(g_jvm);
+    
+    return NULL;
+}
+
+<strong>// 3. Método JNI llamado desde Java (thread principal)</strong>
+JNIEXPORT void JNICALL
+Java_com_example_myapp_MyActivity_startNativeWork(JNIEnv *env, jobject thiz) {
+    
+    // Guardar referencia global para uso en otros threads
+    g_activity_ref = (*env)->NewGlobalRef(env, thiz);
+    g_main_thread = pthread_self();
+    
+    // CASO 1: Llamada desde thread principal (NO necesita attach)
+    jclass cls = (*env)->GetObjectClass(env, thiz);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "showMessage", 
+                                        "(Ljava/lang/String;)V");
+    jstring msg = (*env)->NewStringUTF(env, "Hola desde thread PRINCIPAL!");
+    (*env)->CallVoidMethod(env, thiz, mid, msg);
+    (*env)->DeleteLocalRef(env, msg);
+    
+    // CASO 2: Crear thread nativo (SÍ necesita attach)
+    pthread_t tid;
+    pthread_create(&tid, NULL, native_worker, NULL);
+}
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Flujo de Ejecución</h2>
+        
+        <div class="sequence-diagram">
+            <div class="sequence-column">
+                <h4>LADO JAVA</h4>
+                <div class="sequence-step">1. System.loadLibrary()</div>
+                <div class="sequence-step">2. onCreate()</div>
+                <div class="sequence-step">3. startNativeWork()</div>
+                <div class="sequence-step">8. showMessage() [Main Thread]</div>
+                <div class="sequence-step">12. showMessage() [Native Thread]</div>
+            </div>
+            
+            <div class="sequence-column">
+                <h4>LADO C/JNI</h4>
+                <div class="sequence-step highlight">4. JNI_OnLoad() → guarda g_jvm</div>
+                <div class="sequence-step">5. startNativeWork() ejecuta</div>
+                <div class="sequence-step">6. Llamada directa a Java</div>
+                <div class="sequence-step">7. pthread_create()</div>
+                <div class="sequence-step highlight">9. AttachCurrentThread()</div>
+                <div class="sequence-step">10. Llamada a Java desde thread nativo</div>
+                <div class="sequence-step highlight">11. DetachCurrentThread()</div>
+            </div>
+            
+            <div class="sequence-column">
+                <h4>THREADS</h4>
+                <div class="sequence-step">Main Thread (UI)</div>
+                <div class="sequence-step">Main Thread (UI)</div>
+                <div class="sequence-step">Main Thread (UI)</div>
+                <div class="sequence-step">Main Thread (UI)</div>
+                <div class="sequence-step">Native Thread (pthread)</div>
+                <div class="sequence-step">Native Thread (pthread)</div>
+                <div class="sequence-step">Native Thread (pthread)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>4. Comparación: Thread Principal vs Thread Nativo</h2>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div class="thread-box main-thread">
+                <h3>THREAD PRINCIPAL (UI)</h3>
+                <div style="font-size: 12px;">
+                    <p><strong>Características:</strong></p>
+                    <p>• Creado por Android/JVM</p>
+                    <p>• Ya está attached automáticamente</p>
+                    <p>• Tiene JNIEnv válido</p>
+                    <p>• Es el "thiz" que llega al método JNI</p>
+                    
+                    <p><strong>Uso JNI:</strong></p>
+                    <p>• Usar directamente el JNIEnv recibido</p>
+                    <p>• NO llamar AttachCurrentThread</p>
+                    <p>• NO llamar DetachCurrentThread</p>
+                    
+                    <div class="code-block" style="margin: 10px 0; font-size: 10px;">
+// En método JNI
+JNIEXPORT void JNICALL 
+Java_..._method(JNIEnv *env, jobject thiz) {
+    // ¡Directo! Sin attach
+    jclass cls = (*env)->GetObjectClass(env, thiz);
+    // ... usar JNI normalmente
+}
+                    </div>
+                </div>
+            </div>
+            
+            <span class="arrow">vs</span>
+            
+            <div class="thread-box native-thread">
+                <h3>THREAD NATIVO (pthread)</h3>
+                <div style="font-size: 12px;">
+                    <p><strong>Características:</strong></p>
+                    <p>• Creado con pthread_create()</p>
+                    <p>• NO está attached al JVM</p>
+                    <p>• NO tiene JNIEnv válido</p>
+                    <p>• Necesita referencia global</p>
+                    
+                    <p><strong>Uso JNI:</strong></p>
+                    <p>• OBLIGATORIO: AttachCurrentThread</p>
+                    <p>• Obtener JNIEnv del attach</p>
+                    <p>• OBLIGATORIO: DetachCurrentThread</p>
+                    
+                    <div class="code-block" style="margin: 10px 0; font-size: 10px;">
+// En función de thread nativo
+void* worker(void* arg) {
+    JNIEnv *env;
+    // ¡OBLIGATORIO!
+    (*g_jvm)->AttachCurrentThread(g_jvm, &env, NULL);
+    
+    // Ahora usar JNI
+    jclass cls = (*env)->GetObjectClass(env, g_activity_ref);
+    
+    // ¡OBLIGATORIO!
+    (*g_jvm)->DetachCurrentThread(g_jvm);
+    return NULL;
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <table class="comparison-table">
+            <tr>
+                <th>Aspecto</th>
+                <th>Thread Principal</th>
+                <th>Thread Nativo</th>
+            </tr>
+            <tr>
+                <td>Creación</td>
+                <td>Android/JVM</td>
+                <td>pthread_create()</td>
+            </tr>
+            <tr>
+                <td>Attach al JVM</td>
+                <td>Automático</td>
+                <td>Manual (AttachCurrentThread)</td>
+            </tr>
+            <tr>
+                <td>JNIEnv</td>
+                <td>Parámetro del método JNI</td>
+                <td>Obtenido del AttachCurrentThread</td>
+            </tr>
+            <tr>
+                <td>Referencia objeto</td>
+                <td>"thiz" (local)</td>
+                <td>g_activity_ref (global)</td>
+            </tr>
+            <tr>
+                <td>Limpieza</td>
+                <td>Automática</td>
+                <td>Manual (DetachCurrentThread)</td>
+            </tr>
+            <tr>
+                <td>Riesgo de crash</td>
+                <td>Bajo</td>
+                <td>Alto (si no se hace attach)</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2>5. Conceptos Clave</h2>
+        
+        <div class="flow-step">
+            <h4>JNI_OnLoad - El Punto de Entrada</h4>
+            <p style="font-size: 12px; margin: 5px 0;">
+                • Se ejecuta automáticamente cuando Java carga la librería con System.loadLibrary()<br>
+                • Es el momento perfecto para guardar la referencia al JavaVM en g_jvm<br>
+                • Sin esta referencia, los threads nativos no pueden usar JNI<br>
+                • Solo se ejecuta UNA vez por proceso
+            </p>
+        </div>
+        
+        <div class="flow-step">
+            <h4>Referencias Locales vs Globales</h4>
+            <p style="font-size: 12px; margin: 5px 0;">
+                • "thiz" es una referencia LOCAL válida solo en el método JNI actual<br>
+                • g_activity_ref es una referencia GLOBAL válida desde cualquier thread<br>
+                • NewGlobalRef() crea una referencia que sobrevive al método JNI<br>
+                • Las referencias globales deben liberarse con DeleteGlobalRef()
+            </p>
+        </div>
+        
+        <div class="flow-step">
+            <h4>Attach/Detach - ¿Por qué es necesario?</h4>
+            <p style="font-size: 12px; margin: 5px 0;">
+                • El JVM solo conoce threads que él creó (main thread)<br>
+                • Los threads nativos son "extraños" para el JVM<br>
+                • AttachCurrentThread() registra el thread en el JVM y proporciona JNIEnv<br>
+                • DetachCurrentThread() limpia recursos y desregistra el thread
+            </p>
+        </div>
+        
+        <div class="warning-box">
+            <h4>⚠️ ERROR COMÚN: JNI sin Attach</h4>
+            <div class="code-block error" style="font-size: 11px;">
+// ❌ ESTO CAUSA CRASH
+void* bad_worker(void* arg) {
+    // NO hay AttachCurrentThread!
+    JNIEnv *env = NULL;  // ¿De dónde sale env?
+    
+    // ¡CRASH! env es NULL o basura
+    jclass cls = (*env)->GetObjectClass(env, g_activity_ref);
+    
+    return NULL;
+}
+            </div>
+            <p style="font-size: 12px; margin: 10px 0;">
+                <strong>Resultado:</strong> Segmentation fault, JNI DETECTED ERROR, o comportamiento indefinido.<br>
+                <strong>Solución:</strong> Siempre hacer AttachCurrentThread antes de usar JNI en threads nativos.
+            </p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>6. Diagrama de Memoria y Referencias</h2>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="border: 2px solid #000; display: inline-block; padding: 15px; margin: 10px;">
+                <h4>HEAP JAVA</h4>
+                <div style="border: 1px solid #666; padding: 10px; margin: 5px;">
+                    <strong>MyActivity Object</strong><br>
+                    <small>Dirección: 0x7f8a2000</small>
+                </div>
+            </div>
+            
+            <span class="arrow">↗</span>
+            
+            <div style="border: 2px solid #000; display: inline-block; padding: 15px; margin: 10px;">
+                <h4>MEMORIA NATIVA C</h4>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 11px;">
+                    <strong>g_jvm:</strong> 0x7f8b1000
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 11px;">
+                    <strong>g_activity_ref:</strong> 0x7f8a2000 →
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 11px;">
+                    <strong>g_main_thread:</strong> tid_123
+                </div>
+            </div>
+            
+            <span class="arrow">↙</span>
+            
+            <div style="border: 2px solid #000; display: inline-block; padding: 15px; margin: 10px;">
+                <h4>THREADS</h4>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 11px; background: #f0f8ff;">
+                    <strong>Main Thread (tid_123)</strong><br>
+                    Attached: ✓<br>
+                    JNIEnv: válido
+                </div>
+                <div style="border: 1px solid #666; padding: 5px; margin: 2px; font-size: 11px; background: #fff8f0;">
+                    <strong>Native Thread (tid_456)</strong><br>
+                    Attached: manual<br>
+                    JNIEnv: del attach
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Resumen de Buenas Prácticas</h2>
+        <div style="font-size: 14px; padding: 10px;">
+            <p><strong>1. En JNI_OnLoad:</strong> Siempre guardar JavaVM* en variable global.</p>
+            
+            <p><strong>2. Referencias globales:</strong> Usar NewGlobalRef() para objetos que se usan desde múltiples threads.</p>
+            
+            <p><strong>3. Thread principal:</strong> Usar directamente el JNIEnv recibido, no hacer attach/detach.</p>
+            
+            <p><strong>4. Threads nativos:</strong> SIEMPRE AttachCurrentThread antes de usar JNI, SIEMPRE DetachCurrentThread al terminar.</p>
+            
+            <p><strong>5. Gestión de memoria:</strong> Liberar referencias locales con DeleteLocalRef, globales con DeleteGlobalRef.</p>
+        </div>
+    </div>
+</body>
+</html>
