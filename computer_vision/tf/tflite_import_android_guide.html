@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importación TFLite Android</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #000;
+            background: #fff;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            border: 2px solid #000;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        
+        .code-block {
+            background: #f8f8f8;
+            border: 1px solid #000;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .checklist {
+            margin: 15px 0;
+        }
+        
+        .checklist-item {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .checklist-item::before {
+            content: "□";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background: #f0f0f0;
+            border-left: 4px solid #000;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .table th,
+        .table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .flow-diagram {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .flow-step {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 10px 15px;
+            margin: 5px;
+            background: #f8f8f8;
+        }
+        
+        .arrow {
+            font-size: 1.5rem;
+            margin: 0 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>IMPORTACIÓN TFLITE ANDROID</h1>
+        <div class="subtitle">Guía de referencia minimalista</div>
+        <div>Configuración • Parámetros • Consideraciones</div>
+    </div>
+
+    <!-- Flujo principal -->
+    <div class="flow-diagram">
+        <strong>FLUJO DE IMPORTACIÓN</strong><br><br>
+        <div class="flow-step">Modelo .tflite</div>
+        <span class="arrow">→</span>
+        <div class="flow-step">Configurar dependencias</div>
+        <span class="arrow">→</span>
+        <div class="flow-step">Inicializar intérprete</div>
+        <span class="arrow">→</span>
+        <div class="flow-step">Configurar I/O</div>
+        <span class="arrow">→</span>
+        <div class="flow-step">Inferencia</div>
+    </div>
+
+    <div class="container">
+        <!-- Configuración básica -->
+        <div class="section">
+            <div class="section-title">1. Configuración inicial</div>
+            
+            <strong>Dependencias (build.gradle):</strong>
+            <div class="code-block">implementation 'org.tensorflow:tensorflow-lite:2.14.0'
+implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'</div>
+
+            <strong>Estructura básica:</strong>
+            <div class="code-block">class TensorFlowLiteDetector(context: Context) {
+    private var interpreter: Interpreter? = null
+    private val inputSize = 320
+    private val outputSize = 84 * 2100
+    
+    fun initialize() {
+        val model = FileUtil.loadMappedFile(
+            context, "modelo.tflite"
+        )
+        interpreter = Interpreter(model)
+    }
+}</div>
+        </div>
+
+        <!-- Parámetros del modelo -->
+        <div class="section">
+            <div class="section-title">2. Parámetros del modelo</div>
+            
+            <table class="table">
+                <tr>
+                    <th>Modelo</th>
+                    <th>Input Size</th>
+                    <th>Output Format</th>
+                </tr>
+                <tr>
+                    <td>YOLOv8n</td>
+                    <td>320×320</td>
+                    <td>[1, 84, 2100]</td>
+                </tr>
+                <tr>
+                    <td>YOLOv5s</td>
+                    <td>416×416</td>
+                    <td>[1, 25200, 85]</td>
+                </tr>
+                <tr>
+                    <td>YOLOv8s</td>
+                    <td>640×640</td>
+                    <td>[1, 84, 8400]</td>
+                </tr>
+            </table>
+
+            <strong>Tipos de datos:</strong>
+            <div class="highlight">
+                • Float32: 4 bytes/pixel (más preciso)<br>
+                • Float16: 2 bytes/pixel (balanced)<br>
+                • INT8: 1 byte/pixel (más rápido)
+            </div>
+        </div>
+
+        <!-- Preprocesamiento -->
+        <div class="section">
+            <div class="section-title">3. Preprocesamiento</div>
+            
+            <strong>Normalización común:</strong>
+            <div class="code-block">// [0,255] → [0,1]
+buffer.putFloat(r / 255.0f)
+
+// [0,255] → [-1,1]  
+buffer.putFloat((r / 127.5f) - 1.0f)
+
+// ImageNet
+buffer.putFloat((r - 123.68f) / 58.393f)</div>
+
+            <strong>Redimensionamiento:</strong>
+            <div class="code-block">val resized = Bitmap.createScaledBitmap(
+    bitmap, inputSize, inputSize, true
+)</div>
+        </div>
+
+        <!-- Configuración de salida -->
+        <div class="section">
+            <div class="section-title">4. Configuración salida</div>
+            
+            <strong>YOLOv8 Output:</strong>
+            <div class="code-block">val outputBuffer = Array(1) { 
+    Array(84) { FloatArray(2100) } 
+}
+
+// 84 = 4 (bbox) + 80 (clases COCO)
+// 2100 = número de anchors</div>
+
+            <strong>YOLOv5 Output:</strong>
+            <div class="code-block">val outputBuffer = Array(1) { 
+    Array(25200) { FloatArray(85) } 
+}
+
+// 85 = 4 (bbox) + 1 (objectness) + 80 (clases)</div>
+        </div>
+    </div>
+
+    <!-- Lista de verificación -->
+    <div class="section">
+        <div class="section-title">5. Lista de verificación antes de importar</div>
+        
+        <div class="container">
+            <div>
+                <strong>Dimensiones del modelo:</strong>
+                <div class="checklist">
+                    <div class="checklist-item">Tamaño de entrada (320×320, 416×416, 640×640)</div>
+                    <div class="checklist-item">Formato de entrada (RGB vs BGR)</div>
+                    <div class="checklist-item">Tipo de normalización ([0,1], [-1,1], ImageNet)</div>
+                    <div class="checklist-item">Tipo de datos (Float32, Float16, INT8)</div>
+                </div>
+            </div>
+            
+            <div>
+                <strong>Arquitectura específica:</strong>
+                <div class="checklist">
+                    <div class="checklist-item">Formato de salida (centro+tamaño vs esquinas)</div>
+                    <div class="checklist-item">Número de clases (80 COCO, custom)</div>
+                    <div class="checklist-item">Umbral de confianza (0.5-0.7)</div>
+                    <div class="checklist-item">NMS IoU threshold (típico 0.45)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optimizaciones -->
+    <div class="section">
+        <div class="section-title">6. Optimizaciones y configuración del intérprete</div>
+        
+        <div class="code-block">val options = Interpreter.Options().apply {
+    // Acelerar con GPU (si disponible)
+    useGpu = true
+    
+    // Número de hilos CPU
+    numThreads = 4
+    
+    // NNAPI (Neural Networks API Android)
+    useNNAPI = true
+}
+
+interpreter = Interpreter(model, options)
+
+// Verificar dimensiones
+val inputShape = interpreter.getInputTensor(0).shape()
+val outputShape = interpreter.getOutputTensor(0).shape()</div>
+
+        <div class="highlight">
+            <strong>IMPORTANTE:</strong> Siempre verificar las dimensiones del modelo antes de procesar para evitar errores en tiempo de ejecución.
+        </div>
+    </div>
+
+    <!-- Inferencia completa -->
+    <div class="section">
+        <div class="section-title">7. Ejemplo de inferencia completa</div>
+        
+        <div class="code-block">fun detect(bitmap: Bitmap): List<Detection> {
+    val interpreter = this.interpreter ?: return emptyList()
+    
+    // 1. Preprocesar imagen
+    val inputBuffer = preprocessImage(bitmap)
+    
+    // 2. Configurar salida según arquitectura
+    val outputBuffer = Array(1) { Array(84) { FloatArray(2100) } }
+    
+    // 3. Ejecutar inferencia
+    interpreter.run(inputBuffer, outputBuffer)
+    
+    // 4. Postprocesar según formato del modelo
+    val rawDetections = processOutput(
+        outputBuffer[0], bitmap.width, bitmap.height
+    )
+    
+    // 5. Aplicar NMS
+    return applyNMS(rawDetections, iouThreshold = 0.45f)
+}</div>
+    </div>
+
+    <div class="flow-diagram">
+        <strong>PUNTOS CRÍTICOS A RECORDAR</strong><br><br>
+        • Verificar dimensiones del modelo antes de implementar<br>
+        • Coincidir normalización con el entrenamiento original<br>
+        • Configurar correctamente el formato de salida<br>
+        • Probar con diferentes umbrales para optimizar detección<br>
+        • Usar delegados (GPU/NNAPI) para acelerar inferencia
+    </div>
+</body>
+</html>
