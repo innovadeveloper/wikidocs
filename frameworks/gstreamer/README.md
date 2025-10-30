@@ -16,6 +16,33 @@ RAMA AUDIO:
 src. ! application/x-rtp,media=audio ! rtpmp4gdepay ! aacparse ! avdec_aac ! audioconvert ! audioresample ! audio/x-raw,rate=48000,channels=2 ! opusenc bitrate=64000 complexity=5 ! rtpopuspay pt=111 ! udpsink host=192.168.1.200 port=5006 sync=false
 ```
 
+Los principales codecs de audio y video son :
+
+
+| Códec de Video   | Extensión / MIME              | Compresión        | Calidad vs Bitrate              | Compatibilidad                                                | Comentarios                                           |
+| ---------------- | ----------------------------- | ----------------- | ------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------- |
+| **H.264 / AVC**  | `.mp4`, `.ts`, `.mkv`, `.flv` | Alta (eficiente)  | Excelente                       | ✅ Universal (Android, iOS, navegadores, RTSP, RTP)            | Estándar actual para transmisión (RTSP, WebRTC, etc.) |
+| **H.265 / HEVC** | `.mp4`, `.mkv`, `.ts`         | Muy alta          | Mejor que H.264 a mismo bitrate | ⚠️ No todos los dispositivos Android lo soportan por hardware | Ideal para 4K/8K o streaming eficiente                |
+| **VP8**          | `.webm`                       | Media             | Buena                           | ✅ Navegadores y WebRTC                                        | Libre de patentes                                     |
+| **VP9**          | `.webm`, `.mkv`               | Alta              | Muy buena                       | ✅ YouTube, Chrome, Android moderno                            | Sustituto libre de HEVC                               |
+| **AV1**          | `.mkv`, `.webm`               | Muy alta          | Excelente                       | ⚠️ Solo en dispositivos y navegadores recientes               | Códec libre y sucesor de VP9                          |
+| **MPEG-2**       | `.mpg`, `.ts`                 | Baja              | Aceptable                       | ⚙️ Televisión, cámaras antiguas                               | Obsoleto pero aún usado en broadcast                  |
+| **MJPEG**        | `.avi`, `.mov`                | Baja (intraframe) | Baja                            | ⚙️ Cámaras IP antiguas                                        | Cada frame es un JPEG — consume mucho ancho de banda  |
+| **Theora**       | `.ogv`                        | Media             | Media                           | 🟡 Antiguo, libre                                             | Obsoleto frente a VP8/VP9                             |
+
+| Códec de Audio                  | Extensión / MIME       | Compresión           | Calidad   | Compatibilidad           | Comentarios                                            |
+| ------------------------------- | ---------------------- | -------------------- | --------- | ------------------------ | ------------------------------------------------------ |
+| **AAC (Advanced Audio Coding)** | `.aac`, `.mp4`, `.mkv` | Alta                 | Excelente | ✅ Android, iOS, RTSP/RTP | Códec estándar moderno (usa GStreamer `faad` / `faac`) |
+| **MP3 (MPEG-1 Layer III)**      | `.mp3`                 | Media                | Buena     | ✅ Universal              | Muy común, incluso en hardware antiguo                 |
+| **Opus**                        | `.opus`, `.webm`       | Muy alta (eficiente) | Excelente | ✅ WebRTC, Android 10+    | Ideal para voz/video en tiempo real                    |
+| **Vorbis**                      | `.ogg`                 | Media                | Buena     | ✅ Web, GStreamer         | Libre, reemplazado por Opus                            |
+| **PCM / WAV**                   | `.wav`, `.raw`         | Sin compresión       | Perfecta  | ✅ Universal              | Muy pesado (sin compresión)                            |
+| **FLAC**                        | `.flac`                | Sin pérdida          | Excelente | ✅ Android, GStreamer     | Ideal para música, no para streaming en vivo           |
+| **AMR-NB / AMR-WB**             | `.amr`                 | Alta                 | Media     | ✅ Telefonía móvil        | Usado en llamadas, no en streaming HD                  |
+| **G.711 / G.722**               | `.ulaw`, `.alaw`       | Baja                 | Media     | ⚙️ VoIP, SIP             | Muy usado en telecomunicaciones                        |
+
+
+
 ---
 
 ## PARTE 1: ELEMENTO FUENTE - rtspsrc
