@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Markdown</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            color: #24292e;
+        }
+        
+        #content {
+            background-color: #ffffff;
+            border: 1px solid #d0d7de;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+            border-bottom: 1px solid #d0d7de;
+            padding-bottom: 8px;
+        }
+        
+        h1 { font-size: 2em; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.25em; }
+        
+        code {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+        }
+        
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 16px;
+            overflow: auto;
+        }
+        
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        blockquote {
+            border-left: 4px solid #d0d7de;
+            padding-left: 16px;
+            color: #57606a;
+            margin: 0;
+        }
+        
+        ul, ol {
+            padding-left: 2em;
+        }
+        
+        img {
+            max-width: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #d0d7de;
+            padding: 6px 13px;
+        }
+        
+        table th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+        
+        #loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        #error {
+            background-color: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Cargando README.md...</div>
+    <div id="content"></div>
+
+    <!-- Librería marked.js desde CDN para parsear Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        // Configurar marked para un renderizado estilo GitHub
+        marked.setOptions({
+            gfm: true, // GitHub Flavored Markdown
+            breaks: true,
+            headerIds: true,
+            mangle: false
+        });
+
+        // Función para cargar y renderizar el archivo Markdown
+        async function loadMarkdown() {
+            const loadingDiv = document.getElementById('loading');
+            const contentDiv = document.getElementById('content');
+            
+            try {
+                // Cambia 'README.md' por la ruta de tu archivo markdown
+                // const response = await fetch('README.md');
+                const response = await fetch('README');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const markdownText = await response.text();
+                
+                // Convertir Markdown a HTML
+                const htmlContent = marked.parse(markdownText);
+                
+                // Mostrar el contenido renderizado
+                loadingDiv.style.display = 'none';
+                contentDiv.innerHTML = htmlContent;
+                
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                contentDiv.innerHTML = `
+                    <div id="error">
+                        <strong>Error al cargar el archivo:</strong> ${error.message}
+                        <br><br>
+                        Asegúrate de que el archivo README.md esté en la misma carpeta que este HTML
+                        y de que estés ejecutando esto desde un servidor web (no file://).
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar el Markdown cuando la página esté lista
+        window.addEventListener('DOMContentLoaded', loadMarkdown);
+    </script>
+</body>
+</html>
