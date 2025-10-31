@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repaso Esencial de C/C++</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            color: #000000;
+            padding: 30px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 36px;
+            border: 4px double #000;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .section {
+            margin: 30px 0;
+            border: 2px solid #000;
+            padding: 25px;
+            background: #fff;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-number {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 2px solid #000;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+
+        .code-block {
+            background: #f0f0f0;
+            border: 2px solid #000;
+            border-left: 6px solid #000;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .code-inline {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border: 1px solid #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            border: 2px solid #000;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .comparison-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+        }
+
+        .tip-box {
+            border: 3px dashed #000;
+            padding: 15px;
+            margin: 15px 0;
+            background: #f9f9f9;
+        }
+
+        .tip-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .memory-diagram {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f5f5f5;
+        }
+
+        .memory-cell {
+            display: inline-block;
+            border: 2px solid #000;
+            padding: 10px 15px;
+            margin: 5px;
+            background: #fff;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .memory-label {
+            font-size: 11px;
+            margin-top: 5px;
+            color: #666;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        .highlight-box {
+            background: #e8e8e8;
+            border-left: 6px solid #000;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .check-mark {
+            color: #000;
+        }
+
+        .cross-mark {
+            color: #000;
+        }
+
+        .keyword {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .concept-card {
+            border: 2px solid #000;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+
+        .concept-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #000;
+        }
+
+        .summary-box {
+            border: 4px double #000;
+            padding: 25px;
+            margin: 30px 0;
+            background: #f0f0f0;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border-left: 4px solid #000;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-3col {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                font-size: 12px;
+            }
+        }
+
+        .vs-divider {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 REPASO ESENCIAL DE C/C++</h1>
+
+        <!-- Sección 1: Tipos de datos -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">1</div>
+                TIPOS DE DATOS PRIMITIVOS
+            </div>
+            
+            <table>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Tamaño típico</th>
+                    <th>Ejemplo</th>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">bool</span></td>
+                    <td>Verdadero o falso</td>
+                    <td>1 byte</td>
+                    <td><span class="code-inline">bool activo = true;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">char</span></td>
+                    <td>Carácter ASCII</td>
+                    <td>1 byte</td>
+                    <td><span class="code-inline">char letra = 'A';</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">wchar_t</span></td>
+                    <td>Carácter Unicode ancho</td>
+                    <td>2 o 4 bytes</td>
+                    <td><span class="code-inline">wchar_t w = L'中';</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">short</span></td>
+                    <td>Entero corto</td>
+                    <td>2 bytes</td>
+                    <td><span class="code-inline">short s = 100;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">int</span></td>
+                    <td>Entero estándar</td>
+                    <td>4 bytes</td>
+                    <td><span class="code-inline">int edad = 30;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">long</span></td>
+                    <td>Entero largo</td>
+                    <td>4 u 8 bytes</td>
+                    <td><span class="code-inline">long l = 1000000L;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">long long</span></td>
+                    <td>Entero muy largo</td>
+                    <td>8 bytes</td>
+                    <td><span class="code-inline">long long ll = 9999999999LL;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">float</span></td>
+                    <td>Coma flotante simple</td>
+                    <td>4 bytes</td>
+                    <td><span class="code-inline">float pi = 3.14f;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">double</span></td>
+                    <td>Coma flotante doble</td>
+                    <td>8 bytes</td>
+                    <td><span class="code-inline">double e = 2.718281828;</span></td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">void</span></td>
+                    <td>Sin tipo (punteros/funciones)</td>
+                    <td>—</td>
+                    <td><span class="code-inline">void* ptr;</span></td>
+                </tr>
+            </table>
+
+            <div class="tip-box">
+                <div class="tip-label">💡 TIP:</div>
+                Usa <span class="code-inline">sizeof(Tipo)</span> para conocer el tamaño exacto según la arquitectura
+            </div>
+        </div>
+
+        <!-- Sección 2: Variables y asignación -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">2</div>
+                VARIABLES Y ASIGNACIÓN
+            </div>
+
+            <div class="code-block">int edad = 30;        // definición + asignación
+double pi = 3.1416;
+char inicial = 'K';
+bool activo = true;</div>
+
+            <div class="highlight-box">
+                <strong>Asignación:</strong> Copia el valor de una variable a otra
+            </div>
+
+            <div class="code-block">int a = 5;
+int b = a;  // b = 5 (copia del valor)</div>
+
+            <div class="memory-diagram">
+                <strong>Representación en memoria:</strong><br><br>
+                <div class="memory-cell">
+                    5<br>
+                    <div class="memory-label">a (0x1000)</div>
+                </div>
+                <div class="memory-cell">
+                    5<br>
+                    <div class="memory-label">b (0x1004)</div>
+                </div>
+                <div style="margin-top: 15px; font-size: 12px;">
+                    ▸ Cada variable ocupa su propia posición en memoria<br>
+                    ▸ La asignación COPIA el valor, no comparte la memoria
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 3: Punteros -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">3</div>
+                PUNTEROS (*)
+            </div>
+
+            <div class="highlight-box">
+                <strong>Definición:</strong> Un puntero guarda la <span class="keyword">dirección de memoria</span> de otra variable
+            </div>
+
+            <div class="code-block">int x = 10;
+int* ptr = &x;    // '&' obtiene la dirección de x</div>
+
+            <div class="memory-diagram">
+                <strong>Visualización en memoria:</strong><br><br>
+                <div class="memory-cell">
+                    10<br>
+                    <div class="memory-label">x (0x2000)</div>
+                </div>
+                <span style="font-size: 24px;">←</span>
+                <div class="memory-cell">
+                    0x2000<br>
+                    <div class="memory-label">ptr (0x2008)</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0;">Lectura y escritura:</h3>
+            <div class="code-block">printf("%d", *ptr); // *ptr lee el valor apuntado → 10
+*ptr = 20;          // modifica el valor de x a 20</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Puntero nulo:</h3>
+            <div class="code-block">int* p = nullptr;  // puntero vacío (C++11)
+int* p = NULL;     // versión C clásica</div>
+
+            <div class="grid-3col">
+                <div class="concept-card">
+                    <div class="concept-title">& (Operador de dirección)</div>
+                    Obtiene la dirección de memoria de una variable
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">* (Operador de desreferencia)</div>
+                    Accede al valor almacenado en la dirección
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">* (En declaración)</div>
+                    Declara una variable como puntero
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 4: Referencias -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">4</div>
+                REFERENCIAS (& en definición)
+            </div>
+
+            <div class="highlight-box">
+                <strong>Definición:</strong> Una referencia es un <span class="keyword">alias</span> de otra variable (no puede ser nula ni reasignada)
+            </div>
+
+            <div class="code-block">int valor = 5;
+int& ref = valor;  // ref es otro nombre para valor
+ref = 10;          // modifica valor a 10</div>
+
+            <div class="memory-diagram">
+                <strong>Visualización conceptual:</strong><br><br>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div class="memory-cell">
+                        10<br>
+                        <div class="memory-label">valor</div>
+                    </div>
+                    <div style="font-size: 18px;">≡</div>
+                    <div class="memory-cell">
+                        (mismo espacio)<br>
+                        <div class="memory-label">ref</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; font-size: 12px;">
+                    ▸ Ambas variables apuntan a la MISMA ubicación de memoria<br>
+                    ▸ Modificar ref modifica automáticamente valor
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 5: Punteros vs Referencias -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">5</div>
+                PUNTEROS VS REFERENCIAS
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">PUNTEROS</div>
+                    <div class="code-block">int x = 10;
+int* ptr = &x;
+*ptr = 20;  // cambia x
+ptr = nullptr;  // válido</div>
+                    <div style="margin-top: 15px;">
+                        <div>✓ Puede ser nullptr</div>
+                        <div>✓ Puede reasignarse</div>
+                        <div>✓ Sintaxis: *ptr</div>
+                        <div>✓ Usado con new/delete</div>
+                    </div>
+                </div>
+
+                <div class="comparison-box">
+                    <div class="comparison-title">REFERENCIAS</div>
+                    <div class="code-block">int x = 10;
+int& ref = x;
+ref = 20;  // cambia x
+// ref = y;  // ¡ERROR!</div>
+                    <div style="margin-top: 15px;">
+                        <div>✗ NO puede ser null</div>
+                        <div>✗ NO puede reasignarse</div>
+                        <div>✓ Sintaxis: ref (sin *)</div>
+                        <div>✗ No se usa con new/delete</div>
+                    </div>
+                </div>
+            </div>
+
+            <table style="margin-top: 20px;">
+                <tr>
+                    <th>Característica</th>
+                    <th>Puntero</th>
+                    <th>Referencia</th>
+                </tr>
+                <tr>
+                    <td>Puede ser nullptr</td>
+                    <td><span class="check-mark">✓ Sí</span></td>
+                    <td><span class="cross-mark">✗ No</span></td>
+                </tr>
+                <tr>
+                    <td>Puede cambiar a otra variable</td>
+                    <td><span class="check-mark">✓ Sí</span></td>
+                    <td><span class="cross-mark">✗ No</span></td>
+                </tr>
+                <tr>
+                    <td>Sintaxis para acceso</td>
+                    <td><span class="code-inline">*ptr</span></td>
+                    <td><span class="code-inline">ref</span></td>
+                </tr>
+                <tr>
+                    <td>Se usa con new/delete</td>
+                    <td><span class="check-mark">✓</span></td>
+                    <td><span class="cross-mark">✗</span></td>
+                </tr>
+                <tr>
+                    <td>Debe inicializarse</td>
+                    <td>Opcional</td>
+                    <td>Obligatorio</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Sección 6: Arrays -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">6</div>
+                ARRAYS
+            </div>
+
+            <div class="highlight-box">
+                Colección contigua de elementos del mismo tipo en memoria
+            </div>
+
+            <div class="code-block">int numeros[3] = {10, 20, 30};
+printf("%d", numeros[1]);  // 20</div>
+
+            <div class="memory-diagram">
+                <strong>Disposición en memoria (contigua):</strong><br><br>
+                <div class="memory-cell">
+                    10<br>
+                    <div class="memory-label">numeros[0]</div>
+                </div>
+                <div class="memory-cell">
+                    20<br>
+                    <div class="memory-label">numeros[1]</div>
+                </div>
+                <div class="memory-cell">
+                    30<br>
+                    <div class="memory-label">numeros[2]</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0;">Arrays y punteros:</h3>
+            <div class="code-block">int* p = numeros;      // numeros decae a puntero
+printf("%d", *(p + 2)); // 30 (aritmética de punteros)
+printf("%d", p[2]);     // 30 (equivalente)</div>
+
+            <div class="tip-box">
+                <div class="tip-label">⚠️ IMPORTANTE:</div>
+                En C++ moderno prefiere: <span class="code-inline">std::array</span> o <span class="code-inline">std::vector</span><br>
+                Los arrays C no conocen su propio tamaño y son propensos a errores
+            </div>
+        </div>
+
+        <!-- Sección 7: Estructuras -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">7</div>
+                ESTRUCTURAS (struct)
+            </div>
+
+            <div class="highlight-box">
+                Agrupan variables de distintos tipos bajo un mismo nombre
+            </div>
+
+            <div class="code-block">struct Persona {
+    char nombre[50];
+    int edad;
+    float altura;
+};
+
+Persona p1 = {"Kendall", 25, 1.80f};
+printf("%s tiene %d años", p1.nombre, p1.edad);</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Acceso a miembros:</h3>
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">POR VALOR (objeto)</div>
+                    <div class="code-block">Persona p;
+p.edad = 30;      // operador .</div>
+                </div>
+                <div class="comparison-box">
+                    <div class="comparison-title">POR PUNTERO</div>
+                    <div class="code-block">Persona* ptr = &p;
+ptr->edad = 30;   // operador -></div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-label">💡 C++ MODERNO:</div>
+                En C++ puedes definir <span class="keyword">métodos dentro del struct</span>, igual que una clase
+            </div>
+        </div>
+
+        <!-- Sección 8: Clases -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">8</div>
+                CLASES Y OBJETOS
+            </div>
+
+            <div class="code-block">class Coche {
+public:
+    std::string marca;
+    int velocidad;
+    
+    void acelerar() { 
+        velocidad += 10; 
+    }
+};
+
+Coche c;
+c.marca = "Toyota";
+c.velocidad = 0;
+c.acelerar();  // velocidad = 10</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Modificadores de acceso:</h3>
+            <table>
+                <tr>
+                    <th>Modificador</th>
+                    <th>Accesible desde</th>
+                    <th>Uso común</th>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">public</span></td>
+                    <td>Cualquier parte del código</td>
+                    <td>API pública de la clase</td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">private</span></td>
+                    <td>Solo dentro de la clase</td>
+                    <td>Datos internos (encapsulación)</td>
+                </tr>
+                <tr>
+                    <td><span class="code-inline">protected</span></td>
+                    <td>Clase y clases derivadas</td>
+                    <td>Herencia</td>
+                </tr>
+            </table>
+
+            <div class="tip-box">
+                <div class="tip-label">🎯 CONCEPTOS CLAVE:</div>
+                • <strong>Encapsulación:</strong> Ocultar datos internos<br>
+                • <strong>Constructores:</strong> Inicialización automática<br>
+                • <strong>Herencia:</strong> Reutilización de código<br>
+                • <strong>Polimorfismo:</strong> Comportamiento dinámico
+            </div>
+        </div>
+
+        <!-- Sección 9: Memoria dinámica -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">9</div>
+                MEMORIA DINÁMICA (new / delete)
+            </div>
+
+            <h3 style="margin: 10px 0;">Asignación simple:</h3>
+            <div class="code-block">int* ptr = new int(42);  // reserva memoria
+printf("%d", *ptr);      // 42
+delete ptr;              // libera memoria
+ptr = nullptr;           // buena práctica</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Arrays dinámicos:</h3>
+            <div class="code-block">int* arr = new int[5];   // array de 5 elementos
+arr[0] = 10;
+delete[] arr;            // IMPORTANTE: delete[]
+arr = nullptr;</div>
+
+            <div class="highlight-box">
+                <strong>⚠️ REGLA DE ORO:</strong><br>
+                • <span class="code-inline">new</span> → <span class="code-inline">delete</span><br>
+                • <span class="code-inline">new[]</span> → <span class="code-inline">delete[]</span><br>
+                NO mezclar delete con new[] o viceversa
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-label">🚀 C++ MODERNO (preferido):</div>
+                Usa punteros inteligentes en lugar de new/delete manual:<br>
+                • <span class="code-inline">std::unique_ptr</span> - propiedad única<br>
+                • <span class="code-inline">std::shared_ptr</span> - propiedad compartida<br>
+                • <span class="code-inline">std::weak_ptr</span> - referencia débil
+            </div>
+        </div>
+
+        <!-- Sección 10: Enumeraciones -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">10</div>
+                ENUMERACIONES (enum)
+            </div>
+
+            <h3>Enum clásico (C):</h3>
+            <div class="code-block">enum Estado { INACTIVO, ACTIVO, PAUSADO };
+Estado estado = ACTIVO;  // ACTIVO = 1</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Enum class (C++11 - más seguro):</h3>
+            <div class="code-block">enum class Color { ROJO, VERDE, AZUL };
+Color c = Color::ROJO;  // requiere scope</div>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">enum (C clásico)</div>
+                    <div>• Valores en scope global</div>
+                    <div>• Conversión implícita a int</div>
+                    <div>• Colisión de nombres posible</div>
+                </div>
+                <div class="comparison-box">
+                    <div class="comparison-title">enum class (C++11)</div>
+                    <div>• Valores con scope</div>
+                    <div>• NO conversión implícita</div>
+                    <div>• Type-safe</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 11: Funciones -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">11</div>
+                FUNCIONES
+            </div>
+
+            <h3>Función básica:</h3>
+            <div class="code-block">int sumar(int a, int b) {
+    return a + b;
+}
+
+int resultado = sumar(5, 3);  // 8</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Paso de parámetros:</h3>
+            
+            <div class="grid-3col">
+                <div class="concept-card">
+                    <div class="concept-title">Por VALOR</div>
+                    <div class="code-block" style="margin: 10px 0;">void func(int x) {
+  x = 10;
+}
+// NO modifica original</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Por REFERENCIA</div>
+                    <div class="code-block" style="margin: 10px 0;">void func(int& x) {
+  x = 10;
+}
+// SÍ modifica original</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-title">Por PUNTERO</div>
+                    <div class="code-block" style="margin: 10px 0;">void func(int* x) {
+  *x = 10;
+}
+// SÍ modifica original</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 12: Paso de punteros y referencias -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">12</div>
+                PASO DE PUNTEROS Y REFERENCIAS A FUNCIONES
+            </div>
+
+            <div class="code-block">void cambiarPorPuntero(int* p) { 
+    *p = 100; 
+}
+
+void cambiarPorReferencia(int& r) { 
+    r = 200; 
+}
+
+int x = 5;
+cambiarPorPuntero(&x);    // x = 100
+cambiarPorReferencia(x);  // x = 200</div>
+
+            <table>
+                <tr>
+                    <th>Método</th>
+                    <th>Sintaxis llamada</th>
+                    <th>Sintaxis función</th>
+                    <th>¿Modifica original?</th>
+                </tr>
+                <tr>
+                    <td>Por valor</td>
+                    <td><span class="code-inline">func(x)</span></td>
+                    <td><span class="code-inline">void func(int n)</span></td>
+                    <td>NO</td>
+                </tr>
+                <tr>
+                    <td>Por referencia</td>
+                    <td><span class="code-inline">func(x)</span></td>
+                    <td><span class="code-inline">void func(int& n)</span></td>
+                    <td>SÍ</td>
+                </tr>
+                <tr>
+                    <td>Por puntero</td>
+                    <td><span class="code-inline">func(&x)</span></td>
+                    <td><span class="code-inline">void func(int* n)</span></td>
+                    <td>SÍ</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Sección 13: Strings -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">13</div>
+                STRINGS
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">C CLÁSICO</div>
+                    <div class="code-block">char nombre[] = "Kendall";
+printf("%s", nombre);
+
+// Manipulación manual:
+strcpy(nombre, "Alex");
+strcat(nombre, " Smith");</div>
+                    <div style="margin-top: 10px;">
+                        ⚠️ Propenso a buffer overflow<br>
+                        ⚠️ Gestión manual del tamaño
+                    </div>
+                </div>
+
+                <div class="comparison-box">
+                    <div class="comparison-title">C++ MODERNO</div>
+                    <div class="code-block">#include &lt;string&gt;
+std::string nombre = "Kendall";
+std::cout << nombre;
+
+// Operaciones seguras:
+nombre = "Alex";
+nombre += " Smith";</div>
+                    <div style="margin-top: 10px;">
+                        ✓ Gestión automática de memoria<br>
+                        ✓ Operadores sobrecargados
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0;">Operaciones comunes con std::string:</h3>
+            <div class="code-block">std::string s = "Hola";
+s.length();           // 4
+s.empty();            // false
+s.append(" Mundo");   // "Hola Mundo"
+s.substr(0, 4);       // "Hola"
+s.find("Mundo");      // posición 5
+s.compare("Hola");    // comparación</div>
+        </div>
+
+        <!-- Sección 14: Namespaces -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">14</div>
+                NAMESPACES
+            </div>
+
+            <div class="highlight-box">
+                Los namespaces evitan colisiones de nombres agrupando identificadores
+            </div>
+
+            <div class="code-block">namespace Utils {
+    void imprimir() { 
+        printf("Hola desde Utils"); 
+    }
+    int valor = 42;
+}
+
+// Uso:
+Utils::imprimir();
+int x = Utils::valor;</div>
+
+            <h3 style="margin: 20px 0 10px 0;">Using directive:</h3>
+            <div class="code-block">using namespace std;  // ahora puedes usar cout en lugar de std::cout
+cout << "Hola" << endl;</div>
+
+            <div class="tip-box">
+                <div class="tip-label">⚠️ ADVERTENCIA:</div>
+                Evita <span class="code-inline">using namespace std;</span> en headers<br>
+                Puede causar colisiones de nombres en proyectos grandes
+            </div>
+        </div>
+
+        <!-- Sección 15: Constantes -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">15</div>
+                CONSTANTES Y CONSTEXPR
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">const</div>
+                    <div class="code-block">const int MAX = 100;
+MAX = 200;  // ERROR!
+
+const int* ptr;  // puntero a constante
+int* const ptr;  // puntero constante</div>
+                    <div style="margin-top: 10px;">
+                        • Evaluado en tiempo de ejecución<br>
+                        • Valor inmutable después de inicializar
+                    </div>
+                </div>
+
+                <div class="comparison-box">
+                    <div class="comparison-title">constexpr (C++11)</div>
+                    <div class="code-block">constexpr int TAM = 256;
+constexpr int cuadrado(int x) {
+    return x * x;
+}</div>
+                    <div style="margin-top: 10px;">
+                        • Evaluado en tiempo de compilación<br>
+                        • Más eficiente que const
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 20px 0 10px 0;">Punteros const:</h3>
+            <div class="code-block">const int* p1;        // puntero a constante: no puedes cambiar *p1
+int* const p2 = &x;   // puntero constante: no puedes cambiar p2
+const int* const p3;  // ambos son constantes</div>
+        </div>
+
+        <!-- Sección 16: Estructuras avanzadas -->
+        <div class="section">
+            <div class="section-title">
+                <div class="section-number">16</div>
+                ESTRUCTURAS DE DATOS MODERNAS (STL)
+            </div>
+
+            <div class="grid-3col">
+                <div class="concept-card">
+                    <div class="concept-title">std::vector</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;vector&gt;
+vector&lt;int&gt; v;
+v.push_back(10);
+v[0]; // acceso
+v.size();</div>
+                    Array dinámico redimensionable
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">std::map</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;map&gt;
+map&lt;string, int&gt; m;
+m["key"] = 100;
+m.find("key");</div>
+                    Diccionario clave-valor
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">std::set</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;set&gt;
+set&lt;int&gt; s;
+s.insert(10);
+s.count(10);</div>
+                    Conjunto de valores únicos
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">std::thread</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;thread&gt;
+thread t(func);
+t.join();</div>
+                    Hilos modernos
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">std::mutex</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;mutex&gt;
+mutex m;
+m.lock();
+m.unlock();</div>
+                    Sincronización de hilos
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">std::atomic</div>
+                    <div class="code-block" style="margin: 10px 0; font-size: 11px;">#include &lt;atomic&gt;
+atomic&lt;int&gt; a;
+a.store(10);
+a.load();</div>
+                    Operaciones thread-safe
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen final -->
+        <div class="summary-box">
+            <div class="summary-title">📌 RESUMEN DE CONCEPTOS CLAVE</div>
+            
+            <div class="summary-item">
+                <strong>Punteros:</strong> Variables que almacenan direcciones de memoria. Usa * para declarar y desreferenciar, & para obtener dirección.
+            </div>
+            
+            <div class="summary-item">
+                <strong>Referencias:</strong> Alias de variables existentes. No pueden ser null ni reasignadas. Sintaxis más limpia que punteros.
+            </div>
+            
+            <div class="summary-item">
+                <strong>Memoria dinámica:</strong> new/delete para asignación manual. Prefiere unique_ptr/shared_ptr en C++ moderno.
+            </div>
+            
+            <div class="summary-item">
+                <strong>Arrays vs vectores:</strong> Arrays tienen tamaño fijo y son propensos a errores. std::vector es más seguro y flexible.
+            </div>
+            
+            <div class="summary-item">
+                <strong>Paso de parámetros:</strong> Por valor (copia), por referencia (alias), por puntero (dirección). Elige según necesites modificar el original.
+            </div>
+            
+            <div class="summary-item">
+                <strong>const vs constexpr:</strong> const es inmutable en runtime, constexpr se evalúa en compile-time.
+            </div>
+            
+            <div class="summary-item">
+                <strong>STL (Standard Template Library):</strong> Usa contenedores modernos como vector, map, set en lugar de estructuras C manuales.
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
