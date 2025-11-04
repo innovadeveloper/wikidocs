@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom GSource - Creando Tu Propio Tipo de Evento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #000;
+        }
+        
+        .hero {
+            background: #f5f5f5;
+            border: 3px solid #000;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .hero p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        
+        .flow-diagram {
+            background: #fafafa;
+            border: 2px solid #000;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .flow-box {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            position: relative;
+        }
+        
+        .flow-box h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .flow-arrow {
+            text-align: center;
+            font-size: 2em;
+            margin: 10px 0;
+            color: #000;
+        }
+        
+        .highlight-box {
+            background: #e8e8e8;
+            border-left: 4px solid #000;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .code-block {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-left: 3px solid #000;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison > div {
+            border: 2px solid #000;
+            padding: 20px;
+        }
+        
+        .comparison h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .step {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step h3 {
+            display: inline;
+            font-size: 1.3em;
+        }
+        
+        .lifecycle {
+            background: #f9f9f9;
+            border: 2px solid #000;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .lifecycle-phase {
+            background: white;
+            border: 1px solid #000;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .lifecycle-phase h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .android-analogy {
+            background: #e0f7fa;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .android-analogy h3 {
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f0f0f0;
+            border-bottom: 2px solid #000;
+            font-weight: bold;
+        }
+        
+        .key-concept {
+            background: #fff9c4;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .key-concept h3 {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🛠️ Custom GSource: Creando Tu Propio Tipo de Evento</h1>
+    
+    <div class="hero">
+        <h2>¿Qué estamos haciendo?</h2>
+        <p><strong>Creando un tipo personalizado de evento (Custom GSource)</strong></p>
+        <p>En lugar de usar <code>g_timeout_add()</code> o <code>g_idle_add()</code> predefinidos,</p>
+        <p>estamos construyendo nuestro propio mecanismo de eventos desde cero.</p>
+    </div>
+    
+    <div class="android-analogy">
+        <h3>🤖 Analogía con Android</h3>
+        <p style="margin-bottom: 15px;">
+            En Android, cuando usas <code>Handler.postDelayed()</code>, estás usando un tipo predefinido de mensaje.
+            Crear un Custom GSource es como crear tu propia subclase de <code>Message</code> con lógica personalizada
+            de cuándo debe ejecutarse.
+        </p>
+        <pre class="code-block"><code>// Android: Usar mensaje predefinido
+handler.postDelayed(runnable, 1000);
+
+// Android equivalente: Custom Message con lógica propia
+class CustomMessage extends Message {
+    @Override
+    boolean isReady() { /* tu lógica */ }
+    @Override
+    void execute() { /* tu código */ }
+}</code></pre>
+    </div>
+    
+    <div class="flow-diagram">
+        <h2 style="text-align: center; margin-bottom: 30px;">📊 Arquitectura del Custom GSource</h2>
+        
+        <div class="flow-box">
+            <h3>🏗️ CustomSource (tu estructura)</h3>
+            <pre class="code-block"><code>typedef struct {
+    GSource source;         // ← DEBE ser el primer campo (herencia en C)
+    gint interval_ms;       // Tu dato: intervalo personalizado
+    gint64 last_time;       // Tu dato: timestamp del último evento
+    gint counter;           // Tu dato: contador de eventos
+    gpointer user_data;     // Datos del usuario
+    GSourceFunc callback;   // Callback del usuario
+} CustomSource;</code></pre>
+            <div class="highlight-box">
+                <strong>💡 Key Point:</strong> Estás extendiendo GSource agregando tus propios campos.
+                Es como hacer "herencia" en C (el primer campo DEBE ser GSource).
+            </div>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-box">
+            <h3>⚙️ GSourceFuncs (el contrato)</h3>
+            <p style="margin-bottom: 15px;">
+                Le dices a GLib cómo manejar tu Custom GSource implementando estas 3 funciones:
+            </p>
+            <pre class="code-block"><code>static GSourceFuncs custom_funcs = {
+    .prepare  = custom_source_prepare,   // ¿Cuándo estará listo?
+    .check    = custom_source_check,     // ¿Ya está listo?
+    .dispatch = custom_source_dispatch,  // ¡Ejecutar ahora!
+    .finalize = NULL                     // Cleanup (opcional)
+};</code></pre>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-box">
+            <h3>🔄 GMainContext usa tus funciones</h3>
+            <p>En cada iteración del event loop, GMainContext llama automáticamente:</p>
+            <ol style="padding-left: 30px; margin-top: 10px;">
+                <li><code>prepare()</code> → Pregunta si el evento está listo</li>
+                <li><code>poll()</code> → GLib duerme el tiempo necesario</li>
+                <li><code>check()</code> → Confirma si realmente está listo</li>
+                <li><code>dispatch()</code> → Ejecuta tu lógica + callback del usuario</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="lifecycle">
+        <h2 style="margin-bottom: 20px;">🔄 Ciclo de Vida: Las 3 Fases Críticas</h2>
+        
+        <div class="lifecycle-phase">
+            <h4><span class="step-number">1</span> prepare() - "¿Estás listo?"</h4>
+            <pre class="code-block"><code>static gboolean custom_source_prepare(GSource *source, gint *timeout_) {
+    CustomSource *cs = (CustomSource *)source;
+    gint64 now = g_get_monotonic_time();
+    gint64 elapsed_ms = (now - cs->last_time) / 1000;
+
+    if (elapsed_ms >= cs->interval_ms) {
+        *timeout_ = 0;      // ¡Ya está listo!
+        return TRUE;        // Dispatch inmediatamente
+    } else {
+        *timeout_ = cs->interval_ms - elapsed_ms;  // Dormir X ms
+        return FALSE;       // No listo aún
+    }
+}</code></pre>
+            <div class="highlight-box">
+                <strong>🎯 Propósito:</strong> Calcular cuánto tiempo debe dormir GMainContext antes de volver a revisar.
+                <br><strong>Return:</strong> TRUE = listo para dispatch, FALSE = necesita más tiempo
+                <br><strong>timeout_:</strong> Cuántos ms esperar (0 = inmediato, -1 = indefinido)
+            </div>
+        </div>
+        
+        <div class="lifecycle-phase">
+            <h4><span class="step-number">2</span> check() - "¿Confirmas que estás listo?"</h4>
+            <pre class="code-block"><code>static gboolean custom_source_check(GSource *source) {
+    CustomSource *cs = (CustomSource *)source;
+    gint64 now = g_get_monotonic_time();
+    gint64 elapsed_ms = (now - cs->last_time) / 1000;
+    
+    return elapsed_ms >= cs->interval_ms;  // TRUE = ejecutar ahora
+}</code></pre>
+            <div class="highlight-box">
+                <strong>🎯 Propósito:</strong> Después del poll(), confirmar si realmente debemos ejecutar.
+                <br><strong>Return:</strong> TRUE = llamar a dispatch(), FALSE = omitir esta vez
+                <br><strong>Nota:</strong> Similar a prepare(), pero después de que poll() retorna.
+            </div>
+        </div>
+        
+        <div class="lifecycle-phase">
+            <h4><span class="step-number">3</span> dispatch() - "¡Ejecuta tu lógica!"</h4>
+            <pre class="code-block"><code>static gboolean custom_source_dispatch(
+    GSource *source,
+    GSourceFunc callback,    // ← Callback del USUARIO
+    gpointer user_data       // ← Datos del USUARIO
+) {
+    CustomSource *cs = (CustomSource *)source;
+    cs->last_time = g_get_monotonic_time();  // Actualizar timestamp
+    cs->counter++;                           // Incrementar contador
+    
+    g_print("[CustomSource] Evento #%d\n", cs->counter);
+    
+    if (callback)
+        return callback(user_data); // ejecuta el callback del usuario
+    if (cs->callback)
+        return cs->callback(cs->user_data); // ejecuta el callback del desarrollador (definido en la estructura)
+    return TRUE;  // TRUE = mantener, FALSE = eliminar source
+}</code></pre>
+            <div class="highlight-box">
+                <strong>🎯 Propósito:</strong> Ejecutar tu lógica interna + llamar al callback del usuario.
+                <br><strong>callback:</strong> La función que el usuario pasó (on_custom_event)
+                <br><strong>Return:</strong> Lo que retorne el callback del usuario (TRUE = continuar, FALSE = eliminar)
+            </div>
+        </div>
+    </div>
+    
+    <div class="key-concept">
+        <h3>🔑 Concepto Clave: Dos Capas de Callbacks</h3>
+        <table>
+            <tr>
+                <th>Capa</th>
+                <th>Quién la define</th>
+                <th>Propósito</th>
+            </tr>
+            <tr>
+                <td><strong>1. Funciones del GSourceFuncs</strong></td>
+                <td>Tú (el creador del Custom GSource)</td>
+                <td>Lógica interna: cuándo ejecutar, cómo calcular tiempo, etc.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Callback del usuario final</strong></td>
+                <td>El usuario de tu Custom GSource</td>
+                <td>La acción real que el usuario quiere ejecutar cuando ocurra el evento</td>
+            </tr>
+        </table>
+        
+        <pre class="code-block" style="margin-top: 15px;"><code>// TU CÓDIGO (crear el Custom GSource):
+static gboolean custom_source_dispatch(..., GSourceFunc callback, ...) {
+    // Tu lógica interna aquí
+    cs->counter++;
+    
+    // Llamar al callback del USUARIO
+    if (callback)
+        return callback(user_data);  // ← Esto ejecuta on_custom_event()
+    
+    return TRUE;
+}
+
+// CÓDIGO DEL USUARIO (usar tu Custom GSource):
+gboolean on_custom_event(gpointer user_data) {
+    g_print("[Callback] Evento personalizado recibido\n");
+    return TRUE;  // ← Este retorno lo recibe dispatch() arriba
+}</code></pre>
+    </div>
+    
+    <div class="step">
+        <h3><span class="step-number">4</span> Crear y Registrar el Custom GSource</h3>
+        <pre class="code-block"><code>GSource *custom_source_new(gint interval_ms, 
+                           GSourceFunc callback, 
+                           gpointer user_data) {
+    
+    // 1️⃣ Crear el GSource con tus funciones personalizadas
+    CustomSource *cs = (CustomSource *)g_source_new(
+        &custom_funcs,           // Tus 3 funciones
+        sizeof(CustomSource)     // Tamaño de tu estructura
+    );
+    
+    // 2️⃣ Inicializar TUS campos personalizados
+    cs->interval_ms = interval_ms;
+    cs->last_time = g_get_monotonic_time();
+    cs->callback = callback;    // callback del desarrollador
+    cs->user_data = user_data;
+    cs->counter = 0;
+    
+    return (GSource *)cs;
+}</code></pre>
+    </div>
+    
+    <div class="step">
+        <h3><span class="step-number">5</span> Usar el Custom GSource</h3>
+        <pre class="code-block"><code>// En el thread secundario:
+void *event_thread_func(void *arg) {
+    ThreadData *data = (ThreadData *)arg;
+    
+    // Asociar contexto al thread
+    g_main_context_push_thread_default(data->context);
+    
+    // 🔸 Crear tu Custom GSource (intervalo: 2000ms)
+    GSource *source = custom_source_new(2000, on_custom_event, NULL);   // seteando el callback de desarrollador
+    g_source_set_callback(source, on_custom_event, NULL, NULL); // seteando el callback de usuario
+
+    // 🔸 Adjuntar al contexto
+    g_source_attach(source, data->context);
+    g_source_unref(source);  // GMainContext ahora lo posee
+    
+    // Iniciar el loop
+    g_main_loop_run(data->loop);
+    
+    g_main_context_pop_thread_default(data->context);
+    return NULL;
+}</code></pre>
+        <div class="highlight-box" style="margin-top: 15px;">
+            <strong>📌 Nota:</strong> Se necesita llamar <code>g_source_set_callback()</code> porque
+            el callback q se pasó por <code>custom_source_new()</code> es un tipo de callback interno del 
+            desarrollador. Sin embargo el otro tipo de callback de usuario se setea a través de <code>g_source_set_callback()</code> 
+            y ese es el glib envia a través de su función de despacho
+        </div>
+    </div>
+    
+    <div class="comparison">
+        <div>
+            <h3>❌ Sin Custom GSource (limitado)</h3>
+            <pre class="code-block"><code>// Solo puedes usar tipos predefinidos:
+
+// ⏰ Timeout fijo
+g_timeout_add(1000, callback, data);
+
+// ⏸ Idle (sin control de timing)
+g_idle_add(callback, data);
+
+// 📁 I/O simple
+g_io_add_watch(channel, G_IO_IN, 
+               callback, data);
+
+// ❌ No puedes:
+// - Lógica personalizada de timing
+// - Combinar múltiples condiciones
+// - Mantener estado interno complejo</code></pre>
+        </div>
+        
+        <div>
+            <h3>✅ Con Custom GSource (poderoso)</h3>
+            <pre class="code-block"><code>// Puedes crear CUALQUIER lógica:
+
+// ✅ Timing personalizado
+// ✅ Mantener estado interno
+// ✅ Combinar múltiples condiciones
+// ✅ Lógica compleja de cuándo ejecutar
+
+// Ejemplos de Custom GSource:
+// - Evento cada X tiempo PERO solo en horario laboral
+// - Evento cuando sensor + temperatura > umbral
+// - Evento cuando múltiples sockets tengan datos
+// - Evento con backoff exponencial
+// - Evento basado en machine learning
+// - ¡Lo que tu imaginación requiera!</code></pre>
+        </div>
+    </div>
+    
+    <div class="flow-diagram">
+        <h2 style="text-align: center; margin-bottom: 30px;">🔄 Flujo Completo de Ejecución</h2>
+        
+        <div class="flow-box" style="background: #e3f2fd;">
+            <strong>Iteración 1 (t=0ms):</strong>
+            <ol style="padding-left: 30px; margin-top: 10px;">
+                <li><code>prepare()</code> → elapsed=0ms, interval=2000ms → return FALSE, timeout=2000</li>
+                <li>GMainContext duerme 2000ms</li>
+                <li>Nadie ejecuta nada todavía</li>
+            </ol>
+        </div>
+        
+        <div class="flow-arrow">↓ (2000ms después)</div>
+        
+        <div class="flow-box" style="background: #fff3e0;">
+            <strong>Iteración 2 (t=2000ms):</strong>
+            <ol style="padding-left: 30px; margin-top: 10px;">
+                <li><code>prepare()</code> → elapsed=2000ms, interval=2000ms → return TRUE, timeout=0</li>
+                <li><code>check()</code> → elapsed=2000ms → return TRUE</li>
+                <li><code>dispatch()</code> → Imprime "[CustomSource] Evento #1"</li>
+                <li>Llama <code>on_custom_event()</code> → Imprime "[Callback] Evento personalizado recibido"</li>
+                <li><code>on_custom_event()</code> retorna TRUE → mantener el source activo</li>
+            </ol>
+        </div>
+        
+        <div class="flow-arrow">↓ (2000ms después)</div>
+        
+        <div class="flow-box" style="background: #e3f2fd;">
+            <strong>Iteración 3 (t=4000ms):</strong>
+            <ol style="padding-left: 30px; margin-top: 10px;">
+                <li>Se repite el mismo proceso</li>
+                <li>Imprime "[CustomSource] Evento #2"</li>
+                <li>Imprime "[Callback] Evento personalizado recibido"</li>
+            </ol>
+        </div>
+        
+        <div class="flow-arrow">↓ (continúa...)</div>
+        
+        <div class="flow-box" style="background: #ffebee;">
+            <strong>Después de 12 segundos (main thread):</strong>
+            <ol style="padding-left: 30px; margin-top: 10px;">
+                <li><code>sleep(12)</code> termina en el main thread</li>
+                <li><code>g_main_loop_quit(loop)</code> detiene el event loop</li>
+                <li><code>g_main_loop_run()</code> retorna en el thread secundario</li>
+                <li>Cleanup y finalización</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="android-analogy" style="margin-top: 40px;">
+        <h3>🤖 Equivalente en Android (conceptual)</h3>
+        <pre class="code-block"><code>// Tu Custom GSource es como crear un custom Message:
+
+class CustomMessage extends Message {
+    long intervalMs;
+    long lastTime;
+    int counter;
+    
+    // prepare() equivalente
+    boolean isReady() {
+        long elapsed = System.currentTimeMillis() - lastTime;
+        return elapsed >= intervalMs;
+    }
+    
+    // dispatch() equivalente
+    void execute() {
+        lastTime = System.currentTimeMillis();
+        counter++;
+        Log.d("CustomMessage", "Evento #" + counter);
+        
+        // Llamar callback del usuario
+        if (callback != null) {
+            callback.run();
+        }
+    }
+}
+
+// Usar tu Custom Message:
+Handler handler = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+        if (msg instanceof CustomMessage) {
+            CustomMessage cm = (CustomMessage) msg;
+            if (cm.isReady()) {
+                cm.execute();
+                // Reenviar si debe continuar
+                sendMessageDelayed(cm, cm.intervalMs);
+            }
+        }
+    }
+};
+
+// Crear y enviar
+CustomMessage msg = new CustomMessage();
+msg.intervalMs = 2000;
+msg.callback = () -> Log.d("User", "¡Evento recibido!");
+handler.sendMessage(msg);</code></pre>
+        <div class="highlight-box" style="margin-top: 15px;">
+            <strong>💡 Diferencia clave:</strong> En GLib, el GMainContext ya tiene toda la infraestructura
+            para manejar sources personalizados. Solo defines las 3 funciones (prepare/check/dispatch) 
+            y GLib se encarga del resto. En Android tendrías que implementar más lógica manualmente.
+        </div>
+    </div>
+    
+    <div class="key-concept" style="margin-top: 40px; background: #f0f0f0;">
+        <h3>🎯 Resumen: ¿Cuándo crear un Custom GSource?</h3>
+        <table style="margin-top: 15px;">
+            <tr>
+                <th>Escenario</th>
+                <th>¿Custom GSource?</th>
+                <th>Alternativa</th>
+            </tr>
+            <tr>
+                <td>Evento cada X segundos</td>
+                <td>❌ NO</td>
+                <td>Usa <code>g_timeout_add()</code></td>
+            </tr>
+            <tr>
+                <td>Evento cuando hay datos en socket</td>
+                <td>❌ NO</td>
+                <td>Usa <code>g_io_add_watch()</code></td>
+            </tr>
+            <tr>
+                <td>Evento con lógica compleja de timing</td>
+                <td>✅ SÍ</td>
+                <td>Custom GSource te da control total</td>
+            </tr>
+            <tr>
+                <td>Evento basado en múltiples condiciones</td>
+                <td>✅ SÍ</td>
+                <td>Puedes verificar todo en check()</td>
+            </tr>
+            <tr>
+                <td>Evento con estado interno complejo</td>
+                <td>✅ SÍ</td>
+                <td>Tu estructura puede tener cualquier campo</td>
+            </tr>
+            <tr>
+                <td>Integrar con biblioteca externa</td>
+                <td>✅ SÍ</td>
+                <td>Wrapper para eventos de otras APIs</td>
+            </tr>
+        </table>
+        
+        <p style="margin-top: 20px; font-size: 1.1em;">
+            <strong>Regla de oro:</strong> Si los tipos predefinidos (<code>g_timeout_add</code>, <code>g_idle_add</code>, <code>g_io_add_watch</code>)
+            no cubren tu caso de uso, entonces necesitas un Custom GSource.
+        </p>
+    </div>
+</body>
+</html>
