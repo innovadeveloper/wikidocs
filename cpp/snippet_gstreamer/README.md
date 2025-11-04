@@ -185,3 +185,25 @@ NewGlobalRef es obligatorio si quieres usar thiz desde (jobject app_ref):
   DeleteGlobalRef(env, player_data->app_ref)
 
 ```
+
+Ni g_timeout_add() ni g_timeout_add_full() permiten especificar explícitamente un GMainContext.
+Ambas se basan en el contexto “predeterminado del hilo actual”.
+```md
+[SIN control de contexto]
+---------------------------------------
+g_timeout_add(1000, on_timeout, data);
+↓
+GLib crea internamente:
+   GSource *src = g_timeout_source_new(1000);
+   g_source_set_callback(src, on_timeout, data, NULL);
+   g_source_attach(src, g_main_context_get_thread_default());
+
+---------------------------------------
+
+[CON control de contexto]
+---------------------------------------
+GSource *src = g_timeout_source_new(1000);
+g_source_set_callback(src, on_timeout, data, NULL);
+g_source_attach(src, my_context);   ← tú decides a dónde va
+---------------------------------------
+```
