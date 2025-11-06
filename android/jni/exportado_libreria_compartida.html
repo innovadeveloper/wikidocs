@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilar y Distribuir Librerías .so con Gradle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #000;
+        }
+        
+        h2 {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+            font-size: 1.5em;
+        }
+        
+        .intro {
+            background: #f5f5f5;
+            border: 2px solid #000;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .step {
+            background: white;
+            border: 2px solid #000;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            background: #000;
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-left: 3px solid #000;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        
+        code {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .explanation {
+            background: #e8e8e8;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #000;
+        }
+        
+        .tip {
+            background: #fff9c4;
+            border: 2px solid #000;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .tip-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .file-tree {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            font-size: 0.9em;
+        }
+        
+        .flow {
+            background: #f9f9f9;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .flow-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            margin: 10px 0;
+            color: #000;
+        }
+        
+        .distribution-box {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .distribution-box h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>📦 Compilar y Distribuir Librerías .so con Gradle</h1>
+    
+    <div class="intro">
+        <h2 style="border: none; margin-top: 0;">🎯 El Proceso Completo</h2>
+        <p style="margin: 15px 0; font-size: 1.1em;">
+            <strong>Fase 1:</strong> Compilar código nativo (C/C++) → Genera archivos <code>.so</code><br>
+            <strong>Fase 2:</strong> Copiar <code>.so</code> a <code>jniLibs/</code><br>
+            <strong>Fase 3:</strong> Distribuir la librería a otras apps
+        </p>
+    </div>
+    
+    <h2>🔨 PARTE 1: Compilar la Librería Nativa</h2>
+    
+    <div class="step">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <div class="step-title">Limpiar y Compilar</div>
+        </div>
+        
+        <pre class="code-block"><code># Ir al directorio raíz del proyecto
+cd /Users/kenny/Projects/AndroidStudioProjects/app-mobile-libraries-jdk11/rtsp-viewer-library
+
+# Limpiar build anterior (opcional pero recomendado)
+./gradlew :rtsp-viewer-library:clean
+
+# Compilar SOLO la parte nativa (más rápido)
+./gradlew :rtsp-viewer-library:externalNativeBuildDebug</code></pre>
+        
+        <div class="explanation">
+            <strong>💡 ¿Qué hace cada comando?</strong><br>
+            • <code>:rtsp-viewer-library:clean</code> → Borra builds anteriores del módulo<br>
+            • <code>:rtsp-viewer-library:externalNativeBuildDebug</code> → Compila C/C++ usando CMake/NDK<br><br>
+            <strong>Variantes:</strong><br>
+            • <code>externalNativeBuildDebug</code> → Versión de desarrollo (con símbolos de debug)<br>
+            • <code>externalNativeBuildRelease</code> → Versión optimizada para producción
+        </div>
+        
+        <div class="tip">
+            <span class="tip-title">⚡ Compilación completa (si necesitas todo):</span>
+            <pre class="code-block"><code># Compila TODO: Java/Kotlin + nativo + genera AAR
+./gradlew :rtsp-viewer-library:assembleDebug</code></pre>
+        </div>
+    </div>
+    
+    <div class="step">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <div class="step-title">Localizar los .so Generados</div>
+        </div>
+        
+        <pre class="code-block"><code># Buscar TODOS los .so en el proyecto
+find . -name "*.so" -type f
+
+# Buscar solo en el módulo específico
+find ./rtsp-viewer-library -name "*.so" -type f
+
+# Ver directamente la ubicación esperada
+ls -la rtsp-viewer-library/build/intermediates/cmake/debug/obj/arm64-v8a/</code></pre>
+        
+        <div class="explanation">
+            <strong>📍 Ubicaciones típicas de los .so generados:</strong>
+            <div class="file-tree">
+rtsp-viewer-library/
+└── build/
+    └── intermediates/
+        └── cmake/
+            ├── debug/          ← Versión debug
+            │   └── obj/
+            │       ├── arm64-v8a/    ← 64-bit ARM (mayoría de dispositivos modernos)
+            │       │   └── libgstreamer-native.so
+            │       ├── armeabi-v7a/  ← 32-bit ARM (dispositivos antiguos)
+            │       ├── x86/          ← Emuladores x86
+            │       └── x86_64/       ← Emuladores x86 de 64-bit
+            └── release/        ← Versión release
+                └── obj/
+                    └── ...
+            </div>
+        </div>
+        
+        <div class="tip">
+            <span class="tip-title">🎯 ABIs (Arquitecturas) comunes:</span>
+            • <strong>arm64-v8a</strong> → Todos los dispositivos modernos (2015+)<br>
+            • <strong>armeabi-v7a</strong> → Dispositivos antiguos (pre-2015)<br>
+            • <strong>x86_64</strong> → Emuladores en PC/Mac Intel<br>
+            • <strong>x86</strong> → Emuladores antiguos (32-bit)
+        </div>
+    </div>
+    
+    <div class="step">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <div class="step-title">Copiar a jniLibs/</div>
+        </div>
+        
+        <pre class="code-block"><code># Crear estructura de directorios
+mkdir -p rtsp-viewer-library/src/main/jniLibs/arm64-v8a
+mkdir -p rtsp-viewer-library/src/main/jniLibs/armeabi-v7a
+
+# Copiar .so para arm64-v8a (64-bit)
+cp rtsp-viewer-library/build/intermediates/cmake/debug/obj/arm64-v8a/libgstreamer-native.so \
+   rtsp-viewer-library/src/main/jniLibs/arm64-v8a/
+
+# Copiar .so para armeabi-v7a (32-bit)
+cp rtsp-viewer-library/build/intermediates/cmake/debug/obj/armeabi-v7a/libgstreamer-native.so \
+   rtsp-viewer-library/src/main/jniLibs/armeabi-v7a/</code></pre>
+        
+        <div class="explanation">
+            <strong>🗂️ Estructura final deseada:</strong>
+            <div class="file-tree">
+rtsp-viewer-library/
+└── src/
+    └── main/
+        ├── java/              ← Tu código Java/Kotlin
+        ├── jniLibs/           ← Librerías nativas (.so)
+        │   ├── arm64-v8a/
+        │   │   └── libgstreamer-native.so
+        │   ├── armeabi-v7a/
+        │   │   └── libgstreamer-native.so
+        │   ├── x86_64/
+        │   └── x86/
+        └── AndroidManifest.xml
+            </div>
+        </div>
+        
+        <div class="success">
+            <strong>✅ ¡Listo!</strong> Ahora tu módulo incluye las librerías nativas.
+            Cuando compiles el AAR, los <code>.so</code> se empaquetarán automáticamente.
+        </div>
+    </div>
+    
+    <div class="tip">
+        <span class="tip-title">🔄 Script automatizado (opcional):</span>
+        <pre class="code-block"><code>#!/bin/bash
+# copy-so.sh - Automatiza la copia de .so
+
+BUILD_TYPE="debug"  # o "release"
+SRC="rtsp-viewer-library/build/intermediates/cmake/$BUILD_TYPE/obj"
+DST="rtsp-viewer-library/src/main/jniLibs"
+
+for ABI in arm64-v8a armeabi-v7a; do
+    mkdir -p "$DST/$ABI"
+    cp "$SRC/$ABI/libgstreamer-native.so" "$DST/$ABI/"
+    echo "✅ Copiado $ABI"
+done</code></pre>
+        Ejecutar con: <code>bash copy-so.sh</code>
+    </div>
+    
+    <h2>📤 PARTE 2: Distribuir a Otras Apps</h2>
+    
+    <div class="flow">
+        <div class="flow-title">🎯 Hay 3 formas de distribuir:</div>
+        <ol style="padding-left: 25px; margin-top: 10px;">
+            <li><strong>AAR (Android Archive)</strong> → Empaqueta todo (Java + .so + recursos)</li>
+            <li><strong>Maven Local</strong> → Publicar en repositorio local de tu máquina</li>
+            <li><strong>Maven Remoto</strong> → Subir a repositorio privado/público (GitHub Packages, etc.)</li>
+        </ol>
+    </div>
+    
+    <div class="distribution-box">
+        <h3>📦 Opción 1: Generar AAR (más simple)</h3>
+        
+        <pre class="code-block"><code># Generar el archivo AAR
+./gradlew :rtsp-viewer-library:assembleRelease
+
+# Ubicación del AAR generado:
+# rtsp-viewer-library/build/outputs/aar/rtsp-viewer-library-release.aar</code></pre>
+        
+        <div class="explanation">
+            <strong>📍 El AAR contiene:</strong><br>
+            • Clases compiladas (.class → .dex)<br>
+            • Librerías nativas (.so) de todas las arquitecturas<br>
+            • Recursos (layouts, drawables, etc.)<br>
+            • AndroidManifest.xml<br>
+            • ProGuard rules
+        </div>
+        
+        <h4 style="margin-top: 25px; margin-bottom: 15px;">Usar el AAR en otra app:</h4>
+        
+        <div class="file-tree">
+mi-otra-app/
+├── app/
+│   ├── libs/                          ← Crear esta carpeta
+│   │   └── rtsp-viewer-library-release.aar
+│   └── build.gradle
+└── settings.gradle
+        </div>
+        
+        <pre class="code-block"><code>// app/build.gradle
+
+android {
+    // ...
+}
+
+dependencies {
+    // Agregar el AAR como dependencia
+    implementation files('libs/rtsp-viewer-library-release.aar')
+    
+    // Dependencias que necesite tu librería (si las hay)
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}</code></pre>
+        
+        <pre class="code-block"><code>// Cargar la librería nativa en tu código Java/Kotlin
+
+class MainActivity : AppCompatActivity() {
+    companion object {
+        init {
+            System.loadLibrary("gstreamer-native")  // Sin el prefijo "lib" ni extensión ".so"
+        }
+    }
+    
+    // Declarar métodos nativos
+    private external fun nativeInit(): Boolean
+}</code></pre>
+    </div>
+    
+    <div class="distribution-box">
+        <h3>🏠 Opción 2: Maven Local (desarrollo/testing)</h3>
+        
+        <h4>Paso 1: Configurar publishing en la librería</h4>
+        <pre class="code-block"><code>// rtsp-viewer-library/build.gradle
+
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
+
+android { /* ... */ }
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.tuempresa'
+                artifactId = 'rtsp-viewer-library'
+                version = '1.0.0'
+            }
+        }
+    }
+}</code></pre>
+        
+        <h4>Paso 2: Publicar en Maven Local</h4>
+        <pre class="code-block"><code># Publicar la librería en ~/.m2/repository/
+./gradlew :rtsp-viewer-library:publishToMavenLocal</code></pre>
+        
+        <h4>Paso 3: Usar desde otra app</h4>
+        <pre class="code-block"><code>// settings.gradle de la app consumidora
+
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()  // ← Agregar esto
+        google()
+        mavenCentral()
+    }
+}</code></pre>
+        
+        <pre class="code-block"><code>// app/build.gradle
+
+dependencies {
+    implementation 'com.tuempresa:rtsp-viewer-library:1.0.0'
+}</code></pre>
+    </div>
+    
+    <div class="distribution-box">
+        <h3>☁️ Opción 3: Maven Remoto (producción)</h3>
+        
+        <div class="explanation">
+            <strong>Repositorios comunes:</strong><br>
+            • <strong>GitHub Packages</strong> → Gratis para repos públicos<br>
+            • <strong>Maven Central</strong> → Requiere registro, proceso largo<br>
+            • <strong>JitPack</strong> → Súper fácil, desde GitHub directamente<br>
+            • <strong>Artifactory/Nexus</strong> → Empresarial, privado
+        </div>
+        
+        <h4>Ejemplo con JitPack (más fácil):</h4>
+        
+        <pre class="code-block"><code>// 1. Subir tu código a GitHub
+// 2. Crear un release (tag) en GitHub: v1.0.0
+
+// 3. En la app consumidora:
+
+// settings.gradle
+dependencyResolutionManagement {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+// app/build.gradle
+dependencies {
+    implementation 'com.github.tuusuario:rtsp-viewer-library:1.0.0'
+}</code></pre>
+        
+        <div class="tip">
+            <span class="tip-title">📖 Más info sobre JitPack:</span>
+            • Solo necesitas código en GitHub<br>
+            • Soporta release tags automáticamente<br>
+            • No requiere configuración compleja<br>
+            • URL: <code>https://jitpack.io</code>
+        </div>
+    </div>
+    
+    <h2>🔧 Configuración Adicional en build.gradle</h2>
+    
+    <div class="step">
+        <div class="step-title" style="margin-bottom: 15px;">Filtrar ABIs (reducir tamaño del APK)</div>
+        
+        <pre class="code-block"><code>// rtsp-viewer-library/build.gradle
+
+android {
+    defaultConfig {
+        // Solo incluir arquitecturas que necesites
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
+            // Excluye x86, x86_64 si no usas emuladores en producción
+        }
+    }
+    
+    // O filtrar por build type
+    buildTypes {
+        release {
+            ndk {
+                abiFilters 'arm64-v8a'  // Solo 64-bit en release
+            }
+        }
+        debug {
+            ndk {
+                abiFilters 'arm64-v8a', 'x86_64'  // Incluir emulador en debug
+            }
+        }
+    }
+}</code></pre>
+    </div>
+    
+    <div class="step">
+        <div class="step-title" style="margin-bottom: 15px;">Splits de APK por ABI (APKs separados)</div>
+        
+        <pre class="code-block"><code>// app/build.gradle (en la app que CONSUME la librería)
+
+android {
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a'
+            universalApk false  // No generar APK universal (más pequeño)
+        }
+    }
+}</code></pre>
+        
+        <div class="explanation">
+            <strong>🎯 Resultado:</strong> Genera APKs separados por arquitectura<br>
+            • <code>app-arm64-v8a-release.apk</code> (solo 64-bit)<br>
+            • <code>app-armeabi-v7a-release.apk</code> (solo 32-bit)<br>
+            Google Play automáticamente entrega el APK correcto a cada dispositivo
+        </div>
+    </div>
+    
+    <h2>✅ Verificación Final</h2>
+    
+    <div class="step">
+        <div class="step-title" style="margin-bottom: 15px;">Comprobar que el .so está incluido</div>
+        
+        <pre class="code-block"><code># Ver contenido del AAR (es un archivo ZIP)
+unzip -l rtsp-viewer-library/build/outputs/aar/rtsp-viewer-library-release.aar
+
+# Deberías ver algo como:
+# jni/arm64-v8a/libgstreamer-native.so
+# jni/armeabi-v7a/libgstreamer-native.so
+
+# Extraer y verificar
+unzip rtsp-viewer-library-release.aar -d /tmp/aar-extracted
+ls -la /tmp/aar-extracted/jni/*/</code></pre>
+    </div>
+    
+    <div class="step">
+        <div class="step-title" style="margin-bottom: 15px;">Verificar en APK instalado</div>
+        
+        <pre class="code-block"><code># Después de instalar tu app en el dispositivo
+adb shell run-as com.tu.paquete ls -la lib/
+
+# Deberías ver:
+# libgstreamer-native.so</code></pre>
+    </div>
+    
+    <div class="warning">
+        <strong>⚠️ Problemas comunes:</strong><br><br>
+        <strong>1. UnsatisfiedLinkError:</strong> El .so no está en jniLibs/ o nombre incorrecto<br>
+        <strong>2. "No implementation found":</strong> Falta método nativo en C/C++ o JNI signature incorrecta<br>
+        <strong>3. App crash al cargar:</strong> ABI incompatible (ej: solo arm64 pero dispositivo es armeabi-v7a)<br>
+        <strong>4. AAR vacío:</strong> Olvidaste copiar .so a jniLibs/ antes de assembleRelease
+    </div>
+    
+    <div class="success" style="margin-top: 30px; font-size: 1.1em;">
+        <strong>🎉 ¡Proceso completo!</strong><br><br>
+        <strong>Resumen:</strong><br>
+        1. Compilar nativo → <code>externalNativeBuildDebug</code><br>
+        2. Copiar .so a <code>src/main/jniLibs/</code><br>
+        3. Generar AAR → <code>assembleRelease</code><br>
+        4. Distribuir → AAR directo, Maven Local, o Maven Remoto<br>
+        5. Cargar en código → <code>System.loadLibrary("nombre")</code>
+    </div>
+</body>
+</html>

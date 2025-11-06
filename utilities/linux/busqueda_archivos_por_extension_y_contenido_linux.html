@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Búsqueda en Unix/Linux: find & grep</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #000;
+        }
+        
+        .intro {
+            background: #f5f5f5;
+            border: 2px solid #000;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .intro h2 {
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+        }
+        
+        h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .command-box {
+            background: #f9f9f9;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .command-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        code {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            margin: 0;
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            white-space: pre-wrap;
+        }
+        
+        pre code {
+            padding: 0;
+            background: transparent;
+        }
+        
+        .code-block {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-left: 3px solid #000;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        
+        .explanation {
+            background: #e8e8e8;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #000;
+        }
+        
+        .tip {
+            background: #fff9c4;
+            border: 2px solid #000;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .tip strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison > div {
+            border: 2px solid #000;
+            padding: 20px;
+        }
+        
+        .comparison h4 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f0f0f0;
+            border-bottom: 2px solid #000;
+            font-weight: bold;
+        }
+        
+        .use-case {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .use-case h4 {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Guía Completa: Búsqueda en Unix/Linux</h1>
+    
+    <div class="intro">
+        <h2>🎯 Los Dos Comandos Esenciales</h2>
+        <div class="comparison" style="margin-top: 20px;">
+            <div>
+                <h4>find - Buscar ARCHIVOS</h4>
+                <p>Encuentra archivos y directorios por nombre, tipo, tamaño, fecha, permisos, etc.</p>
+                <pre class="code-block"><code># Buscar por nombre
+find /ruta -name "*.txt"</code></pre>
+            </div>
+            <div>
+                <h4>grep - Buscar CONTENIDO</h4>
+                <p>Busca texto dentro de archivos, mostrando las líneas que coinciden.</p>
+                <pre class="code-block"><code># Buscar texto en archivos
+grep -r "palabra" /ruta</code></pre>
+            </div>
+        </div>
+        <div class="tip">
+            <strong>💡 La combinación perfecta:</strong>
+            <code>find</code> encuentra los archivos, <code>grep</code> busca dentro de ellos.
+            Juntos son imparables para buscar en millones de archivos.
+        </div>
+    </div>
+    
+    <h2>1️⃣ Comando FIND - Buscar Archivos</h2>
+    
+    <h3>Estructura básica</h3>
+    <pre class="code-block"><code>find [RUTA] [OPCIONES] [EXPRESIÓN]
+
+find /ruta/donde/buscar -name "patron" -type f</code></pre>
+    
+    <h3>🔸 Buscar por nombre (-name)</h3>
+    
+    <div class="command-box">
+        <h4>Tu ejemplo: Archivos .cmake y .mk</h4>
+        <pre class="code-block"><code>find /Users/kenny/Files/gstreamer-archis/1.26 -name "*.cmake" -o -name "*.mk"</code></pre>
+        <div class="explanation">
+            <strong>Desglose:</strong><br>
+            • <code>/Users/kenny/...</code> - Ruta donde buscar<br>
+            • <code>-name "*.cmake"</code> - Encuentra archivos que terminen en .cmake<br>
+            • <code>-o</code> - OR lógico (o esto O aquello)<br>
+            • <code>-name "*.mk"</code> - O archivos que terminen en .mk<br><br>
+            <strong>Resultado:</strong> Lista todos los .cmake y .mk en esa ruta
+        </div>
+    </div>
+    
+    <div class="command-box">
+        <h4>Variaciones útiles de -name</h4>
+        <pre class="code-block"><code># Un solo tipo de archivo
+find . -name "*.java"
+
+# Múltiples extensiones (OR)
+find . -name "*.java" -o -name "*.kt" -o -name "*.xml"
+
+# Nombre exacto
+find . -name "MainActivity.java"
+
+# Case-insensitive (ignora mayúsculas/minúsculas)
+find . -iname "*.JAVA"    # encuentra .java, .Java, .JAVA
+
+# Excluir archivos (NOT)
+find . -name "*.java" ! -name "*Test.java"
+
+# Buscar solo en este directorio (no subdirectorios)
+find . -maxdepth 1 -name "*.txt"
+
+# Buscar desde profundidad 2 en adelante
+find . -mindepth 2 -name "*.java"</code></pre>
+    </div>
+    
+    <h3>🔸 Buscar por tipo (-type)</h3>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># Solo archivos normales
+find . -type f -name "*.java"
+
+# Solo directorios
+find . -type d -name "src"
+
+# Solo enlaces simbólicos
+find . -type l
+
+# Combinado: directorios llamados "build" o "bin"
+find . -type d \( -name "build" -o -name "bin" \)</code></pre>
+        <div class="explanation">
+            <strong>Tipos comunes:</strong><br>
+            • <code>f</code> - archivo normal<br>
+            • <code>d</code> - directorio<br>
+            • <code>l</code> - enlace simbólico<br>
+            • <code>s</code> - socket<br>
+            • <code>p</code> - named pipe
+        </div>
+    </div>
+    
+    <h3>🔸 Buscar por tamaño (-size)</h3>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># Archivos mayores a 100MB
+find . -type f -size +100M
+
+# Archivos menores a 1KB
+find . -type f -size -1k
+
+# Archivos de exactamente 512 bytes
+find . -type f -size 512c
+
+# Archivos entre 10MB y 50MB
+find . -type f -size +10M -size -50M
+
+# Archivos vacíos
+find . -type f -empty</code></pre>
+        <div class="explanation">
+            <strong>Unidades:</strong><br>
+            • <code>c</code> - bytes<br>
+            • <code>k</code> - kilobytes<br>
+            • <code>M</code> - megabytes<br>
+            • <code>G</code> - gigabytes<br>
+            • <code>+</code> - mayor que<br>
+            • <code>-</code> - menor que
+        </div>
+    </div>
+    
+    <h3>🔸 Buscar por fecha (-mtime, -ctime, -atime)</h3>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># Modificados en las últimas 24 horas
+find . -type f -mtime -1
+
+# Modificados hace más de 7 días
+find . -type f -mtime +7
+
+# Modificados hace exactamente 3 días
+find . -type f -mtime 3
+
+# Modificados en los últimos 30 minutos
+find . -type f -mmin -30
+
+# Accedidos hoy
+find . -type f -atime 0
+
+# Cambiados en permisos/propietario en última semana
+find . -type f -ctime -7</code></pre>
+        <div class="explanation">
+            <strong>Tipos de tiempo:</strong><br>
+            • <code>-mtime</code> - modification time (contenido modificado)<br>
+            • <code>-atime</code> - access time (último acceso)<br>
+            • <code>-ctime</code> - change time (metadatos cambiados)<br>
+            • <code>-mmin</code> - en minutos en lugar de días
+        </div>
+    </div>
+    
+    <h3>🔸 Acciones con archivos encontrados (-exec, -delete)</h3>
+    
+    <div class="command-box">
+        <h4>Tu ejemplo: find + grep</h4>
+        <pre class="code-block"><code>find . -name "*.cmake" -exec grep -l "JAVA_SRC_DIR" {} \;</code></pre>
+        <div class="explanation">
+            <strong>Desglose:</strong><br>
+            • <code>find . -name "*.cmake"</code> - Encuentra todos los .cmake<br>
+            • <code>-exec</code> - Ejecuta un comando con cada archivo encontrado<br>
+            • <code>grep -l "JAVA_SRC_DIR"</code> - Busca "JAVA_SRC_DIR" en el archivo<br>
+            • <code>{}</code> - Placeholder para el archivo actual<br>
+            • <code>\;</code> - Fin del comando -exec<br><br>
+            <strong>Resultado:</strong> Lista solo los archivos .cmake que CONTIENEN "JAVA_SRC_DIR"
+        </div>
+    </div>
+    
+    <div class="command-box">
+        <h4>Más ejemplos de -exec</h4>
+        <pre class="code-block"><code># Copiar archivos encontrados
+find . -name "*.log" -exec cp {} /backup/ \;
+
+# Mover archivos
+find . -name "*.tmp" -exec mv {} /tmp/ \;
+
+# Ejecutar múltiples comandos
+find . -name "*.java" -exec echo "Procesando: {}" \; -exec wc -l {} \;
+
+# Confirmar antes de ejecutar (interactivo)
+find . -name "*.bak" -ok rm {} \;
+
+# Ejecutar en lote (más eficiente para muchos archivos)
+find . -name "*.txt" -exec grep "error" {} +
+
+# Renombrar archivos (con bash)
+find . -name "*.jpeg" -exec bash -c 'mv "$1" "${1%.jpeg}.jpg"' _ {} \;</code></pre>
+    </div>
+    
+    <div class="command-box">
+        <h4>Eliminar archivos encontrados</h4>
+        <pre class="code-block"><code># Borrar archivos .tmp
+find . -name "*.tmp" -delete
+
+# Borrar archivos viejos
+find . -type f -mtime +30 -delete
+
+# Borrar directorios vacíos
+find . -type d -empty -delete
+
+# ⚠️ PELIGROSO: Siempre prueba primero sin -delete
+# Primero lista:
+find . -name "*.bak"
+# Si se ve bien, entonces:
+find . -name "*.bak" -delete</code></pre>
+    </div>
+    
+    <h2>2️⃣ Comando GREP - Buscar Contenido</h2>
+    
+    <h3>Estructura básica</h3>
+    <pre class="code-block"><code>grep [OPCIONES] "patrón" archivos
+
+grep "texto_a_buscar" archivo.txt
+grep -r "texto_a_buscar" /ruta/</code></pre>
+    
+    <h3>🔸 Búsqueda recursiva (-r)</h3>
+    
+    <div class="command-box">
+        <h4>Tu ejemplo: Buscar referencias a Java</h4>
+        <pre class="code-block"><code>grep -r "JAVA_SRC_DIR\|java/\|src/" /Users/kenny/Files/gstreamer-archis/1.26/</code></pre>
+        <div class="explanation">
+            <strong>Desglose:</strong><br>
+            • <code>-r</code> - Recursivo (busca en todos los subdirectorios)<br>
+            • <code>"JAVA_SRC_DIR\|java/\|src/"</code> - Patrón con OR (<code>\|</code>)<br>
+            • Busca líneas que contengan CUALQUIERA de estos tres patrones<br>
+            • <code>/Users/kenny/...</code> - Ruta raíz donde buscar<br><br>
+            <strong>Resultado:</strong> Muestra todas las líneas que mencionen Java en cualquier archivo
+        </div>
+    </div>
+    
+    <div class="command-box">
+        <h4>Variaciones de búsqueda recursiva</h4>
+        <pre class="code-block"><code># Recursivo básico
+grep -r "error" /var/log/
+
+# Mostrar solo nombres de archivo (no contenido)
+grep -rl "TODO" .
+
+# Mostrar número de línea
+grep -rn "import" src/
+
+# Case-insensitive
+grep -ri "error" .
+
+# Mostrar archivos que NO contienen el patrón
+grep -rL "test" .
+
+# Limitar a ciertos tipos de archivo
+grep -r --include="*.java" "MainActivity" .
+
+# Excluir ciertos tipos
+grep -r --exclude="*.log" "error" .
+
+# Excluir directorios
+grep -r --exclude-dir="node_modules" "import" .
+grep -r --exclude-dir={build,dist,target} "error" .</code></pre>
+    </div>
+    
+    <h3>🔸 Opciones de visualización</h3>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># Mostrar 3 líneas antes y después (contexto)
+grep -C 3 "error" app.log
+
+# Solo líneas antes
+grep -B 5 "Exception" app.log
+
+# Solo líneas después
+grep -A 10 "Stack trace:" app.log
+
+# Numerar líneas
+grep -n "TODO" Main.java
+
+# Contar coincidencias
+grep -c "error" app.log
+
+# Mostrar solo la parte que coincide
+grep -o "http://[^ ]*" index.html
+
+# Colorear resultados (muchos shells lo hacen por defecto)
+grep --color=always "error" app.log</code></pre>
+    </div>
+    
+    <h3>🔸 Múltiples patrones</h3>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># OR con \| (como en tu ejemplo)
+grep "error\|warning\|fatal" app.log
+
+# OR con -E (extended regex, más legible)
+grep -E "error|warning|fatal" app.log
+
+# Múltiples patrones con -e
+grep -e "error" -e "warning" -e "fatal" app.log
+
+# Desde archivo con patrones (uno por línea)
+grep -f patterns.txt app.log
+
+# AND (ambos patrones en la misma línea)
+grep "error" app.log | grep "database"
+
+# NOT (líneas que NO contienen)
+grep -v "debug" app.log
+
+# Solo líneas que empiezan con
+grep "^Error" app.log
+
+# Solo líneas que terminan con
+grep "failed$" app.log</code></pre>
+    </div>
+    
+    <h2>3️⃣ Combinaciones Poderosas: find + grep</h2>
+    
+    <div class="use-case">
+        <h4>📱 Caso Android: Buscar Activities</h4>
+        <pre class="code-block"><code># Encontrar todos los archivos Java/Kotlin que definen Activities
+find . -type f \( -name "*.java" -o -name "*.kt" \) \
+  -exec grep -l "extends Activity\|: Activity" {} \;
+
+# Con contexto (ver las líneas)
+find . -type f \( -name "*.java" -o -name "*.kt" \) \
+  -exec grep -H -n "extends Activity" {} \;</code></pre>
+    </div>
+    
+    <div class="use-case">
+        <h4>🔍 Caso: Buscar strings hardcodeados</h4>
+        <pre class="code-block"><code># Encontrar strings hardcodeados en Java (no en strings.xml)
+find ./app/src/main/java -name "*.java" \
+  -exec grep -n "setText(\"" {} \;
+
+# Buscar URLs hardcodeadas
+find . -type f \( -name "*.java" -o -name "*.kt" \) \
+  -exec grep -E "https?://[^\"]+" {} \;</code></pre>
+    </div>
+    
+    <div class="use-case">
+        <h4>🗑️ Caso: Limpiar archivos de build</h4>
+        <pre class="code-block"><code># Encontrar y eliminar todos los directorios build
+find . -type d -name "build" -exec rm -rf {} +
+
+# Encontrar y eliminar archivos .class
+find . -type f -name "*.class" -delete
+
+# Encontrar archivos grandes de build
+find . -type f -name "*.apk" -size +50M</code></pre>
+    </div>
+    
+    <div class="use-case">
+        <h4>📊 Caso: Análisis de código</h4>
+        <pre class="code-block"><code># Contar líneas de código Java
+find . -name "*.java" -exec wc -l {} + | sort -n
+
+# Encontrar TODOs en el proyecto
+find . -type f \( -name "*.java" -o -name "*.kt" -o -name "*.xml" \) \
+  -exec grep -Hn "TODO\|FIXME\|HACK" {} \;
+
+# Buscar usos de APIs deprecadas
+find . -name "*.java" -exec grep -n "@Deprecated" {} \;
+
+# Archivos sin licencia
+find . -name "*.java" ! -exec grep -q "Copyright" {} \; -print</code></pre>
+    </div>
+    
+    <div class="use-case">
+        <h4>🔧 Caso GStreamer: Configuración</h4>
+        <pre class="code-block"><code># Tu ejemplo mejorado: encontrar configuraciones Java
+find /Users/kenny/Files/gstreamer-archis/1.26 \
+  \( -name "*.cmake" -o -name "*.mk" -o -name "*.pc" \) \
+  -exec grep -Hn "JAVA\|JNI\|android" {} \;
+
+# Encontrar includes de headers específicos
+find . -name "*.h" -exec grep -l "#include.*gst/gst.h" {} \;
+
+# Buscar plugins registrados
+find . -name "*.c" -exec grep -n "GST_PLUGIN_DEFINE" {} \;</code></pre>
+    </div>
+    
+    <h2>4️⃣ Trucos y Optimizaciones</h2>
+    
+    <div class="tip">
+        <strong>🚀 Performance: xargs vs -exec</strong>
+        <pre class="code-block"><code># ❌ LENTO: ejecuta grep una vez por archivo
+find . -name "*.java" -exec grep "error" {} \;
+
+# ✅ RÁPIDO: ejecuta grep una vez con todos los archivos
+find . -name "*.java" -exec grep "error" {} +
+
+# ✅ TAMBIÉN RÁPIDO: con xargs
+find . -name "*.java" | xargs grep "error"
+
+# ✅ SEGURO con nombres raros (espacios, etc)
+find . -name "*.java" -print0 | xargs -0 grep "error"</code></pre>
+    </div>
+    
+    <div class="tip">
+        <strong>🎯 Excluir directorios comunes</strong>
+        <pre class="code-block"><code># Excluir node_modules, build, .git
+find . -type d \( -name "node_modules" -o -name "build" -o -name ".git" \) -prune \
+  -o -name "*.js" -print
+
+# Con grep
+grep -r --exclude-dir={node_modules,build,.git,dist,target} "TODO" .
+
+# Crear alias útil
+alias findsrc='find . -type d \( -name build -o -name .git \) -prune -o -type f'
+findsrc -name "*.java"</code></pre>
+    </div>
+    
+    <div class="tip">
+        <strong>📝 Guardar resultados</strong>
+        <pre class="code-block"><code># Guardar lista de archivos
+find . -name "*.java" > java_files.txt
+
+# Guardar resultados de grep
+grep -rn "TODO" . > todos.txt
+
+# Guardar errores por separado
+grep -r "error" /var/log/ > errors.log 2> grep_errors.log
+
+# Append en lugar de sobrescribir
+find . -name "*.log" >> all_logs.txt</code></pre>
+    </div>
+    
+    <h2>5️⃣ Recetas Útiles para Android/C/C++</h2>
+    
+    <table>
+        <tr>
+            <th>Tarea</th>
+            <th>Comando</th>
+        </tr>
+        <tr>
+            <td>Buscar todas las Activities</td>
+            <td><code>find . -name "*.java" -exec grep -l "extends.*Activity" {} \;</code></td>
+        </tr>
+        <tr>
+            <td>Encontrar JNI methods</td>
+            <td><code>grep -rn "JNIEXPORT\|JNIEnv" --include="*.c" --include="*.cpp" .</code></td>
+        </tr>
+        <tr>
+            <td>Buscar memory leaks potenciales</td>
+            <td><code>grep -rn "malloc\|new" . | grep -v "free\|delete"</code></td>
+        </tr>
+        <tr>
+            <td>Encontrar archivos modificados hoy</td>
+            <td><code>find . -type f -mtime 0</code></td>
+        </tr>
+        <tr>
+            <td>Archivos grandes (>100MB)</td>
+            <td><code>find . -type f -size +100M</code></td>
+        </tr>
+        <tr>
+            <td>Duplicar nombres de archivo</td>
+            <td><code>find . -type f -printf "%f\n" | sort | uniq -d</code></td>
+        </tr>
+        <tr>
+            <td>Archivos sin extensión</td>
+            <td><code>find . -type f ! -name "*.*"</code></td>
+        </tr>
+        <tr>
+            <td>Buscar por permisos</td>
+            <td><code>find . -type f -perm 777</code></td>
+        </tr>
+        <tr>
+            <td>Archivos de usuario específico</td>
+            <td><code>find . -user kenny</code></td>
+        </tr>
+        <tr>
+            <td>Buscar binarios ejecutables</td>
+            <td><code>find . -type f -executable</code></td>
+        </tr>
+    </table>
+    
+    <h2>6️⃣ Regex en grep (avanzado)</h2>
+    
+    <div class="command-box">
+        <pre class="code-block"><code># Emails
+grep -rE "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" .
+
+# IPs
+grep -rE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" .
+
+# URLs
+grep -rE "https?://[^\s\"]+" .
+
+# Números de teléfono (formato: 123-456-7890)
+grep -rE "[0-9]{3}-[0-9]{3}-[0-9]{4}" .
+
+# Fechas (YYYY-MM-DD)
+grep -rE "[0-9]{4}-[0-9]{2}-[0-9]{2}" .
+
+# UUIDs
+grep -rE "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" .
+
+# Imports de Java
+grep -rE "^import\s+[a-zA-Z0-9.]+;" --include="*.java" .
+
+# Package names en Android
+grep -rE 'package="[a-z0-9.]+"' --include="AndroidManifest.xml" .</code></pre>
+    </div>
+    
+    <div class="tip" style="margin-top: 40px; background: #f0f0f0;">
+        <strong>🎓 Resumen de Opciones Más Usadas</strong>
+        <table style="margin-top: 15px;">
+            <tr>
+                <th>find</th>
+                <th>grep</th>
+            </tr>
+            <tr>
+                <td><code>-name</code> patrón de nombre</td>
+                <td><code>-r</code> recursivo</td>
+            </tr>
+            <tr>
+                <td><code>-type f/d</code> archivo/directorio</td>
+                <td><code>-i</code> ignorar mayúsculas</td>
+            </tr>
+            <tr>
+                <td><code>-size +10M</code> tamaño</td>
+                <td><code>-n</code> mostrar número de línea</td>
+            </tr>
+            <tr>
+                <td><code>-mtime -7</code> modificado</td>
+                <td><code>-l</code> solo nombres de archivo</td>
+            </tr>
+            <tr>
+                <td><code>-exec cmd {} \;</code> ejecutar</td>
+                <td><code>-v</code> invertir (NOT)</td>
+            </tr>
+            <tr>
+                <td><code>-delete</code> eliminar</td>
+                <td><code>-E</code> regex extendido</td>
+            </tr>
+            <tr>
+                <td><code>-o</code> OR lógico</td>
+                <td><code>-A/-B/-C</code> contexto</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

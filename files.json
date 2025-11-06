@@ -1,5 +1,6 @@
 [
   "android/jni/diferencia_entre_jni_jvm.html",
+  "android/jni/exportado_libreria_compartida.html",
   "computer_vision/tf/tflite_conversion_guide.html",
   "computer_vision/tf/tflite_import_android_guide.html",
   "cpp/c_repaso.html",
@@ -17,5 +18,6 @@
   "games/tipos_sprites_unity2d_guia.html",
   "games/videojuegos_2d_categorias.html",
   "posix/posix_platforms_comparison.html",
-  "posix/unix_posix_history.html"
+  "posix/unix_posix_history.html",
+  "utilities/linux/busqueda_archivos_por_extension_y_contenido_linux.html"
 ]
