@@ -1,6 +1,6 @@
 # Diccionario de Datos - Sistema de Transporte Urbano
 
-**Versión:** 2.1 Optimizada  
+**Versión:** 2.2 Optimizada  
 **Fecha:** Noviembre 2025  
 **Base de Datos:** PostgreSQL 14+
 
@@ -700,19 +700,57 @@ INSERT INTO location_history (tracker_id, vehicle_id, latitude, longitude, speed
 | acknowledged_by_profile_id | INTEGER | FK | Usuario que reconoció |
 | acknowledged_at | TIMESTAMP | | Momento de reconocimiento |
 | resolved_at | TIMESTAMP | | Momento de resolución |
+| resolution_notes | TEXT | | Notas de cierre |
+| escalation_level | INTEGER | DEFAULT 0 | Nivel de escalamiento actual |
+| escalated_at | TIMESTAMP | | Última fecha de escalamiento |
 | metadata | JSONB | | Datos adicionales en JSON |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de creación |
+
 
 **Notas:**
 - Alertas operativas automáticas generadas por el sistema
 - Prioridad variable según tipo de evento
 - `source_table` + `source_id` referencian al evento origen
 - `metadata` puede contener datos específicos del tipo de alerta
+- system_alerts tienen estado actual + escalation_level
+
+**Constraints:**
+```sql
+CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'))
+CHECK (status IN ('ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'DISMISSED'))
+```
 
 **Datos de ejemplo:**
 ```sql
 INSERT INTO system_alerts (alert_type, source_table, source_id, vehicle_id, priority, title, description) VALUES
 ('SPEED_VIOLATION', 'speed_violations', 1, 1, 'HIGH', 'Exceso de velocidad detectado', 'Bus ABC-123 a 85 km/h en zona de 60 km/h');
+```
+
+
+---
+
+### panic_types
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | SERIAL | PRIMARY KEY | Identificador único |
+| code | VARCHAR(20) | UNIQUE, NOT NULL | SERVICE_OUT, CALL_REQUEST, EMERGENCY, BEACON_PANIC |
+| name | VARCHAR(100) | NOT NULL | Nombre descriptivo |
+| priority | VARCHAR(10) | NOT NULL, CHECK | LOW, MEDIUM, HIGH, CRITICAL |
+| auto_activate_cameras | BOOLEAN | DEFAULT false | Activar cámaras automáticamente |
+| requires_acknowledge | BOOLEAN | DEFAULT true | Requiere ACK obligatorio |
+| escalation_timeout_seconds | INTEGER | | Timeout para escalar si no hay ACK |
+| is_active | BOOLEAN | DEFAULT true | Estado activo |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de creación |
+
+#### Datos semilla panic_types
+
+```sql
+INSERT INTO panic_types (code, name, priority, auto_activate_cameras, escalation_timeout_seconds) VALUES
+('SERVICE_OUT', 'Fuera de Servicio', 'MEDIUM', false, 600),
+('CALL_REQUEST', 'Solicitud de Llamada', 'LOW', false, 300),
+('EMERGENCY', 'Emergencia Digital', 'CRITICAL', true, 120),
+('BEACON_PANIC', 'Pánico Beacon Físico', 'CRITICAL', true, 30);
 ```
 
 ---
@@ -723,34 +761,336 @@ INSERT INTO system_alerts (alert_type, source_table, source_id, vehicle_id, prio
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | id | BIGSERIAL | PRIMARY KEY | Identificador único |
-| tracker_id | INTEGER | NOT NULL, FK | Tracker que envió la alerta |
+| panic_type_id | INTEGER | NOT NULL, FK | Tipo de pánico |
+| tracker_id | INTEGER | NOT NULL, FK | Tracker que envió alerta |
 | vehicle_id | INTEGER | NOT NULL, FK | Vehículo involucrado |
-| driver_profile_id | INTEGER | FK | Conductor que activó el pánico |
-| latitude | DECIMAL(10,8) | NOT NULL | Ubicación de la emergencia |
-| longitude | DECIMAL(11,8) | NOT NULL | Ubicación de la emergencia |
+| driver_profile_id | INTEGER | FK | Conductor asignado |
+| dispatch_id | INTEGER | FK | Despacho activo |
+| beacon_mac | VARCHAR(50) | | MAC del beacon |
+| triggered_by | VARCHAR(20) | DEFAULT 'DRIVER', CHECK | DRIVER, PASSENGER, UNKNOWN |
+| latitude | DECIMAL(10,8) | NOT NULL | Ubicación del evento |
+| longitude | DECIMAL(11,8) | NOT NULL | Ubicación del evento |
 | status | VARCHAR(20) | DEFAULT 'ACTIVE', CHECK | ACTIVE, ACKNOWLEDGED, RESOLVED, FALSE_ALARM |
-| priority | VARCHAR(10) | DEFAULT 'CRITICAL', CHECK | HIGH, CRITICAL |
+| priority | VARCHAR(10) | NOT NULL, CHECK | Copiado desde panic_type |
+| camera_stream_url | VARCHAR(255) | | URL streaming |
 | acknowledged_by_profile_id | INTEGER | FK | Usuario que atendió |
 | acknowledged_at | TIMESTAMP | | Momento de reconocimiento |
 | resolved_at | TIMESTAMP | | Momento de resolución |
-| resolution_notes | TEXT | | Notas sobre la resolución |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de creación |
+| resolution_notes | TEXT | | Notas de cierre |
+| escalation_level | INTEGER | DEFAULT 0 | Nivel de escalamiento actual |
+| escalated_at | TIMESTAMP | | Última fecha de escalamiento |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Timestamp del evento |
 
 **Notas:**
-- Emergencias del conductor (botón de pánico manual)
-- Siempre prioridad CRITICAL o HIGH
+- Emergencias del conductor (botón de pánico manual o digital)
 - Requiere protocolo de respuesta diferenciado (seguridad vs operativo)
 - Diferencia con system_alerts: origen manual vs automático
+- panic_alerts tienen estado actual + escalation_level
 
-**Datos de ejemplo:**
+**Constraints:**
 ```sql
-INSERT INTO panic_alerts (tracker_id, vehicle_id, driver_profile_id, latitude, longitude, priority) VALUES
-(1, 1, 1, -12.0463, -77.0428, 'CRITICAL');
+CHECK (triggered_by IN ('DRIVER', 'PASSENGER', 'UNKNOWN'))
+CHECK (status IN ('ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'FALSE_ALARM'))
+CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'))
+```
+
+```sql
+INSERT INTO panic_alerts (
+    panic_type_id,
+    tracker_id,
+    vehicle_id,
+    driver_profile_id,
+    dispatch_id,
+    beacon_mac,
+    triggered_by,
+    latitude,
+    longitude,
+    priority,
+    camera_stream_url
+) VALUES (
+    4,
+    1,
+    25,
+    1,
+    123,
+    'AA:BB:CC:DD:EE:FF',
+    'UNKNOWN',
+    -12.0463,
+    -77.0428,
+    'CRITICAL',
+    'https://stream.example.com/vehicle/25/live'
+);
+```
+
+
+### alert_escalations
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | SERIAL | PRIMARY KEY | Identificador único |
+| alert_source | VARCHAR(20) | NOT NULL, CHECK | SYSTEM, PANIC |
+| system_alert_id | BIGINT | FK | Referencia a system_alerts |
+| panic_alert_id | BIGINT | FK | Referencia a panic_alerts |
+| escalation_level | INTEGER | NOT NULL | Nivel de escalamiento (1, 2, 3) |
+| escalated_to_role | VARCHAR(50) | NOT NULL | Rol destino del escalamiento |
+| escalated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de escalamiento |
+| acknowledged_by_profile_id | INTEGER | FK | Usuario que reconoció este nivel |
+| acknowledged_at | TIMESTAMP | | Momento de reconocimiento |
+
+**Notas:**
+- alert_escalations es histórico/auditoría
+
+**Constraint:**
+```sql
+CHECK (
+  (system_alert_id IS NOT NULL AND panic_alert_id IS NULL) OR
+  (system_alert_id IS NULL AND panic_alert_id IS NOT NULL)
+)
+```
+
+```sql
+-- Escalamiento nivel 1: EMERGENCY a Gerente Operaciones
+INSERT INTO alert_escalations (
+    alert_source,
+    panic_alert_id,
+    escalation_level,
+    escalated_to_role
+) VALUES (
+    'PANIC',
+    500,
+    1,
+    'OPERATIONS_MANAGER'
+);
+
+-- Escalamiento nivel 2: Sin respuesta, a Gerencia General
+INSERT INTO alert_escalations (
+    alert_source,
+    system_alert_id,
+    escalation_level,
+    escalated_to_role
+) VALUES (
+    'SYSTEM',
+    1234,
+    2,
+    'GENERAL_MANAGER'
+);
+
+-- ACK del escalamiento por gerente
+UPDATE alert_escalations
+SET acknowledged_by_profile_id = 3,
+    acknowledged_at = NOW()
+WHERE id = 1;
+```
+---
+
+### audit_log
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| event_type | VARCHAR(50) | NOT NULL | Tipo de evento auditado |
+| entity_type | VARCHAR(50) | | Tipo de entidad afectada |
+| entity_id | BIGINT | | ID de la entidad |
+| user_profile_id | INTEGER | FK | Usuario que ejecutó la acción |
+| action | VARCHAR(50) | NOT NULL | Acción realizada |
+| details | JSONB | | Detalles adicionales |
+| ip_address | VARCHAR(45) | | IP del usuario |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Timestamp del evento |
+
+```sql
+-- Auditoría: Beacon emparejado
+INSERT INTO audit_log (
+    event_type,
+    entity_type,
+    entity_id,
+    user_profile_id,
+    action,
+    details,
+    ip_address
+) VALUES (
+    'BEACON_PAIRING',
+    'beacon_pairing_requests',
+    15,
+    2,
+    'APPROVED',
+    '{"beacon_mac": "AA:BB:CC:DD:EE:FF", "vehicle_id": 25, "requester": "Carlos Gómez"}'::jsonb,
+    '192.168.1.100'
+);
+
+-- Auditoría: Alerta de pánico resuelta
+INSERT INTO audit_log (
+    event_type,
+    entity_type,
+    entity_id,
+    user_profile_id,
+    action,
+    details
+) VALUES (
+    'PANIC_ALERT_RESOLVED',
+    'panic_alerts',
+    500,
+    5,
+    'RESOLVED',
+    '{"resolution": "False alarm confirmed via RTC call", "duration_minutes": 8}'::jsonb
+);
+
+-- Auditoría: Escalamiento ejecutado
+INSERT INTO audit_log (
+    event_type,
+    entity_type,
+    entity_id,
+    user_profile_id,
+    action,
+    details
+) VALUES (
+    'ALERT_ESCALATED',
+    'alert_escalations',
+    1,
+    NULL,
+    'AUTO_ESCALATE',
+    '{"from_level": 0, "to_level": 1, "reason": "No ACK in 120 seconds", "escalated_to": "OPERATIONS_MANAGER"}'::jsonb
+);
+```
+---
+
+
+## MÓDULO DE EMPAREJAMIENTO DE BEACONS EXTERNOS (Opcional en caso lo empleen)
+
+### beacon_pairing_requests
+Esta tabla registrará las solicitudes de las personas q intenten emparejar un nuevo beacon en su unidad. (No se busca tener un inventario de beacons)
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | SERIAL | PRIMARY KEY | Identificador único |
+| vehicle_id | INTEGER | NOT NULL, FK | Vehículo solicitante |
+| beacon_mac_address | VARCHAR(17) | NOT NULL | Dirección MAC del beacon |
+| beacon_name | VARCHAR(100) | | Nombre BLE advertised |
+| rssi | INTEGER | | Señal RSSI al momento de solicitud |
+| requested_by_type | VARCHAR(20) | NOT NULL, CHECK | DRIVER, MAINTENANCE, FIELD_TECH, UNKNOWN |
+| requested_by_name | VARCHAR(100) | | Nombre texto libre |
+| requested_by_profile_id | INTEGER | FK | Usuario si está registrado |
+| requester_voice_text | TEXT | | Transcripción voz a texto |
+| requester_photo_url | VARCHAR(255) | | URL foto temporal en storage |
+| photo_expires_at | TIMESTAMP | | Fecha expiración foto (7 días) |
+| status | VARCHAR(20) | DEFAULT 'PENDING', CHECK | PENDING, APPROVED, REJECTED |
+| reviewed_by_profile_id | INTEGER | FK | Monitoreador que revisó |
+| reviewed_at | TIMESTAMP | | Fecha de revisión |
+| rejection_reason | TEXT | | Motivo si fue rechazado |
+| verification_method | VARCHAR(20) | CHECK | RTC_CALL, IN_PERSON, NONE |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de solicitud |
+
+**Constraints:**
+```sql
+CHECK (requested_by_type IN ('DRIVER', 'MAINTENANCE', 'FIELD_TECH', 'UNKNOWN'))
+CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))
+CHECK (verification_method IN ('RTC_CALL', 'IN_PERSON', 'NONE'))
 ```
 
 ---
 
-## MÓDULO DE CONFIGURACIÓN DEL SISTEMA (POR REVISAR ********************************)
+### vehicle_beacons
+Esta tabla ya registra el beacon asociado a la unidad para q así solo permita recibir los eventos BLE por medio del beacon_mac_address
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| id | SERIAL | PRIMARY KEY | Identificador único |
+| vehicle_id | INTEGER | UNIQUE, NOT NULL, FK | Vehículo asociado |
+| beacon_mac_address | VARCHAR(17) | NOT NULL | MAC del beacon activo |
+| paired_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de emparejamiento |
+| paired_by_request_id | INTEGER | FK | Solicitud que originó |
+| last_seen_at | TIMESTAMP | | Última señal BLE recibida |
+| is_active | BOOLEAN | DEFAULT true | Estado activo |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Fecha de creación |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Última actualización |
+
+---
+
+### Flujo de Emparejamiento 
+
+#### Caso 1: Solicitud desde tablet (PENDING)
+
+**Contexto:** Técnico Carlos usa tablet en bus 025, captura voz + foto
+
+```sql
+INSERT INTO beacon_pairing_requests (...) VALUES (
+    25,                          -- vehicle_id del bus
+    'AA:BB:CC:DD:EE:FF',        -- MAC del beacon escaneado
+    'iBeacon-XYZ',              -- Nombre que transmite el beacon
+    -45,                         -- Señal RSSI (buena proximidad)
+    'MAINTENANCE',               -- Tipo de solicitante
+    'Carlos Gómez',             -- Texto libre desde voz
+    'Carlos Gómez técnico...',  -- Transcripción completa
+    'https://.../20251127.jpg', -- URL temporal (S3/MinIO)
+    NOW() + INTERVAL '7 days',  -- Expira en 7 días
+    'NONE'                       -- Aún no verificado
+);
+```
+
+**Estado:** Solicitud queda `PENDING`, monitoreador recibe notificación.
+
+---
+
+### Caso 2: Monitoreador aprueba
+
+**Contexto:** Monitoreador vio foto, llamó por RTC, confirmó identidad
+
+```sql
+UPDATE beacon_pairing_requests 
+SET status = 'APPROVED',              -- Cambia de PENDING
+    reviewed_by_profile_id = 2,       -- ID del monitoreador
+    reviewed_at = NOW(),              -- Timestamp de decisión
+    verification_method = 'RTC_CALL'  -- Verificó por llamada
+WHERE id = 1;
+```
+
+**Estado:** Solicitud aprobada, ahora se empareja el beacon.
+
+---
+
+### Caso 3: Emparejamiento final
+
+**Contexto:** Sistema registra beacon como activo para ese vehículo
+
+```sql
+INSERT INTO vehicle_beacons (...) VALUES (
+    25,                  -- Mismo vehicle_id
+    'AA:BB:CC:DD:EE:FF', -- MAC aprobada
+    1,                   -- ID de la solicitud aprobada
+    NOW()                -- Última vez visto
+)
+ON CONFLICT (vehicle_id)  -- Si ya tenía otro beacon
+DO UPDATE SET 
+    beacon_mac_address = EXCLUDED.beacon_mac_address,  -- Reemplaza MAC
+    paired_at = NOW(),                                 -- Nueva fecha
+    paired_by_request_id = EXCLUDED.paired_by_request_id,
+    is_active = true,                                  -- Reactiva
+    updated_at = NOW();
+```
+
+**Resultado:** 
+- Si bus 025 no tenía beacon → INSERT nuevo
+- Si ya tenía beacon viejo → UPDATE con nuevo MAC (reemplazo)
+
+---
+
+### Caso 4: Rechazo
+
+```sql
+UPDATE beacon_pairing_requests 
+SET status = 'REJECTED',
+    reviewed_by_profile_id = 2,
+    reviewed_at = NOW(),
+    rejection_reason = 'Persona no identificada en llamada RTC',
+    verification_method = 'RTC_CALL'
+WHERE id = 1;
+```
+
+**Estado:** No se crea registro en `vehicle_beacons`, tablet recibe notificación de rechazo.
+
+
+---
+
+## MÓDULO DE CONFIGURACIÓN DEL SISTEMA
 
 ### redis_sync_log
 **Propósito:** Registra operaciones de sincronización con Redis para monitoreo.
