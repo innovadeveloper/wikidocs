@@ -160,318 +160,381 @@ Se inicia un nuevo día operativo (generalmente a las 04:00 AM), o se requiere r
 
 ---
 
-### **CU-JOP-002: Supervisar Cumplimiento de Frecuencias** (Con Programación)
+### CU-JOP-002: Supervisar Cumplimiento Operativo
 
 **ID:** CU-JOP-002
 
 **Actor:** Jefe Operaciones
 
 **Precondiciones:**
-- El Jefe Operaciones debe estar autenticado en el sistema
-- Debe existir un plan operativo aprobado para el día
-- Deben estar configuradas las frecuencias objetivo por ruta en TbIntervaloFrecuencia
-- Debe haber unidades operando en tiempo real
-- El sistema GPS debe estar activo y registrando posiciones en Tb_RegistroTrack
-- Deben estar definidos los puntos de control en Tb_Control
+- Jefe Operaciones autenticado en el sistema
+- Debe haber operación activa con despachos ejecutados
+- Sistema registrando salidas en Tb_SalidaUnidad
+- Datos históricos disponibles para comparación
 
 **Trigger:**
-El Jefe Operaciones necesita verificar el cumplimiento operativo durante el turno, o el sistema genera alerta de desviación significativa de frecuencias, o se cumple un horario de revisión programada (cada 2 horas).
+- Jefe Operaciones necesita evaluar desempeño operativo del turno/día
+- Se requiere reporte para gerencia
+- Revisión programada (cada 2 horas)
+- Finalización de turno
 
 **Flujo Principal:**
-1. El Jefe Operaciones accede al módulo de Supervisión de Frecuencias
-2. El sistema muestra el dashboard de cumplimiento en tiempo real:
-   - Vista general por ruta:
-     * Ruta 25: 92% cumplimiento ✅
-     * Ruta 30: 78% cumplimiento ⚠️
-     * Ruta 15: 65% cumplimiento ❌
-   - Semáforo de criticidad:
-     * Verde: >= 85% cumplimiento
-     * Amarillo: 70-84% cumplimiento
-     * Rojo: < 70% cumplimiento
-3. El Jefe Operaciones selecciona una ruta específica para análisis detallado (ej: Ruta 30)
-4. El sistema despliega información detallada de la ruta:
-   - Configuración objetivo:
-     * Frecuencia programada: 10 minutos entre salidas
-     * Horario operativo: 05:00 - 23:00
-     * Unidades asignadas: 10
-   - Estado actual:
-     * Unidades operando: 8 (2 fuera de servicio)
-     * Frecuencia real promedio: 12.5 minutos
-     * Desvío: +2.5 minutos (25% de desvío)
-     * Cumplimiento: 78%
-5. El sistema muestra gráfico de frecuencias en el tiempo:
-   - Eje X: Hora del día
-   - Eje Y: Minutos entre despachos
-   - Línea roja: Frecuencia objetivo (10 min)
-   - Línea azul: Frecuencia real registrada
-   - Áreas sombreadas: Desvíos significativos
-6. El sistema identifica franjas horarias problemáticas:
-   - 07:00 - 09:00: Frecuencia 15 min (objetivo 8 min) - HORA PICO ❌
-   - 12:00 - 14:00: Frecuencia 11 min (objetivo 10 min) - Aceptable ⚠️
-   - 18:00 - 20:00: Frecuencia 14 min (objetivo 8 min) - HORA PICO ❌
-7. El sistema muestra análisis de causas raíz:
-   - Unidades fuera de servicio: 2
-     * Unidad 245: Mantenimiento correctivo (avería)
-     * Unidad 267: Sin conductor disponible
-   - Retrasos acumulados:
-     * Congestión vehicular en Av. Principal: +3 min promedio
-     * Paradas prolongadas por alta demanda: +2 min
-   - Incidencias registradas:
-     * Accidente en ruta 08:15 AM (bloqueó 30 minutos)
-     * Bloqueo de vía 18:30 PM (desvío temporal)
-8. El Jefe Operaciones analiza puntos de control críticos:
-   - Selecciona punto de control "Terminal Central"
-   - El sistema muestra histograma de paso de unidades:
-     * Objetivo: 1 unidad cada 10 minutos (6 por hora)
-     * Real: 4.5 unidades por hora en promedio
-     * Brecha: -1.5 unidades por hora
-9. El sistema calcula impacto en servicio:
-   - Pasajeros afectados (estimado): 350 personas
-   - Tiempo de espera promedio: 15 minutos (vs. 10 objetivo)
-   - Quejas registradas: 12 (sobre esta ruta)
-10. El Jefe Operaciones identifica acciones correctivas necesarias:
-    - Inmediatas:
-      * Incorporar unidad de reemplazo
-      * Asignar conductor de reserva
-      * Ajustar frecuencia temporalmente a 12 min (realista)
-    - Mediano plazo:
-      * Revisar tiempos de recorrido en horas pico
-      * Evaluar rutas alternas para evitar congestión
-      * Coordinar con ATU ajuste de frecuencias oficiales
-11. El Jefe Operaciones comunica decisiones:
-    - Instruye a Supervisor Terminal:
-      * Activar unidad de reemplazo
-      * Priorizar despachos de ruta 30
-    - Instruye a Monitoreador GPS:
-      * Monitorear de cerca la ruta 30
-      * Alertar de retrasos > 5 minutos
-12. El sistema registra las decisiones tomadas:
-    - Acciones correctivas aplicadas
-    - Responsables asignados
-    - Hora de implementación
-    - Resultado esperado
-13. El Jefe Operaciones programa seguimiento:
-    - Revisión en 1 hora para verificar mejora
-    - Alerta si no se alcanza 80% cumplimiento en 2 horas
-14. El sistema genera reporte de supervisión:
-    - Resumen de cumplimiento por ruta
-    - Rutas con alertas
-    - Acciones correctivas aplicadas
-    - Tendencias del día
-15. El Jefe Operaciones puede exportar el reporte para:
-    - Reunión con Gerencia Operaciones
-    - Análisis del Analista Operaciones
-    - Documentación de incidencias del día
-16. El sistema actualiza el dashboard con las acciones tomadas:
-    - Marca ruta 30 como "En corrección"
-    - Activa monitoreo especial
-    - Programa alerta de verificación
-17. El sistema muestra confirmación: "Supervisión registrada - Acciones correctivas en curso"
+
+1. **Acceso al Módulo de Supervisión**
+
+Jefe Operaciones accede a "Supervisión Operativa"
+
+Sistema muestra dashboard inicial:
+```
+📊 SUPERVISIÓN OPERATIVA
+Terminal: A
+Fecha: 06/12/2024
+Hora: 10:30 AM
+
+Estado: OPERACIÓN NORMAL ✅
+```
+
+2. **Selección de Tipo de Análisis**
+
+Sistema presenta opciones según configuración:
+```
+📋 TIPO DE ANÁLISIS
+
+Empresa configurada con:
+[•] Programación de salidas (TbProgramacionSalida)
+[•] Frecuencias objetivo (TbIntervaloFrecuencia)
+
+Análisis disponible:
+○ Cumplimiento vs Programación
+○ Cumplimiento vs Frecuencias
+● Análisis comparativo (sin programación)
+
+Período:
+[•] Última hora
+[ ] Turno actual
+[ ] Día completo
+
+[GENERAR ANÁLISIS]
+```
+
+3. **Análisis con Programación/Frecuencias** (si aplica)
+
+Sistema procesa datos y muestra:
+```
+⏰ CUMPLIMIENTO DE HORARIOS - RUTA 25
+
+Período: 09:00 - 10:00 AM
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESPACHOS EJECUTADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Unidad | Hr Programa | Hr Real  | Desvío    | Estado
+-------|-------------|----------|-----------|-------
+245    | 09:00       | 09:01    | +1 min    | ✅
+167    | 09:10       | 09:11    | +1 min    | ✅
+312    | 09:20       | 09:19    | -1 min    | ✅
+201    | 09:30       | 09:32    | +2 min    | ✅
+189    | 09:40       | 09:44    | +4 min    | ⚠️
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MÉTRICAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Frecuencia objetivo: 10 minutos
+Frecuencia real promedio: 10.6 minutos
+Desviación: +0.6 min (+6%)
+
+Cumplimiento (±2 min): 80% (4/5)
+Retrasos >2 min: 20% (1/5)
+Adelantos: 0%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVACIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• BUS-189: Retraso +4 min (única desviación)
+• Tendencia general: Estable
+• Impacto pasajeros: Bajo
+```
+
+4. **Análisis SIN Programación** (modo híbrido)
+
+Si empresa opera sin programación formal, sistema muestra análisis comparativo:
+```
+📊 ANÁLISIS OPERATIVO COMPARATIVO - RUTA 25
+
+Período: 09:00 - 10:00 AM
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRODUCTIVIDAD HOY vs HISTÓRICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Servicios ejecutados:
+  Hoy (09:00-10:00):     5 servicios
+  Promedio histórico:    6 servicios
+  Diferencia:           -1 servicio (-17%)
+
+Intervalo promedio despachos:
+  Hoy:                  12.0 minutos
+  Ayer mismo horario:   10.0 minutos
+  Promedio semana:      10.5 minutos
+  Diferencia:          +1.5 min (+14%)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DETALLE DESPACHOS EJECUTADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Unidad | Hora Real | Intervalo | Observación
+-------|-----------|-----------|-------------
+245    | 09:00     | --        | Primera salida
+167    | 09:11     | 11 min    | Normal
+312    | 09:23     | 12 min    | Aceptable
+201    | 09:37     | 14 min    | Ligeramente alto
+189    | 09:51     | 14 min    | Ligeramente alto
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FACTORES IDENTIFICADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Disponibilidad unidades: 5 de 6 operando
+  (BUS-401 fuera servicio)
+
+• Tiempo promedio en cola: 8 minutos
+  (Normal: 5-6 minutos)
+
+• Demanda observada: Normal
+• Congestión vial: No reportada
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVALUACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Rendimiento: 83% vs histórico
+Tendencia: ↓ Ligeramente bajo
+Criticidad: 🟡 MEDIA (no crítico)
+
+Causa principal aparente:
+- Déficit de 1 unidad operativa
+```
+
+5. **Análisis Consolidado por Ruta**
+
+Jefe Operaciones selecciona "Vista General Todas las Rutas":
+```
+📊 RESUMEN OPERATIVO - TODAS LAS RUTAS
+
+Período: Turno Mañana (06:00 - 14:00)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CON PROGRAMACIÓN/FRECUENCIAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ruta | Servicios | Cumplim. | Desv.Prom | Estado
+-----|-----------|----------|-----------|-------
+25   | 24        | 92%      | +1.2 min  | ⭐ Excelente
+30   | 19        | 95%      | +0.8 min  | ⭐ Excelente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SIN PROGRAMACIÓN (Análisis comparativo)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ruta | Servic.Hoy | Prom.Hist | Variación | Estado
+-----|------------|-----------|-----------|-------
+15   | 11         | 13        | -15%      | ⚠️ Bajo
+40   | 8          | 8         | 0%        | ✅ Normal
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INDICADORES GLOBALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total despachos turno: 62
+Promedio histórico: 67
+Rendimiento: 92.5%
+
+Rutas con desempeño óptimo: 2 (Ruta 25, 30)
+Rutas requieren atención: 1 (Ruta 15)
+```
+
+6. **Identificación de Patrones**
+
+Sistema genera análisis de tendencias:
+```
+📈 ANÁLISIS DE TENDENCIAS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PATRÓN HORA PICO (07:00-09:00)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Con programación:
+• Cumplimiento: 88%
+• Retrasos promedio: +2.1 min
+• Patrón: Desviaciones normales hora pico
+
+Sin programación:
+• Servicios: 85% vs histórico
+• Intervalos: +15% más largos que promedio
+• Patrón: Déficit de unidades disponibles
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PATRÓN HORA VALLE (10:00-12:00)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Con programación:
+• Cumplimiento: 96%
+• Retrasos promedio: +0.5 min
+• Patrón: Excelente control
+
+Sin programación:
+• Servicios: 98% vs histórico
+• Intervalos: Consistentes con histórico
+• Patrón: Operación normal
+```
+
+7. **Generación de Reporte Informativo**
+
+Jefe Operaciones hace clic en "Generar Reporte":
+```
+📄 REPORTE OPERATIVO - SUPERVISIÓN
+
+Fecha: 06/12/2024
+Turno: Mañana (06:00 - 14:00)
+Generado por: Roberto Sánchez (Jefe Operaciones)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESUMEN EJECUTIVO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Despachos ejecutados: 62
+Meta programada: 67
+Cumplimiento: 92.5%
+
+Calificación general: 🟢 BUENO
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RUTAS CON PROGRAMACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ruta 25:
+• Cumplimiento horarios: 92% ⭐
+• Frecuencia real: 10.6 min (obj: 10 min)
+• Desviación: +6%
+• Evaluación: Excelente
+
+Ruta 30:
+• Cumplimiento horarios: 95% ⭐
+• Frecuencia real: 12.2 min (obj: 12 min)
+• Desviación: +2%
+• Evaluación: Excelente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RUTAS SIN PROGRAMACIÓN (Análisis comparativo)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ruta 15:
+• Servicios ejecutados: 11 (histórico: 13)
+• Rendimiento: 85% vs promedio
+• Intervalo promedio: 13.2 min (histórico: 11.5)
+• Evaluación: Por debajo del estándar
+• Causa identificada: 1 unidad fuera servicio
+
+Ruta 40:
+• Servicios ejecutados: 8 (histórico: 8)
+• Rendimiento: 100% vs promedio ⭐
+• Intervalo promedio: 15.0 min (histórico: 15.1)
+• Evaluación: Conforme a patrón histórico
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SITUACIONES IDENTIFICADAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ruta 15 - Rendimiento bajo
+   Período: Todo el turno
+   Factor: BUS-401 fuera servicio (avería)
+   Impacto: -15% servicios vs histórico
+   Prioridad: MEDIA
+
+2. Hora pico - Ligeros retrasos
+   Período: 07:00-09:00
+   Factor: Congestión vehicular normal
+   Impacto: +2.1 min promedio (aceptable)
+   Prioridad: BAJA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVACIONES OPERATIVAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fortalezas:
+✅ Rutas programadas con excelente cumplimiento
+✅ Hora valle con operación óptima
+✅ Ruta 40 mantiene patrón histórico consistente
+
+Áreas de atención:
+⚠️ Ruta 15 requiere unidad reemplazo
+⚠️ Considerar refuerzo hora pico Ruta 25
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPARACIÓN HISTÓRICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+vs Turno anterior: Similar (+0.5%)
+vs Promedio semanal: -7.5%
+vs Meta mensual: 92.5% (meta: 90%) ✅
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONCLUSIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Operación dentro de parámetros aceptables.
+Rutas programadas con desempeño sobresaliente.
+Ruta 15 presenta oportunidad de mejora por
+déficit de unidad operativa.
+
+Recomendación: Monitoreo continuo Ruta 15.
+
+[EXPORTAR PDF] [ENVIAR EMAIL] [GUARDAR]
+```
+
+8. **Distribución del Reporte**
+
+Sistema ofrece opciones:
+```
+📧 DISTRIBUIR REPORTE
+
+Destinatarios sugeridos:
+[x] Gerencia Operaciones
+[x] Supervisor Terminal A
+[ ] Analista Operaciones
+[ ] Jefe Mantenimiento
+
+Formato:
+[•] PDF
+[ ] Excel
+[ ] Ambos
+
+Adjuntar gráficos: [x] Sí
+
+[ENVIAR] [CANCELAR]
+```
 
 **Postcondiciones:**
-- El estado de cumplimiento de frecuencias queda documentado con timestamp
-- Las desviaciones significativas quedan identificadas y registradas
-- Las acciones correctivas quedan asignadas a responsables específicos
-- Se establece seguimiento automático de las mejoras
-- Queda registro en auditoría de la supervisión realizada
-- El personal operativo recibe instrucciones de ajuste
-- Los indicadores se actualizan para reflejar acciones en curso
-- Se genera información para análisis de mejora continua
+- Análisis de cumplimiento documentado (con/sin programación)
+- Desviaciones identificadas y cuantificadas
+- Causas probables registradas
+- Reporte informativo generado
+- Información disponible para toma de decisiones
+- Historial actualizado para análisis de tendencias
+- Sin acciones correctivas automáticas ejecutadas
 
----
+**Diferencias Clave por Modalidad:**
 
-### CU-JOP-002-ALT: Monitorear Productividad sin Programación
+| Aspecto | Con Programación | Sin Programación |
+|---------|-----------------|------------------|
+| Métrica principal | % Cumplimiento vs programado | % vs histórico |
+| Referencia | TbProgramacionSalida/TbIntervaloFrecuencia | Promedio histórico |
+| Evaluación | Objetivo/Verde/Amarillo/Rojo | Tendencia ↑↓→ |
+| Salida | "Cumplimiento 92%" | "Rendimiento 85% vs histórico" |
 
-**ID:** CU-JOP-002-ALT  
-**Nombre:** Monitorear Productividad Operativa sin Programación  
-**Variante de:** CU-JOP-002 (para empresas SIN programación de frecuencias)  
-**Actor Principal:** Jefe Operaciones  
-**Nivel:** Estratégico
-
-**Precondiciones:**
-- Jefe Operaciones autenticado en el sistema
-- Empresa opera bajo **modalidad de despacho libre** (sin programación)
-- TbIntervaloFrecuencia **vacía o no utilizada**
-- Unidades operando en tiempo real
-- Sistema GPS registrando en Tb_RegistroTrack
-- Histórico operativo de al menos 30 días disponible
-
-**Trigger:**
-- Jefe Operaciones necesita evaluar productividad del turno
-- Revisión programada cada 2-3 horas
-- Sospecha de baja productividad operativa
-- Comparación con días anteriores requerida
-
-
-**Flujo Principal:**
-
-1. **Acceso al Dashboard de Productividad**
-
-   * Sistema muestra indicadores descriptivos (NO prescriptivos):
-
-     ```
-     OPERACIÓN EN TIEMPO REAL - 06/12/2024 10:30 AM
-
-     RUTA 25:
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     Servicios ejecutados HOY:      28
-     Promedio histórico (mismo día): 32  ⚠️ -12.5%
-
-     Intervalo promedio despachos:  11.5 min
-     Intervalo ayer (mismo horario): 9.8 min  ⚠️ +17%
-
-     Unidades operando:             8/10
-     Producción acumulada:          $780
-     Producción promedio/servicio:  $27.85
-
-     RUTA 30:
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     Servicios ejecutados HOY:      22
-     Promedio histórico:             21  ✅ +4.8%
-
-     Intervalo promedio despachos:  13.2 min
-     Intervalo ayer:                 12.9 min  ✅ Similar
-
-     Unidades operando:             6/6
-     Producción acumulada:          $595
-     ```
-
-2. **Análisis Comparativo Temporal**
-
-   * Jefe Operaciones selecciona Ruta 25.
-   * Sistema despliega comparación temporal:
-
-     ```
-     ANÁLISIS COMPARATIVO - RUTA 25
-
-     SERVICIOS EJECUTADOS (por hora):
-     06:00-07:00  ■■■■■ 5    (Ayer: 6)
-     07:00-08:00  ■■■■■■■ 7  (Ayer: 8)
-     08:00-09:00  ■■■■■■ 6   (Ayer: 7)
-     09:00-10:00  ■■■■■ 5    (Ayer: 6) ⚠️
-     10:00-11:00  ■■■■■ 5    (Ayer: 5) ✅
-
-     HORA PICO (07:00-09:00):
-     Servicios HOY:   13
-     Servicios AYER:  15  ⚠️ -13%
-     Brecha:          -2 servicios
-
-     FRECUENCIA PROMEDIO:
-     HOY:    11.5 min
-     AYER:   9.8 min
-     SEMANA: 10.2 min
-     ```
-
-3. **Identificación de Causas**
-
-   * Sistema identifica factores relevantes:
-
-     ```
-     Disponibilidad Unidades:
-     - 2 unidades fuera servicio (20%)
-       * BUS-245: Mantenimiento
-       * BUS-267: Sin conductor
-
-     Tiempo en Terminal:
-     - Espera hoy: 8.5 min (ayer: 6.2 min)
-
-     Producción por Servicio:
-     - HOY: $27.85 por servicio (+2% vs ayer)
-     ```
-
-4. **Evaluación de Impacto**
-
-   ```
-   Servicios perdidos:                 4
-   Ingresos no percibidos:            $110
-   Pasajeros afectados estimados:     ~160
-   Quejas hoy:                         3
-   Quejas histórico:                   1
-   ```
-
-5. **Toma de Decisiones**
-
-   * **Acciones inmediatas:**
-
-     * Activar unidad de reserva.
-     * Reducir tiempo entre despachos.
-     * Asignar conductor de reserva.
-
-   * **Acciones de mediano plazo:**
-
-     * Evaluar ampliación de flota.
-     * Capacitar despachador.
-     * Analizar demanda para optimizar frecuencias.
-
-6. **Comunicación de Instrucciones**
-
-   ```
-   Jefe Ops → Supervisor Terminal:
-   "Ruta 25 está 12% bajo rendimiento histórico.
-   Activar bus de reserva y agilizar despachos."
-
-   Jefe Ops → Despachador:
-   "Prioriza Ruta 25. Objetivo: 1 despacho cada 9-10 min."
-   ```
-
-7. **Registro de Decisiones**
-    - Considerar que si esta acción no se lleva acabo, no sea un impedimento para el seguimiento personalizado (notificación programada por hora al jefe de operaciones desde la web) si el usuario activar un nuevo punto de inicio seguimiento (opcional). 
-
-
-   ```
-   INSERT INTO TbDecisionOperativa (
-       Fecha, Hora, CodRuta, 
-       TipoDecision, Descripcion, 
-       MetricaObservada, AccionTomada,
-       CodUsuario
-   ) VALUES (
-       '2024-12-06', '10:35:00', 25,
-       'BAJO_RENDIMIENTO',
-       'Servicios 12% bajo histórico en hora pico',
-       'Frecuencia 11.5 min vs 9.8 histórico',
-       'Activar unidad reserva + instrucción agilizar despachos',
-       @CodJefeOps
-   )
-   ```
-
-8. **Seguimiento**
-
-   * Sistema programa evaluaciones:
-
-     * En 1 hora: verificar mejora de frecuencia.
-     * Fin de turno: comparar servicios vs histórico.
-
-   * Alertas si:
-
-     * Frecuencia > 11 min después de 1 hora.
-     * Servicios < 85% del histórico diario.
-
-9. **Reporte Descriptivo**
-
-   ```
-   REPORTE DE PRODUCTIVIDAD - Turno Mañana
-   Fecha: 06/12/2024
-
-   Total servicios: 28 (Histórico: 32)
-   Rendimiento: 87.5%
-
-   Franja 06:00-09:00: 18 servicios (-11%)
-   Franja 09:00-12:00: 10 servicios (+5%)
-
-   Acciones:
-   10:35 - Activación unidad reserva
-   10:40 - Agilizar despachos
-
-   Resultado:
-   11:00-12:00 → 6 servicios (+20% vs hora anterior) ✅
-   ```
-**Postcondiciones**
-- Productividad evaluada vs. histórico (no vs. programación)
-- Brechas de rendimiento identificadas
-- Acciones correctivas comunicadas al equipo
-- Seguimiento programado automáticamente
-- Decisiones documentadas para análisis futuro
-- Base de datos actualizada con eventos operativos
 
 ---
 
@@ -586,6 +649,67 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 - Las evaluaciones de performance quedan documentadas
 - Se identifican necesidades de capacitación o refuerzo
 - Se genera información para decisiones de RRHH
+
+---
+
+
+### **CU-JOP-006: Configurar Geocercas y Alertas**
+
+**ID:** CU-JOP-006
+
+**Actor Principal:** Jefe de operacione ( u otro usuario con permisos de configuración)
+
+**Precondiciones:**
+- Usuario con rol de configuración
+- Rutas definidas en sistema
+- Necesidad de ajuste operativo identificada
+
+**Trigger:**
+- Nueva ruta requiere geocerca
+- Cambio en recorrido autorizado
+- Zona de riesgo identificada
+- Optimización de alertas requerida
+
+**Flujo Principal:**
+
+1. **Acceso a Configuración**
+   - Usuario accede a módulo de geocercas
+   - Sistema muestra mapa con geocercas existentes
+   - Muestra panel de configuración de alertas
+
+2. **Creación de Geocerca**
+   - Selecciona herramienta de dibujo
+   - Define área en mapa:
+     * Polígono irregular (para rutas complejas)
+     * Círculo (para puntos de control)
+     * Corredor (para avenidas principales)
+   - Asigna propiedades:
+     * Nombre: "Ruta 25 - Tramo Centro"
+     * Tipo: Ruta autorizada
+     * Tolerancia: ±100 metros
+     * Horario: 05:00-23:00
+
+3. **Configuración de Alertas**
+   - Define reglas:
+     * Si unidad sale de geocerca > 5 minutos → Alerta MEDIA
+     * Si velocidad > 80 km/h → Alerta ALTA
+     * Si parada > 15 minutos fuera de terminal → Alerta BAJA
+   - Asigna responsables:
+     * Monitoreador GPS (primera línea)
+     * Supervisor Terminal (escalamiento)
+
+4. **Validación y Activación**
+   - Sistema valida configuración
+   - Prueba con datos históricos
+   - Monitoreador activa geocerca
+   - Sistema comienza monitoreo
+
+**Postcondiciones:**
+- Geocercas configuradas y activas
+- Alertas automatizadas funcionando
+- Monitoreo optimizado para operación
+- Configuración documentada en sistema
+
 
 ---
 
@@ -3819,773 +3943,208 @@ Se presenta un evento anormal en el terminal, o el Despachador observa una situa
 - El sistema alimenta estadísticas de incidencias
 
 ---
-
-### **CU-DES-008: Comunicarse con Conductores**
+### **CU-DES-008: Comunicarse con Unidades Pre-Despacho**
 
 **ID:** CU-DES-008
 
-**Actor:** Despachador
-
-**Precondiciones:**
-- El Despachador debe estar autenticado en el sistema
-- El conductor debe estar registrado con medio de contacto (radio, celular, app)
-- Debe existir una necesidad operativa de comunicación
-
-**Trigger:**
-Se requiere dar instrucciones al conductor, o solicitar información, o coordinar una acción específica, o resolver una duda del conductor.
-
-**Flujo Principal (Ejemplo: Coordinar Reabastecimiento):**
-1. El Despachador necesita comunicarse con el conductor de BUS-189
-2. El Despachador accede a **"Comunicaciones"**
-3. El sistema muestra opciones de comunicación:
-   ```
-   📱 COMUNICACIÓN CON CONDUCTORES
-   
-   Buscar conductor:
-   [BUS-189___________] [🔍 Buscar]
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ```
-
-4. El sistema muestra información del conductor:
-   ```
-   🚌 BUS-189 - Mario López
-   
-   Estado: EN SERVICIO
-   Ruta: 30
-   Ubicación: Km 8 de la ruta
-   Última actualización: Hace 1 minuto
-   
-   MEDIOS DE CONTACTO DISPONIBLES:
-   
-   📻 Radio:
-   - Canal: 3
-   - Señal: Fuerte 📶📶📶📶
-   - Estado: Activo ✅
-   
-   📱 Celular:
-   - Número: 987-654-321
-   - WhatsApp: Disponible ✅
-   - Última conexión: Activa
-   
-   💬 App Conductor:
-   - Instalada: Sí ✅
-   - Versión: 2.5.1
-   - Mensajería: Habilitada
-   - Notificaciones: ON
-   
-   Método preferido: 💬 App (Respuesta rápida)
-   ```
-
-5. El Despachador selecciona: **App Conductor**
-
-6. El sistema abre ventana de mensajería:
-   ```
-   💬 MENSAJERÍA - BUS-189 (Mario López)
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   HISTORIAL:
-   
-   [08:22] Sistema: Despacho autorizado
-   [08:25] Sistema: Alerta - Stock bajo
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   PLANTILLAS RÁPIDAS:
-   [Reabastecer] [Cambio ruta] [Emergencia]
-   [Consulta] [Instrucción] [Otro]
-   
-   Escribir mensaje:
-   [_________________________________]
-   [_________________________________]
-   
-   [📎 Adjuntar] [📍 Ubicación] [ENVIAR]
-   ```
-
-7. El Despachador selecciona plantilla: **[Reabastecer]**
-
-8. El sistema precarga mensaje con plantilla:
-   ```
-   Al finalizar tu vuelta actual:
-   - Dirigirte a almacén de boletos
-   - Solicitar reabastecimiento Ruta 30
-   - Cantidad: 500 boletos
-   - Prioridad: Media
-   
-   No despachar nuevamente sin reabastecer.
-   
-   ¿Confirmas recibido?
-   ```
-
-9. El Despachador revisa y hace clic en **ENVIAR**
-
-10. El sistema envía el mensaje:
-    - A la app del conductor (push notification)
-    - Registra en log de comunicaciones
-    - Marca como "Enviado" con timestamp
-
-11. El sistema muestra confirmación:
-    ```
-    ✅ Mensaje enviado
-    
-    A: BUS-189 - Mario López
-    Hora: 08:30 AM
-    Vía: App Conductor
-    
-    Estado: Entregado ✅
-    Leído: Esperando...
-    ```
-
-12. A los 30 segundos, el conductor lee el mensaje:
-    ```
-    ✅ Mensaje leído
-    
-    Leído por: Mario López
-    Hora: 08:30:35 AM
-    ```
-
-13. El conductor responde:
-    ```
-    💬 RESPUESTA RECIBIDA
-    
-    De: Mario López (BUS-189)
-    Hora: 08:31 AM
-    
-    "Confirmado. Reabasteceré al retornar
-    (aprox. 11:00 AM). Gracias."
-    
-    [RESPONDER] [ARCHIVAR] [MARCAR COMO IMPORTANTE]
-    ```
-
-14. El Despachador marca como importante y archiva
-
-15. El sistema registra la comunicación completa:
-    ```sql
-    INSERT INTO TbComunicacionDespachador (
-        CodComunicacion,
-        FechaHora,
-        CodUnidad,
-        CodPersona,
-        Tipo,
-        MedioUtilizado,
-        MensajeEnviado,
-        MensajeRecibido,
-        TiempoRespuesta,
-        Estado,
-        UsuarioDespacha
-    ) VALUES (
-        [AUTO],
-        '2024-12-06 08:30:00',
-        189,
-        5678,
-        'INSTRUCCION_OPERATIVA',
-        'APP_CONDUCTOR',
-        'Al finalizar tu vuelta...',
-        'Confirmado. Reabasteceré...',
-        65, -- segundos
-        'CONFIRMADO',
-        'MGonzalez'
-    )
-    ```
-
-16. El sistema programa recordatorio automático:
-    ```
-    🔔 RECORDATORIO PROGRAMADO
-    
-    Para: Despachador (María González)
-    Fecha/Hora: 06/12/2024 - 11:00 AM
-    
-    Mensaje:
-    "Verificar reabastecimiento BUS-189
-     Conductor confirmó 11:00 AM"
-    
-    [CONFIRMAR] [MODIFICAR HORA] [CANCELAR]
-    ```
-
-**Escenario 2: Comunicación de Emergencia**
-
-17. El Despachador recibe alerta del sistema:
-    ```
-    🚨 ALERTA DE CONDUCTOR
-    
-    BUS-167 - Carlos García
-    Hora: 09:15 AM
-    Tipo: EMERGENCIA
-    
-    Mensaje recibido:
-    "Accidente menor. Pasajero con lesión.
-     Necesito ambulancia. Km 12 de ruta."
-    
-    [ATENDER AHORA] [ESCALAR A SUPERVISOR]
-    ```
-
-18. El Despachador hace clic en **ATENDER AHORA**
-
-19. El sistema abre comunicación prioritaria:
-    ```
-    🚨 MODO EMERGENCIA ACTIVADO
-    
-    Conductor: Carlos García (BUS-167)
-    Ubicación: Km 12 - Av. Principal
-    
-    ACCIONES SUGERIDAS:
-    ✓ Contactar vía radio (más rápido)
-    ✓ Solicitar ambulancia automáticamente
-    ✓ Notificar a Supervisor
-    ✓ Activar protocolo de emergencia
-    
-    [EJECUTAR TODAS] [PERSONALIZAR]
-    ```
-
-20. El Despachador selecciona: **EJECUTAR TODAS**
-
-21. El sistema realiza múltiples acciones:
-    
-    **Radio:**
-    ```
-    📻 LLAMADA DE RADIO INICIADA
-    
-    Canal: 3
-    Prioridad: EMERGENCIA
-    
-    [Conectando con BUS-167...]
-    [Línea establecida]
-    
-    🔴 EN LLAMADA
-    
-    [FINALIZAR LLAMADA]
-    ```
-    
-    **Ambulancia:**
-    ```
-    ✅ Ambulancia solicitada
-    
-    Servicio: SAMU
-    Unidad: Ambulancia 05
-    Ubicación destino: Av. Principal Km 12
-    ETA: 8 minutos
-    
-    Contacto: 106
-    ```
-    
-    **Notificaciones:**
-    ```
-    ✅ Notificaciones enviadas
-    
-    - Supervisor: Emergencia médica BUS-167
-    - Jefe Operaciones: Alerta de accidente
-    - Seguros: Incidente reportado
-    ```
-
-22. El Despachador habla con el conductor por radio:
-    - Confirma estado de pasajero herido
-    - Coordina punto de encuentro con ambulancia
-    - Instruye sobre primeros auxilios básicos
-    - Tranquiliza al conductor
-
-23. El sistema registra la llamada:
-    ```
-    Tipo: Radio
-    Duración: 3 minutos 45 segundos
-    Grabación: SÍ (archivo de audio)
-    Acciones tomadas: Ambulancia, Supervisor, Seguros
-    ```
-
-24. El sistema permite al Despachador registrar resumen:
-    ```
-    📝 RESUMEN DE COMUNICACIÓN DE EMERGENCIA
-    
-    Situación:
-    [Pasajero se golpeó la cabeza al frenar    ]
-    [bruscamente. Consciente pero mareado.       ]
-    [Ambulancia en camino. Conductor asistiendo.]
-    
-    Acciones tomadas:
-    ✓ Ambulancia SAMU solicitada
-    ✓ Supervisor notificado
-    ✓ Conductor instruido en primeros auxilios
-    ✓ Punto de encuentro coordinado
-    
-    Estado: ⏳ Esperando ambulancia (ETA 5 min)
-    
-    [GUARDAR] [SEGUIR ACTUALIZANDO]
-    ```
-
-25. El sistema mantiene comunicación abierta hasta resolución
-
-**Estadísticas del Turno:**
-```
-📊 COMUNICACIONES DEL TURNO
-
-Total comunicaciones: 28
-
-Por tipo:
-- Instrucciones operativas: 15
-- Consultas: 8
-- Emergencias: 1
-- Coordinaciones: 4
-
-Por medio:
-- App Conductor: 18 (64%)
-- Radio: 7 (25%)
-- Celular: 3 (11%)
-
-Tiempo promedio respuesta: 45 segundos ✅
-Confirmaciones recibidas: 27/28 (96%) ✅
-
-Emergencias atendidas: 1
-Tiempo respuesta emergencia: 30 segundos ✅
-```
-
-**Postcondiciones:**
-- Todas las comunicaciones quedan registradas con timestamp
-- Los mensajes importantes quedan archivados y categorizados
-- Las emergencias quedan priorizadas y documentadas
-- Queda grabación de comunicaciones por radio
-- Se establece trazabilidad de instrucciones dadas
-- Los recordatorios quedan programados automáticamente
-- Se genera información para evaluación de respuesta
-
-
-### **CU-DES-009: Controlar Cumplimiento de Horarios**
-
-**ID:** CU-DES-009
+**Nombre:** Comunicarse con Unidades en Terminal (Pre-Despacho)
 
 **Actor:** Despachador
 
 **Precondiciones:**
-- El Despachador debe estar autenticado en el sistema
-- Deben estar configuradas las frecuencias objetivo por ruta en TbIntervaloFrecuencia
-- Debe haber unidades operando y/o programadas para despachar
-- El sistema debe estar registrando tiempos de despacho en tiempo real
-- Deben existir horarios de referencia (programados o por frecuencia)
+
+- Despachador autenticado en el sistema
+- Unidad en cola de despacho (aún no despachada)
+- Dispositivo GPS activo en unidad
+- Conductor identificado en sistema
+- Al menos un medio de comunicación disponible
 
 **Trigger:**
-El Despachador necesita verificar que los despachos se ejecuten según frecuencias establecidas, o el sistema genera alerta de desviación de frecuencias, o se cumple un intervalo de revisión programada (cada 30 minutos), o el Supervisor solicita reporte de cumplimiento.
+
+- Despachador necesita dar instrucción antes de despachar
+- Requiere confirmación de conductor sobre observación
+- Necesita aclarar restricción o alerta detectada
+- Coordinación de cambio de última hora (unidad, ruta, etc.)
 
 **Flujo Principal:**
-1. El Despachador accede al **Dashboard de Control de Horarios**
-2. El sistema muestra vista general de cumplimiento:
-   ```
-   ⏰ CONTROL DE CUMPLIMIENTO DE HORARIOS
-   Terminal: A
-   Despachador: María González
-   Fecha: 06/12/2024
-   Hora actual: 09:45 AM
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   RESUMEN GENERAL
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   Despachos del turno: 48
-   A tiempo (±2 min): 42 (87.5%) ✅
-   Retrasados (>2 min): 5 (10.4%) ⚠️
-   Adelantados: 1 (2.1%)
-   
-   Desviación promedio: +1.8 minutos
-   
-   Estado global: 🟢 BUENO
-   ```
 
-3. El sistema presenta cumplimiento por ruta:
-   ```
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CUMPLIMIENTO POR RUTA (Última hora)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   🚌 RUTA 25
-   Frecuencia objetivo: 10 minutos
-   ┌────────┬──────────┬──────────┬──────────┐
-   │ Unidad │ Hr Prog  │ Hr Real  │ Desvío   │
-   ├────────┼──────────┼──────────┼──────────┤
-   │ 245    │ 09:00    │ 09:01    │ +1 min ✅│
-   │ 167    │ 09:10    │ 09:11    │ +1 min ✅│
-   │ 312    │ 09:20    │ 09:19    │ -1 min ✅│
-   │ 201    │ 09:30    │ 09:32    │ +2 min ✅│
-   │ 189    │ 09:40    │ 09:44    │ +4 min ⚠️│
-   └────────┴──────────┴──────────┴──────────┘
-   Cumplimiento: 80% (4/5 a tiempo)
-   
-   🚌 RUTA 30
-   Frecuencia objetivo: 12 minutos
-   ┌────────┬──────────┬──────────┬──────────┐
-   │ Unidad │ Hr Prog  │ Hr Real  │ Desvío   │
-   ├────────┼──────────┼──────────┼──────────┤
-   │ 198    │ 09:00    │ 09:00    │ 0 min ✅ │
-   │ 223    │ 09:12    │ 09:13    │ +1 min ✅│
-   │ 267    │ 09:24    │ 09:25    │ +1 min ✅│
-   │ 401    │ 09:36    │ 09:37    │ +1 min ✅│
-   └────────┴──────────┴──────────┴──────────┘
-   Cumplimiento: 100% (4/4 a tiempo) ⭐
-   
-   🚌 RUTA 15
-   Frecuencia objetivo: 15 minutos
-   ┌────────┬──────────┬──────────┬──────────┐
-   │ Unidad │ Hr Prog  │ Hr Real  │ Desvío   │
-   ├────────┼──────────┼──────────┼──────────┤
-   │ 301    │ 09:00    │ 09:06    │ +6 min 🔴│
-   │ 356    │ 09:15    │ 09:21    │ +6 min 🔴│
-   │ 412    │ 09:30    │ 09:34    │ +4 min ⚠️│
-   └────────┴──────────┴──────────┴──────────┘
-   Cumplimiento: 0% (0/3 a tiempo) 🔴
-   ```
+1. **Identificación de Necesidad de Comunicación**
 
-4. El Despachador identifica problema en Ruta 15
-5. El Despachador hace clic en **Ruta 15** para análisis detallado
-6. El sistema despliega información de diagnóstico:
-   ```
-   🔍 ANÁLISIS DETALLADO - RUTA 15
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ESTADO ACTUAL
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   Frecuencia objetivo: 15 minutos
-   Frecuencia real promedio: 21 minutos (+6 min)
-   Desvío: 40% sobre objetivo 🔴
-   
-   Última salida: 09:34 AM (BUS-412)
-   Próxima programada: 09:45 AM (BUS-301)
-   Tiempo transcurrido: 11 minutos
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CAUSAS IDENTIFICADAS
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   1. ⚠️ UNIDADES INSUFICIENTES
-      - Programadas: 4 unidades
-      - Operando: 3 unidades
-      - Fuera servicio: 1 (BUS-245 - Avería)
-      - Déficit: 25%
-   
-   2. ⚠️ TIEMPO EN COLA ELEVADO
-      - Promedio espera: 8 minutos
-      - Objetivo: < 5 minutos
-      - Causa: Cola compartida con otras rutas
-   
-   3. ℹ️ DEMANDA NORMAL
-      - Pasajeros por servicio: 35 (normal)
-      - Sin congestión reportada
-      - Tiempo de recorrido: Normal
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   IMPACTO OPERATIVO
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   Pasajeros afectados (est.): 120 personas
-   Tiempo espera promedio: 21 minutos (vs 15 objetivo)
-   Quejas registradas: 3
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ACCIONES SUGERIDAS
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   🔧 INMEDIATAS:
-   ✓ Priorizar despacho próxima unidad Ruta 15
-   ✓ Solicitar unidad de reemplazo si disponible
-   ✓ Informar a pasajeros en terminal
-   
-   📊 MEDIANO PLAZO:
-   ○ Escalar a Supervisor déficit de unidades
-   ○ Revisar programación de Ruta 15
-   ○ Evaluar tiempo en cola
-   
-   [EJECUTAR INMEDIATAS] [ESCALAR A SUPERVISOR]
-   ```
+Despachador está por autorizar BUS-245, pero sistema muestra alerta:
+```
+⚠️ ALERTA PRE-DESPACHO
+BUS-245 - Juan Pérez
 
-7. El Despachador selecciona: **EJECUTAR INMEDIATAS**
+Stock boletos Serie B: BAJO (28/50)
+Recomendación: Reabastecer antes de salir
+```
 
-8. El sistema ejecuta acciones correctivas:
-   ```
-   ✅ ACCIONES EJECUTADAS
+2. **Acceso a Panel de Comunicación**
+
+Despachador hace clic en ícono 📞 junto a la unidad.
+
+Sistema muestra medios disponibles:
+```
+📞 COMUNICACIÓN CON BUS-245
+
+Estado unidad: EN COLA (Posición 3)
+Conductor: Juan Pérez
+GPS: Activo (señal 98%)
+
+MEDIOS DISPONIBLES:
+
+🌐 WebRTC (Recomendado)
+   Estado: Disponible ✅
+   Calidad: Alta
+   Latencia: 45ms
    
-   1. Priorización aplicada:
-      - BUS-301 marcado como próximo despacho
-      - Posición en cola: #1
-      - Despacho programado: 09:45 AM (en 1 min)
+📱 Llamada Celular GPS
+   Número: +51-987-654-321
+   Operadora: Movistar
+   Estado: Disponible ✅
    
-   2. Búsqueda de reemplazo:
-      - No hay unidades disponibles inmediatamente
-      - Unidad más próxima: BUS-456 (ETA 20 min)
-      - Sugerencia: Esperar retorno de unidad
-   
-   3. Información a pasajeros:
-      - Mensaje en pantallas actualizado
-      - "Ruta 15: Próximo bus en 1 minuto"
-      - Disculpas por demora
-   ```
+🔊 Mensaje TTS (Texto a Voz)
+   Estado: Disponible ✅
+   Idioma: Español PE
+   Voz: Masculina/Femenina
+```
 
-9. El Despachador despacha BUS-301 a las 09:45 AM exactas
+3. **Selección de Medio - Opción A: WebRTC**
 
-10. El sistema registra el despacho puntual:
-    ```
-    ✅ DESPACHO A TIEMPO
-    
-    Unidad: BUS-301
-    Hora programada: 09:45 AM
-    Hora real: 09:45:05 AM
-    Desvío: +5 segundos ✅
-    
-    Frecuencia Ruta 15 actualizada:
-    - Intervalo anterior: 21 minutos
-    - Intervalo actual: 11 minutos
-    - Promedio móvil: 19 minutos (mejorando ⬆️)
-    ```
+Despachador selecciona **WebRTC** (comunicación bidireccional).
 
-11. El Despachador puede ver gráfico de tendencias:
-    ```
-    📊 GRÁFICO DE FRECUENCIAS - RUTA 15
-    
-    Frecuencia (minutos)
-    30 │                           
-    25 │         ●                 
-    20 │     ●       ●             
-    15 │═════●═══════●═══●═════════  ← Objetivo
-    10 │                       ●   
-     5 │                           
-     0 └────────────────────────────
-       09:00  09:15  09:30  09:45   (Hora)
-    
-    Tendencia: Mejorando ⬆️
-    Se requiere 1 despacho más a tiempo para normalizar
-    ```
+Sistema inicia conexión:
+```
+🌐 INICIANDO LLAMADA WebRTC
 
-12. El sistema programa seguimiento automático:
-    ```
-    🔔 SEGUIMIENTO PROGRAMADO
-    
-    Próxima revisión: 10:00 AM (en 15 min)
-    
-    Verificar:
-    - Frecuencia Ruta 15 normalizada
-    - Unidad BUS-456 disponible
-    - Cumplimiento objetivo >= 80%
-    
-    Si no se normaliza:
-    → Escalar automáticamente a Supervisor
-    ```
+Conectando con GPS de BUS-245...
+[▓▓▓▓▓▓░░░░] 60%
 
-13. El Despachador puede generar alerta manual si detecta otro patrón:
-    ```
-    ⚠️ GENERAR ALERTA MANUAL
-    
-    Ruta: [Seleccionar...]
-    Tipo: 
-    ○ Frecuencia excedida
-    ○ Retraso sistemático
-    ○ Falta de unidades
-    ○ Congestión en cola
-    
-    Descripción:
-    [_________________________________]
-    
-    Notificar a:
-    [x] Supervisor Terminal
-    [ ] Jefe Operaciones
-    [x] Monitoreador GPS
-    
-    [GENERAR ALERTA]
-    ```
+✅ Conexión establecida
 
-14. A las 10:00 AM, el sistema realiza verificación automática:
-    ```
-    ✅ VERIFICACIÓN AUTOMÁTICA - RUTA 15
-    
-    Hora: 10:00 AM
-    
-    RESULTADOS:
-    ✅ Frecuencia normalizada
-       - Promedio última hora: 16 minutos
-       - Objetivo: 15 minutos
-       - Desviación: +1 minuto (aceptable)
-    
-    ✅ Cumplimiento mejorado
-       - Últimos 3 despachos a tiempo: 3/3
-       - Cumplimiento: 100% ⭐
-    
-    ⚠️ Unidad reemplazo aún pendiente
-       - BUS-456 ETA: 10 minutos
-    
-    RECOMENDACIÓN:
-    Continuar monitoreo normal.
-    Situación controlada ✅
-    
-    [CERRAR SEGUIMIENTO] [CONTINUAR MONITOREANDO]
-    ```
+🔴 EN LLAMADA
+Duración: 00:00:15
+Calidad: ████████ 95%
 
-15. El Despachador marca el seguimiento como cerrado
+[🔇 SILENCIAR] [FINALIZAR]
+```
 
-16. El sistema permite al Despachador revisar histórico:
-    ```
-    📋 HISTÓRICO DE CUMPLIMIENTO
-    
-    Seleccionar período:
-    ○ Última hora
-    ● Turno actual (06:00-14:00)
-    ○ Día completo
-    ○ Última semana
-    ○ Personalizado [___] a [___]
-    
-    [GENERAR REPORTE]
-    ```
+Conversación:
+- **Despachador:** "Juan, tu stock de boletos Serie B está bajo. ¿Puedes reabastecer antes de salir?"
+- **Conductor (por GPS):** "Confirmado, voy al almacén ahora. 5 minutos."
+- **Despachador:** "Perfecto, te espero."
 
-17. El Despachador genera reporte del turno:
-    ```
-    📊 REPORTE DE CUMPLIMIENTO DE HORARIOS
-    
-    Despachador: María González
-    Terminal: A
-    Fecha: 06/12/2024
-    Turno: 06:00 - 14:00 (8 horas)
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    RESUMEN GENERAL
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    Total despachos: 72
-    A tiempo (±2 min): 65 (90.3%) ✅
-    Retrasados (>2 min): 6 (8.3%)
-    Adelantados: 1 (1.4%)
-    
-    Desviación promedio: +1.5 minutos
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    CUMPLIMIENTO POR RUTA
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    Ruta 25: 92.3% (24/26) ⭐ Excelente
-    Ruta 30: 95.0% (19/20) ⭐ Excelente
-    Ruta 15: 84.6% (11/13) ✅ Bueno
-    Ruta 40: 100% (11/11) ⭐⭐ Perfecto
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    INCIDENCIAS GESTIONADAS
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    1. Ruta 15 - Frecuencia excedida (09:00-09:45)
-       Causa: Déficit de unidades
-       Acción: Priorización + seguimiento
-       Resultado: Normalizado ✅
-    
-    2. Ruta 25 - Retraso puntual (07:30)
-       Causa: Congestión vehicular
-       Acción: Informar a pasajeros
-       Resultado: Sin impacto mayor ✅
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    TENDENCIAS
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    Hora pico (07:00-09:00):
-    - Cumplimiento: 88.2%
-    - Desviación promedio: +2.1 min
-    - Observación: Normal para hora pico
-    
-    Hora valle (10:00-12:00):
-    - Cumplimiento: 96.4%
-    - Desviación promedio: +0.5 min
-    - Observación: Excelente control ⭐
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    EVALUACIÓN
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    Calificación: ⭐⭐⭐⭐ MUY BUENO
-    
-    Fortalezas:
-    ✅ Excelente cumplimiento global (90.3%)
-    ✅ Ruta 40 con desempeño perfecto
-    ✅ Gestión proactiva de incidencias
-    ✅ Tiempo de respuesta a alertas rápido
-    
-    Oportunidades de mejora:
-    ⚠️ Mejorar coordinación en hora pico
-    ⚠️ Reducir tiempo en cola Ruta 15
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    COMPARACIÓN
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    
-    vs Turno anterior: +2.5% mejora ⬆️
-    vs Promedio semanal: +1.2% mejora ⬆️
-    vs Meta del terminal: 90% objetivo ✅ CUMPLIDO
-    
-    [EXPORTAR PDF] [ENVIAR A SUPERVISOR] [CERRAR]
-    ```
+Despachador finaliza llamada.
 
-18. El Despachador puede exportar el reporte en múltiples formatos:
-    - PDF para impresión
-    - Excel para análisis
-    - Email directo a Supervisor/Jefe Operaciones
+4. **Selección de Medio - Opción B: Mensaje TTS**
 
-19. El sistema actualiza métricas del Despachador:
-    ```
-    👤 PERFIL DEL DESPACHADOR
-    
-    María González
-    
-    Desempeño histórico:
-    - Cumplimiento promedio: 91.2% ⭐
-    - Mejor turno: 96.5% (02/12/2024)
-    - Tendencia: Mejorando ⬆️
-    
-    Ranking:
-    - Terminal A: #2 de 6 despachadores
-    - Global: #5 de 18 despachadores
-    
-    Reconocimientos:
-    🏆 Mejor cumplimiento noviembre 2024
-    ⭐ 15 días consecutivos >90%
-    ```
+Si Despachador prefiere mensaje de voz automático, selecciona **TTS**.
 
-20. Al finalizar turno, el sistema genera resumen automático:
-    ```
-    📧 RESUMEN ENVIADO AUTOMÁTICAMENTE
-    
-    Para: Supervisor Carlos Rodríguez
-    CC: Jefe Operaciones
-    
-    Asunto: Reporte Cumplimiento Horarios - Turno Mañana
-    
-    Adjunto: Reporte_Cumplimiento_06122024_MGonzalez.pdf
-    
-    Resumen ejecutivo:
-    - Cumplimiento: 90.3% ✅
-    - Despachos: 72
-    - Incidencias: 2 (resueltas)
-    - Calificación: Muy Bueno ⭐⭐⭐⭐
-    ```
+Sistema muestra editor:
+```
+🔊 ENVIAR MENSAJE TTS
+
+Destinatario: BUS-245 - Juan Pérez
+
+Mensaje a convertir en voz:
+┌─────────────────────────────────────┐
+│ Conductor de BUS-245, debe          │
+│ reabastecer boletos Serie B antes   │
+│ de despachar. Dirigirse a almacén.  │
+│                                      │
+└─────────────────────────────────────┘
+
+Voz: ( ) Masculina (•) Femenina
+Velocidad: [====|====] Normal
+Repeticiones: [2▼]
+
+[👂 PREVISUALIZAR] [ENVIAR]
+```
+
+Despachador hace clic en **PREVISUALIZAR** → escucha mensaje.
+
+Hace clic en **ENVIAR**.
+
+Sistema transmite:
+```
+✅ Mensaje TTS enviado
+
+A: GPS BUS-245
+Hora: 08:25:30
+Tamaño: 2.3 KB
+Estado: Entregado al GPS ✅
+
+El mensaje se reproducirá automáticamente
+en el dispositivo GPS de la unidad.
+```
+
+5. **Selección de Medio - Opción C: Llamada Celular GPS**
+
+Despachador selecciona **Llamada Celular GPS**.
+
+Sistema muestra instrucciones:
+```
+📱 LLAMAR A GPS BUS-245
+
+Número: +51-987-654-321
+```
+
+Despachador llama directamente a conductor a través del celular integrado al GPS.
+
+6. **Registro de Comunicación (Solo para WebRTC/TTS)**
+
+Sistema documenta automáticamente:
+```sql
+TbComunicacionDespacho:
+- FechaHora: 2024-12-06 08:25:30
+- CodUnidad: 245
+- CodPersona: 1523
+- MedioUtilizado: 'WEBRTC' | 'TTS' | 'CELULAR_GPS'
+- Motivo: 'STOCK_BAJO'
+- DuracionSegundos: 45 (si aplica)
+- MensajeEnviado: "Reabastecer boletos Serie B..."
+- AccionSolicitada: 'REABASTECER'
+- UsuarioDespacha: 'MGonzalez'
+```
+
+7. **Conductor ejecuta instrucciones impartidas por el despachador**
+
+8. **Confirmación y Despacho**
+
+5 minutos después, conductor retorna con stock completo.
+
+Despachador verifica en sistema: Stock actualizado ✅
+
+Procede con despacho normal (CU-DES-002).
+
+**Postcondiciones:**
+
+- Comunicación pre-despacho registrada con timestamp
+- Medio utilizado documentado
+- Acción solicitada al conductor confirmada
+- Unidad puede ser despachada sin restricciones
+- Historial de comunicaciones disponible para auditoría
 
 **Flujos Alternativos:**
 
-**FA1: Incumplimiento Crítico (<80%)**
-- Si cumplimiento cae bajo 80%
-- Sistema genera alerta crítica automática
-- Notifica inmediatamente a Supervisor
-- Requiere plan de acción correctiva
-- Seguimiento cada 15 minutos hasta normalizar
+**FA1: Sin Respuesta del Conductor**
+- Despachador intenta WebRTC → no contesta
+- Prueba con TTS → mensaje enviado
+- Espera 2 minutos
+- Si no hay acción, contacta físicamente en terminal
 
-**FA2: Retraso Sistemático en Múltiples Rutas**
-- Más de 2 rutas con cumplimiento <85%
-- Sistema sugiere revisión general de operación
-- Puede indicar problema estructural (falta de unidades, congestión)
-- Requiere escalamiento a Jefe Operaciones
-- Posible ajuste de frecuencias temporalmente
+**FA2: GPS Sin Conectividad**
+- Medios digitales (WebRTC, TTS) no disponibles
+- Solo opción: Llamada celular tradicional (si GPS tiene SIM)
+- O comunicación física presencial
 
-**FA3: Despachos Consistentemente Adelantados**
-- Si múltiples despachos adelantados
-- Puede indicar programación muy holgada
-- Sistema sugiere ajustar frecuencias
-- Oportunidad de optimización operativa
+**FA3: Emergencia Requiere Inmediatez**
+- Despachador usa WebRTC (más rápido que celular)
+- Si falla, escala a Supervisor para contacto físico
 
-**Postcondiciones:**
-- El cumplimiento de horarios queda monitoreado en tiempo real
-- Las desviaciones quedan identificadas y analizadas
-- Las acciones correctivas quedan documentadas y ejecutadas
-- Los reportes de cumplimiento quedan generados automáticamente
-- El desempeño del Despachador queda evaluado y registrado
-- Se genera información para optimización de frecuencias
-- Queda trazabilidad de seguimiento de incidencias
-- Las tendencias quedan identificadas para mejora continua
+---
+
+### **CU-DES-009: Controlar Cumplimiento de Horarios (omitir porque se movió CU-JOP-002)**
 
 ---
 
@@ -5066,6 +4625,7 @@ Se presenta una situación compleja que requiere autorización superior, o múlt
 - Geocercas configuradas en Tb_GeoCerca
 - Puntos de control definidos en Tb_Control
 - Conexión estable a servidor de rastreo
+- Debe estar asignado como monitoreador de turno permitido por el JEFE DE OPERACIONES (CU-JOP-001)
 
 **Trigger:**
 - Inicio de turno del monitoreador
@@ -5416,70 +4976,266 @@ Se presenta una situación compleja que requiere autorización superior, o múlt
 
 ---
 
-### **CU-MON-004: Validar Cumplimiento de Rutas**
+### CU-MON-004: Validar Cumplimiento de Salidas de Unidades
 
 **ID:** CU-MON-004
 
-**Actor Principal:** Monitoreador GPS
+**Actor:** Monitoreador GPS
 
 **Precondiciones:**
-- Rutas autorizadas definidas en sistema
-- Geocercas configuradas por ruta
-- Puntos de control establecidos
-- Unidades operando con GPS
+- Unidades despachadas en operación
+- Puntos de control/paraderos configurados por ruta en Tb_RecorridoXControl
+- Sistema registrando pasos en Tb_SalidaUnidadHoraPaso
+- GPS activo transmitiendo posiciones
 
 **Trigger:**
-- Verificación de rutina programada
-- Alerta de posible desviación
-- Solicitud de supervisor
-- Fin de servicio de unidad
+- Revisión de rutina programada cada hora
+- Fin de turno del monitoreador
+- Solicitud de supervisor para auditoría
+- Generación de reporte de compliance
 
 **Flujo Principal:**
 
-1. **Selección de Unidad a Validar**
-   - Monitoreador selecciona unidad
-   - Sistema carga información:
-     * Ruta asignada
-     * Puntos de control obligatorios
-     * Recorrido teórico vs. real
-     * Historial de pasos
+1. **Acceso a Panel de Validación**
 
-2. **Análisis de Trazado GPS**
-   - Sistema superpone:
-     * Ruta autorizada (línea azul)
-     * Trazado real GPS (línea roja)
-     * Puntos de control (marcadores)
-     * Geocercas (áreas)
-   - Calcula métricas:
-     * % adherencia a ruta: 94%
-     * Desviación máxima: 120m
-     * Puntos de control pasados: 8/10
-     * Tiempo en ruta: 45 minutos
+Monitoreador accede a "Validación de Salidas":
+```
+📋 VALIDACIÓN DE CUMPLIMIENTO DE SALIDAS
 
-3. **Identificación de Desviaciones**
-   - Sistema detecta automáticamente:
-     * Secciones fuera de geocerca
-     * Puntos de control no visitados
-     * Tiempos anormales entre controles
-     * Rutas alternas tomadas
+Período: [Hoy 06/12/2024] [Ruta: Todas ▼]
+Estado: [Todas ▼] [CONSULTAR]
 
-4. **Evaluación de Validez**
-   - Monitoreador determina si desviaciones son:
-     * Justificadas (congestión, obras, emergencia)
-     * No justificadas (error conductor, negligencia)
-     * Técnicas (error GPS, pérdida señal)
+Mostrando: 15 salidas activas/finalizadas
+```
 
-5. **Documentación de Hallazgos**
-   - Si cumplimiento ≥90%: CONFORME ✅
-   - Si 70-89%: OBSERVADO ⚠️
-   - Si <70%: NO CONFORME ❌
-   - Genera reporte de validación
+2. **Lista de Salidas para Validación**
+
+Sistema muestra tabla consolidada:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SALIDAS - VALIDACIÓN DE CONTROLES/PARADEROS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Unidad | Ruta | Hr Salida | Estado    | Controles | Faltantes | Validación
+-------|------|-----------|-----------|-----------|-----------|------------
+245    | 25   | 08:00     | Finalizada| 10/10 ✅  | Ninguno   | ⭐ CONFORME
+167    | 30   | 08:15     | Finalizada| 8/8 ✅    | Ninguno   | ⭐ CONFORME
+312    | 25   | 08:30     | En ruta   | 7/10 ⏳   | 3 pend.   | ⏳ En curso
+201    | 15   | 08:45     | Finalizada| 5/6 ⚠️    | Control 4 | ⚠️ OBSERVADO
+189    | 25   | 09:00     | Finalizada| 8/10 ⚠️   | Ctrl 3,7  | ⚠️ OBSERVADO
+198    | 30   | 09:15     | Finalizada| 4/8 ❌    | 4 ctrl.   | ❌ NO CONFORME
+
+[VER DETALLE] [EXPORTAR] [FILTROS]
+```
+
+3. **Selección de Salida para Análisis**
+
+Monitoreador hace clic en BUS-198 (4/8 controles - umbral crítico >3 omitidos):
+
+```
+🔍 DETALLE DE SALIDA - BUS-198 (Ruta 30)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INFORMACIÓN GENERAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Conductor: Carlos Méndez
+Hora salida: 09:15 AM
+Hora llegada: 10:32 AM
+Duración total: 1h 17min (objetivo: 1h 10min)
+Estado: FINALIZADA
+
+⚠️ ALERTA: 4 controles omitidos (>umbral permitido)
+ACCIÓN REQUERIDA: Contactar conductor
+
+[📞 LLAMAR CONDUCTOR] [VER RETRASOS/ADELANTOS]
+```
+
+4. **Contacto con Conductor** (umbral >3 omitidos)
+
+Monitoreador hace clic en "LLAMAR CONDUCTOR":
+```
+📞 CONTACTAR CONDUCTOR - BUS-198
+
+Medio de contacto:
+(•) Celular GPS: +51-987-654-321
+( ) WebRTC
+( ) Radio
+
+[INICIAR LLAMADA]
+```
+
+Monitoreador llama y obtiene información:
+```
+📝 REGISTRO DE CONTACTO
+
+Hora llamada: 10:35 AM
+Duración: 2min 15seg
+Respondió: Carlos Méndez
+
+Motivo controles omitidos:
+┌────────────────────────────────────────┐
+│ "Tomé Av. Paralela por congestión      │
+│ severa en ruta principal. Obra vial no │
+│ señalizada en Km 4. Evité 30 min de    │
+│ demora."                                │
+└────────────────────────────────────────┘
+
+Verificación:
+[x] Consultar tráfico en tiempo real
+[x] Confirmar con otros conductores
+[ ] Solicitar foto evidencia
+
+[GUARDAR] [REGISTRAR INCIDENCIA]
+```
+
+5. **Visor de Retrasos/Adelantos (RA)**
+
+Monitoreador hace clic en "VER RETRASOS/ADELANTOS":
+```
+📊 MATRIZ DE RETRASOS/ADELANTOS - BUS-198
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Control/Paradero         | Terminal | Paradero | Control | Paradero | Control | Paradero | Control | Paradero | Control | Terminal
+                         | Origen   | Pla      | Km 3    | Mercado  | Km 7    | Centro   | Km 12   | Norte    | Km 16   | Destino
+-------------------------|----------|----------|---------|----------|---------|----------|---------|----------|---------|----------
+BUS-198                  |    0     |    0     |SALTADO  |    -1    |   -3    |    0     |    0    |    0     |    0    |    0
+
+Leyenda:
+  0       = A tiempo (±2 min)
+  -1, -2  = Adelanto (minutos)
+  +1, +2  = Retraso (minutos)
+  SALTADO = Control no pasado
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Análisis:
+• Control Km 3: SALTADO (desviación de ruta)
+• Paradero Mercado: -1 min (adelanto leve post-desvío)
+• Control Km 7: -3 min (adelanto por ruta alterna más rápida)
+• Resto: A tiempo después de retornar a ruta oficial
+
+[CERRAR] [EXPORTAR TABLA]
+```
+
+6. **Ejemplo Multi-Unidad (Comparativo)**
+
+Si monitoreador selecciona vista múltiple:
+```
+📊 MATRIZ COMPARATIVA RETRASOS/ADELANTOS - RUTA 25
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Unidad      | Terminal | Paradero | Control | Paradero | Control | Paradero | Control | Paradero | Control | Terminal
+            | Origen   | Plaza    | Km 3    | Mercado  | Km 7    | Centro   | Km 12   | Norte    | Km 16   | Destino
+------------|----------|----------|---------|----------|---------|----------|---------|----------|---------|----------
+AXD-223     |    0     |    0     |    0    |    -1    |   -3    |    0     |    0    |    0     |    0    |    0
+AXD-222     |    0     |    2     |    2    |     4    |    0    |    0     |    0    |    0     |    0    |    0
+AXD-221     |    0     |    0     |    0    |     0    | SALTADO |    6     |   44    |    3     |    3    |    1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚨 ALERTAS DETECTADAS:
+• AXD-221: Retraso crítico +44 min en Control Km 12
+• AXD-221: Control Km 7 SALTADO
+
+[CONTACTAR AXD-221] [VER DETALLE] [EXPORTAR]
+```
+
+7. **Registro de Incidencia (Controles Saltados)**
+
+Para BUS-198, monitoreador registra incidencia:
+```
+📝 REGISTRAR INCIDENCIA - BUS-198
+
+Tipo: Control/Paradero Omitido
+Gravedad: [•] Media (3-5 omitidos) [ ] Alta (>5)
+
+Controles afectados:
+[x] Control Km 3
+[x] Control Km 5  
+[x] Control Km 10
+[x] Control Km 15
+
+Causa (según conductor):
+┌────────────────────────────────────────┐
+│ Congestión severa ruta principal.      │
+│ Obra vial no señalizada Km 4.          │
+│ Ruta alterna Av. Paralela (8km).       │
+│ Retorno ruta oficial Km 12.            │
+└────────────────────────────────────────┘
+
+Verificación externa:
+[x] Confirmado: Obra vial activa Km 4-5
+[x] Google Maps: +25min demora ruta oficial
+[x] Otros conductores: Reportan misma situación
+
+Clasificación:
+(•) Justificado ✅ (causa válida verificada)
+( ) Requiere investigación ⚠️
+( ) No justificado ❌
+
+Acción:
+[x] Registrado en sistema
+[x] No requiere sanción
+[ ] Actualizar info ruta
+[ ] Notificar a despachadores
+
+[GUARDAR INCIDENCIA] [CANCELAR]
+```
+
+Sistema registra en TbIncidencia:
+```sql
+INSERT INTO TbIncidencia (
+    CodSalida,
+    TipoIncidencia,
+    Gravedad,
+    ControlesOmitidos,
+    CausaReportada,
+    Verificacion,
+    Clasificacion,
+    FechaHora,
+    UsuarioRegistra
+) VALUES (
+    12345,
+    'CONTROLES_OMITIDOS',
+    'MEDIA',
+    '3,5,10,15',
+    'Obra vial - Ruta alterna',
+    'Verificado con Google Maps',
+    'JUSTIFICADO',
+    '2024-12-06 10:35:00',
+    'ATorres'
+)
+```
+
+8. **Caso Crítico - Retraso Extremo**
+
+Para AXD-221 (+44 min en Km 12):
+```
+🚨 INCIDENCIA CRÍTICA - AXD-221
+
+Control Km 12: +44 minutos de retraso
+
+ACCIÓN OBLIGATORIA:
+[📞 LLAMAR CONDUCTOR AHORA]
+
+[Monitoreador llama...]
+
+Conductor reporta:
+"Avería mecánica. Sobrecalentamiento motor.
+Parada forzosa 40 min. Ahora operativo."
+
+[REGISTRAR INCIDENCIA TÉCNICA]
+[NOTIFICAR MANTENIMIENTO]
+[ESCALAR A SUPERVISOR]
+```
 
 **Postcondiciones:**
-- Cumplimiento de ruta validado y documentado
-- Desviaciones identificadas y clasificadas
-- Reportes generados para análisis
-- Acciones correctivas definidas si aplica
+- Todas las salidas validadas con matriz RA generada
+- Controles saltados identificados y cuantificados
+- Conductores contactados cuando umbral excedido (>3 omitidos)
+- Incidencias registradas con causa, verificación y clasificación
+- Retrasos/adelantos documentados por control
+- Casos críticos escalados a supervisor
+- Datos disponibles para análisis de puntualidad
 
 ---
 
@@ -5731,64 +5487,6 @@ Se presenta una situación compleja que requiere autorización superior, o múlt
 
 ---
 
-### **CU-MON-008: Configurar Geocercas y Alertas**
-
-**ID:** CU-MON-008
-
-**Actor Principal:** Monitoreador GPS (con permisos de configuración)
-
-**Precondiciones:**
-- Monitoreador con rol de configuración
-- Rutas definidas en sistema
-- Necesidad de ajuste operativo identificada
-
-**Trigger:**
-- Nueva ruta requiere geocerca
-- Cambio en recorrido autorizado
-- Zona de riesgo identificada
-- Optimización de alertas requerida
-
-**Flujo Principal:**
-
-1. **Acceso a Configuración**
-   - Monitoreador accede a módulo de geocercas
-   - Sistema muestra mapa con geocercas existentes
-   - Muestra panel de configuración de alertas
-
-2. **Creación de Geocerca**
-   - Selecciona herramienta de dibujo
-   - Define área en mapa:
-     * Polígono irregular (para rutas complejas)
-     * Círculo (para puntos de control)
-     * Corredor (para avenidas principales)
-   - Asigna propiedades:
-     * Nombre: "Ruta 25 - Tramo Centro"
-     * Tipo: Ruta autorizada
-     * Tolerancia: ±100 metros
-     * Horario: 05:00-23:00
-
-3. **Configuración de Alertas**
-   - Define reglas:
-     * Si unidad sale de geocerca > 5 minutos → Alerta MEDIA
-     * Si velocidad > 80 km/h → Alerta ALTA
-     * Si parada > 15 minutos fuera de terminal → Alerta BAJA
-   - Asigna responsables:
-     * Monitoreador GPS (primera línea)
-     * Supervisor Terminal (escalamiento)
-
-4. **Validación y Activación**
-   - Sistema valida configuración
-   - Prueba con datos históricos
-   - Monitoreador activa geocerca
-   - Sistema comienza monitoreo
-
-**Postcondiciones:**
-- Geocercas configuradas y activas
-- Alertas automatizadas funcionando
-- Monitoreo optimizado para operación
-- Configuración documentada en sistema
-
----
 
 ## CONDUCTOR
 
