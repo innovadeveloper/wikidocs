@@ -160,7 +160,7 @@ Se inicia un nuevo día operativo (generalmente a las 04:00 AM), o se requiere r
 
 ---
 
-### **CU-JOP-002: Supervisar Cumplimiento de Frecuencias**
+### **CU-JOP-002: Supervisar Cumplimiento de Frecuencias** (Con Programación)
 
 **ID:** CU-JOP-002
 
@@ -280,7 +280,202 @@ El Jefe Operaciones necesita verificar el cumplimiento operativo durante el turn
 
 ---
 
-### **CU-JOP-003: Coordinar con Gerencia**
+### CU-JOP-002-ALT: Monitorear Productividad sin Programación
+
+**ID:** CU-JOP-002-ALT  
+**Nombre:** Monitorear Productividad Operativa sin Programación  
+**Variante de:** CU-JOP-002 (para empresas SIN programación de frecuencias)  
+**Actor Principal:** Jefe Operaciones  
+**Nivel:** Estratégico
+
+**Precondiciones:**
+- Jefe Operaciones autenticado en el sistema
+- Empresa opera bajo **modalidad de despacho libre** (sin programación)
+- TbIntervaloFrecuencia **vacía o no utilizada**
+- Unidades operando en tiempo real
+- Sistema GPS registrando en Tb_RegistroTrack
+- Histórico operativo de al menos 30 días disponible
+
+**Trigger:**
+- Jefe Operaciones necesita evaluar productividad del turno
+- Revisión programada cada 2-3 horas
+- Sospecha de baja productividad operativa
+- Comparación con días anteriores requerida
+
+
+**Flujo Principal:**
+
+1. **Acceso al Dashboard de Productividad**
+
+   * Sistema muestra indicadores descriptivos (NO prescriptivos):
+
+     ```
+     OPERACIÓN EN TIEMPO REAL - 06/12/2024 10:30 AM
+
+     RUTA 25:
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     Servicios ejecutados HOY:      28
+     Promedio histórico (mismo día): 32  ⚠️ -12.5%
+
+     Intervalo promedio despachos:  11.5 min
+     Intervalo ayer (mismo horario): 9.8 min  ⚠️ +17%
+
+     Unidades operando:             8/10
+     Producción acumulada:          $780
+     Producción promedio/servicio:  $27.85
+
+     RUTA 30:
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     Servicios ejecutados HOY:      22
+     Promedio histórico:             21  ✅ +4.8%
+
+     Intervalo promedio despachos:  13.2 min
+     Intervalo ayer:                 12.9 min  ✅ Similar
+
+     Unidades operando:             6/6
+     Producción acumulada:          $595
+     ```
+
+2. **Análisis Comparativo Temporal**
+
+   * Jefe Operaciones selecciona Ruta 25.
+   * Sistema despliega comparación temporal:
+
+     ```
+     ANÁLISIS COMPARATIVO - RUTA 25
+
+     SERVICIOS EJECUTADOS (por hora):
+     06:00-07:00  ■■■■■ 5    (Ayer: 6)
+     07:00-08:00  ■■■■■■■ 7  (Ayer: 8)
+     08:00-09:00  ■■■■■■ 6   (Ayer: 7)
+     09:00-10:00  ■■■■■ 5    (Ayer: 6) ⚠️
+     10:00-11:00  ■■■■■ 5    (Ayer: 5) ✅
+
+     HORA PICO (07:00-09:00):
+     Servicios HOY:   13
+     Servicios AYER:  15  ⚠️ -13%
+     Brecha:          -2 servicios
+
+     FRECUENCIA PROMEDIO:
+     HOY:    11.5 min
+     AYER:   9.8 min
+     SEMANA: 10.2 min
+     ```
+
+3. **Identificación de Causas**
+
+   * Sistema identifica factores relevantes:
+
+     ```
+     Disponibilidad Unidades:
+     - 2 unidades fuera servicio (20%)
+       * BUS-245: Mantenimiento
+       * BUS-267: Sin conductor
+
+     Tiempo en Terminal:
+     - Espera hoy: 8.5 min (ayer: 6.2 min)
+
+     Producción por Servicio:
+     - HOY: $27.85 por servicio (+2% vs ayer)
+     ```
+
+4. **Evaluación de Impacto**
+
+   ```
+   Servicios perdidos:                 4
+   Ingresos no percibidos:            $110
+   Pasajeros afectados estimados:     ~160
+   Quejas hoy:                         3
+   Quejas histórico:                   1
+   ```
+
+5. **Toma de Decisiones**
+
+   * **Acciones inmediatas:**
+
+     * Activar unidad de reserva.
+     * Reducir tiempo entre despachos.
+     * Asignar conductor de reserva.
+
+   * **Acciones de mediano plazo:**
+
+     * Evaluar ampliación de flota.
+     * Capacitar despachador.
+     * Analizar demanda para optimizar frecuencias.
+
+6. **Comunicación de Instrucciones**
+
+   ```
+   Jefe Ops → Supervisor Terminal:
+   "Ruta 25 está 12% bajo rendimiento histórico.
+   Activar bus de reserva y agilizar despachos."
+
+   Jefe Ops → Despachador:
+   "Prioriza Ruta 25. Objetivo: 1 despacho cada 9-10 min."
+   ```
+
+7. **Registro de Decisiones**
+    - Considerar que si esta acción no se lleva acabo, no sea un impedimento para el seguimiento personalizado (notificación programada por hora al jefe de operaciones desde la web) si el usuario activar un nuevo punto de inicio seguimiento (opcional). 
+
+
+   ```
+   INSERT INTO TbDecisionOperativa (
+       Fecha, Hora, CodRuta, 
+       TipoDecision, Descripcion, 
+       MetricaObservada, AccionTomada,
+       CodUsuario
+   ) VALUES (
+       '2024-12-06', '10:35:00', 25,
+       'BAJO_RENDIMIENTO',
+       'Servicios 12% bajo histórico en hora pico',
+       'Frecuencia 11.5 min vs 9.8 histórico',
+       'Activar unidad reserva + instrucción agilizar despachos',
+       @CodJefeOps
+   )
+   ```
+
+8. **Seguimiento**
+
+   * Sistema programa evaluaciones:
+
+     * En 1 hora: verificar mejora de frecuencia.
+     * Fin de turno: comparar servicios vs histórico.
+
+   * Alertas si:
+
+     * Frecuencia > 11 min después de 1 hora.
+     * Servicios < 85% del histórico diario.
+
+9. **Reporte Descriptivo**
+
+   ```
+   REPORTE DE PRODUCTIVIDAD - Turno Mañana
+   Fecha: 06/12/2024
+
+   Total servicios: 28 (Histórico: 32)
+   Rendimiento: 87.5%
+
+   Franja 06:00-09:00: 18 servicios (-11%)
+   Franja 09:00-12:00: 10 servicios (+5%)
+
+   Acciones:
+   10:35 - Activación unidad reserva
+   10:40 - Agilizar despachos
+
+   Resultado:
+   11:00-12:00 → 6 servicios (+20% vs hora anterior) ✅
+   ```
+**Postcondiciones**
+- Productividad evaluada vs. histórico (no vs. programación)
+- Brechas de rendimiento identificadas
+- Acciones correctivas comunicadas al equipo
+- Seguimiento programado automáticamente
+- Decisiones documentadas para análisis futuro
+- Base de datos actualizada con eventos operativos
+
+---
+
+### **CU-JOP-003: Coordinar con Gerencia** (omitir)
 
 **ID:** CU-JOP-003
 
@@ -396,7 +591,7 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 
 ## ANALISTA OPERACIONES
 
-### **CU-ANL-001: Crear Programación de Salidas**
+### **CU-ANL-001: Crear Programación de Salidas** (No ajustado a la realidad)
 
 **ID:** CU-ANL-001
 
@@ -521,6 +716,170 @@ Se inicia el proceso de programación diaria (generalmente día anterior a las 1
 
 ---
 
+### CU-ANL-001: Cargar Programación de Salidas desde Archivo (No todas las empresas optan por este medio, poco común)
+
+
+**IDENTIFICACIÓN**
+
+* **ID:** CU-ANL-001
+* **Nombre:** Cargar Programación de Salidas desde Archivo Externo
+* **Actor Principal:** Analista Operaciones
+* **Nivel:** Táctico
+
+
+
+**PRECONDICIONES**
+
+* Analista autenticado con permisos de carga
+* Archivo preparado externamente (Excel/CSV)
+* Formato validado según plantilla estándar
+* Rutas activas registradas
+* Fecha de programación definida
+
+
+
+**TRIGGER**
+
+* Programación completada en FreeWay/Excel
+* Reprogramación de un día
+* Evento especial (feriado, cambio de demanda)
+
+
+
+**FLUJO PRINCIPAL**
+
+1. **Preparación del Archivo (Proceso Externo)**
+
+   * Analista usa herramienta externa (FreeWay/Excel):
+
+     * Analiza demanda
+     * Optimiza frecuencias
+     * Define horarios
+   * Exporta archivo Excel o CSV con columnas:
+
+     ```
+     Fecha | Ruta | HoraSalida | Terminal | Unidad | Conductor | TipoServicio
+     ```
+
+2. **Acceso al Módulo de Carga**
+
+   * Ingresa a “Gestión de Programación”
+   * Selecciona *"Cargar Programación desde Archivo"*
+   * Sistema muestra fecha, plantilla y botón para cargar archivo
+
+3. **Selección y Validación del Archivo**
+
+   ```
+   VALIDACIONES PRE-CARGA:
+   ✓ Formato válido
+   ✓ Columnas correctas
+   ✓ Fechas correctas
+   ✓ Rutas existentes
+   ✓ Horarios dentro de rango
+   ⚠ 3 advertencias (unidad inexistente)
+   ✖ 2 errores (hora inválida)
+   ```
+
+4. **Revisión de Errores/Advertencias**
+
+   ```
+   ERRORES CRÍTICOS (2):
+   - Fila 45: Hora "25:30"
+   - Fila 78: Ruta "99"
+
+   ADVERTENCIAS (3):
+   - Fila 12: Unidad no encontrada
+   - Fila 34: Conductor no asignado
+   - Fila 56: Gap de 15 min
+   ```
+
+5. **Vista Previa de Datos**
+
+   ```
+   PROGRAMACIÓN A CARGAR:
+   Fecha: 07/12/2024
+
+   Ruta 25: 145 salidas  
+   Ruta 30: 98 salidas  
+   Ruta 15: 76 salidas  
+   Total: 319 servicios
+   ```
+
+6. **Confirmación de Carga**
+
+   ```
+   ¿Cargar 319 servicios para el 07/12/2024?
+   Esta acción reemplaza programación existente.
+   ```
+
+7. **Proceso de Carga Masiva**
+
+   ```
+   BEGIN TRANSACTION
+   DELETE programación previa
+   INSERT registros del archivo
+   COMMIT
+   ```
+
+   Progreso:
+
+   ```
+   [████████████░░░] 75%
+   ```
+
+8. **Validaciones Post-Carga**
+
+   ```
+   ✓ 319 registros insertados
+   ✓ Sin duplicados
+   ✓ Frecuencias consistentes
+   ⚠ Ruta 15: sin servicios 10:00-12:00
+   ```
+
+9. **Configuración Automática**
+
+   * Marca programación como *Aprobada*
+   * Configura horarios para despacho
+   * Activa alertas de cumplimiento
+   * Prepara dashboard del día siguiente
+
+10. **Selección de Modo de Ejecución**
+
+```
+( ) Manual
+(•) Semi-Automático
+( ) Automático
+```
+
+11. **Generación de Documentos**
+
+* Hoja de ruta PDF
+* Archivo maestro
+* Dashboard web
+* Notificaciones al personal
+
+12. **Confirmación Final**
+
+```
+✓ PROGRAMACIÓN CARGADA
+
+Total: 319 servicios  
+Modo: Semi-Automático  
+Estado: Aprobada
+```
+
+
+
+**POSTCONDICIONES**
+
+* Programación cargada en base de datos
+* Validaciones realizadas
+* Modo definido
+* Documentos generados
+* Personal notificado
+
+
+---
 ### **CU-ANL-002: Optimizar Frecuencias por Horario**
 
 **ID:** CU-ANL-002
@@ -572,7 +931,7 @@ Se programa análisis periódico de optimización (mensual), o se detectan desvi
      * Madrugada: 05:00 - 06:00 (demanda 40-50 pasajeros/hora)
      * Media mañana: 09:00 - 11:00 (demanda 120-150 pasajeros/hora)
      * Noche: 21:00 - 23:00 (demanda 60-80 pasajeros/hora)
-8. El sistema calcula capacidad requerida:
+8. El sistema calcula capacidad requerida: 
    - Capacidad por unidad: 40 pasajeros sentados + 60 parados = 100
    - Factor de ocupación objetivo: 80%
    - Capacidad efectiva: 80 pasajeros por unidad
@@ -644,6 +1003,264 @@ Se programa análisis periódico de optimización (mensual), o se detectan desvi
 - Queda registro en auditoría de la optimización realizada
 - El equipo operativo queda notificado de los cambios
 - Se proyectan ahorros y mejoras de servicio
+
+---
+
+### **CU-SUP-002: Configurar Tiempos de Recorrido y Controles** 
+
+
+**ID:** CU-ANL-003
+
+**Nombre:** Configurar Tiempos de Llegada a Controles por Horario
+
+**Actor:** Analista Operaciones
+
+**Precondiciones:**
+
+* Analista autenticado con permisos de configuración operativa
+* Ruta con recorrido definido en TbRecorrido
+* Puntos de control configurados en Tb_Control y Tb_RecorridoXControl
+* Orden secuencial de controles establecido (NroOrden)
+* Distancias entre controles calculadas
+* Datos históricos de tiempos de recorrido disponibles (mínimo 30 días)
+
+**Trigger:**
+
+* Nueva ruta requiere configuración de tiempos
+* Cambios significativos en tráfico vehicular observados
+* Actualización mensual programada de tiempos
+* Solicitud de ajuste por desviaciones sistemáticas
+* Modificación de recorrido autorizado
+
+**Flujo Principal:**
+
+1. **Acceso al Módulo de Configuración de Tiempos**
+
+   Analista ingresa a "Gestión de Recorridos y Tiempos"
+
+   Sistema muestra:
+
+   * Listado de rutas activas
+   * Última fecha de actualización de tiempos
+   * Alertas de rutas con desviaciones >10% tiempo programado vs real
+
+2. **Selección de Ruta y Período de Análisis**
+
+   Analista selecciona ruta a configurar (ej: Ruta 25)
+
+   Sistema solicita:
+
+   ```
+   Período de análisis histórico:
+   Fecha inicio: 01/10/2024
+   Fecha fin: 06/12/2024
+   Tipo de días: [X] Laborables [ ] Sábados [ ] Domingos
+   Franjas horarias: [X] Todas [ ] Solo horas pico
+   ```
+
+3. **Visualización de Recorrido Actual**
+
+   Sistema muestra matriz actual:
+
+   ```
+   RUTA 25 - CONFIGURACIÓN ACTUAL
+
+   Control | Nombre                | Km Acum | Tiempo Prog | Tiempo Real Prom
+   --------|----------------------|---------|-------------|------------------
+   1       | Terminal A (Origen)  |  0.0    |  00:00      |  00:00
+   2       | Paradero Central     |  3.5    |  00:08      |  00:09 (+1 min)
+   3       | Av. Principal Norte  |  7.2    |  00:16      |  00:19 (+3 min)
+   4       | Cruce Hospital       | 10.8    |  00:24      |  00:28 (+4 min)
+   5       | Plaza Mayor          | 14.3    |  00:32      |  00:38 (+6 min)
+   6       | Terminal B (Destino) | 18.0    |  00:40      |  00:48 (+8 min)
+   ```
+
+4. **Análisis de Tiempos Históricos Reales**
+
+   Sistema procesa datos de Tb_RegistroTrack y Tb_SalidaUnidadHoraPaso:
+
+   ```
+   ANÁLISIS POR FRANJA HORARIA
+
+   HORA PICO MAÑANA (07:00-09:00):
+   Control 1 → 2: 9 min promedio (programado: 8 min) +12%
+   Control 2 → 3: 11 min promedio (programado: 8 min) +37%
+   Control 3 → 4: 10 min promedio (programado: 8 min) +25%
+   Control 4 → 5: 11 min promedio (programado: 8 min) +37%
+   Control 5 → 6: 9 min promedio (programado: 8 min) +12%
+
+   HORA VALLE (10:00-16:00):
+   Control 1 → 2: 7 min promedio (programado: 8 min) -12%
+   Control 2 → 3: 8 min promedio (programado: 8 min) OK
+   Control 3 → 4: 7 min promedio (programado: 8 min) -12%
+   Control 4 → 5: 8 min promedio (programado: 8 min) OK
+   Control 5 → 6: 7 min promedio (programado: 8 min) -12%
+   ```
+
+5. **Identificación de Puntos Críticos**
+
+   Sistema resalta:
+
+   **Cuellos de botella detectados:**
+
+   * Control 2 → 3 (Av. Principal Norte): Congestión hora pico +37%
+   * Control 4 → 5 (Plaza Mayor): Semáforos múltiples +37%
+
+   **Tramos eficientes:**
+
+   * Control 1 → 2: Cumple en todas las franjas
+   * Control 5 → 6: Tramo final fluido
+
+6. **Configuración Diferenciada por Franja Horaria**
+
+   Analista define tiempos distintos según horario:
+
+   ```
+   NUEVA CONFIGURACIÓN PROPUESTA
+
+   HORA PICO (06:00-09:00 y 18:00-20:00):
+   Control | Tiempo Actual | Tiempo Real | Tiempo Propuesto
+   1 → 2   |  8 min       |  9 min      |  9 min
+   2 → 3   |  8 min       | 11 min      | 11 min ⚠️ Ajustado
+   3 → 4   |  8 min       | 10 min      | 10 min ⚠️ Ajustado
+   4 → 5   |  8 min       | 11 min      | 11 min ⚠️ Ajustado
+   5 → 6   |  8 min       |  9 min      |  9 min
+   TOTAL   | 40 min       | 50 min      | 50 min
+
+   HORA VALLE (09:00-18:00):
+   Control | Tiempo Actual | Tiempo Real | Tiempo Propuesto
+   1 → 2   |  8 min       |  7 min      |  7 min ✓ Optimizado
+   2 → 3   |  8 min       |  8 min      |  8 min
+   3 → 4   |  8 min       |  7 min      |  7 min ✓ Optimizado
+   4 → 5   |  8 min       |  8 min      |  8 min
+   5 → 6   |  8 min       |  7 min      |  7 min ✓ Optimizado
+   TOTAL   | 40 min       | 37 min      | 37 min
+   ```
+
+7. **Ajuste Manual de Tiempos Específicos**
+
+   Analista puede editar manualmente:
+
+   * Hace clic en celda de tiempo
+   * Ingresa nuevo valor (ej: "12 min")
+   * Sistema valida: tiempo mínimo físico según velocidad máxima permitida
+
+8. **Cálculo de Horarios de Paso**
+
+   Sistema genera matriz completa para hoja de ruta:
+
+   ```
+   Ejemplo: Salida programada 07:00 (Hora Pico)
+
+   Control | Nombre              | Hora Paso | Tolerancia
+   --------|--------------------|-----------|-----------
+   1       | Terminal A         | 07:00     | ±0 (salida)
+   2       | Paradero Central   | 07:09     | ±2 min
+   3       | Av. Principal      | 07:20     | ±3 min
+   4       | Cruce Hospital     | 07:30     | ±3 min
+   5       | Plaza Mayor        | 07:41     | ±3 min
+   6       | Terminal B         | 07:50     | ±2 min (llegada)
+   ```
+
+9. **Configuración de Tolerancias**
+
+   Analista define márgenes para alertas:
+
+   ```
+   TOLERANCIAS POR TIPO DE CONTROL:
+
+   Salida de terminal: ±0 min (exacto)
+   Control intermedio: ±3 min (flexible)
+   Llegada terminal: ±2 min (puntualidad crítica)
+
+   ALERTAS CONFIGURADAS:
+   - Retraso >5 min: ALERTA AMARILLA
+   - Retraso >10 min: ALERTA ROJA
+   - Adelanto >3 min: ALERTA (posible servicio acelerado)
+   ```
+
+10. **Vista Previa de Hoja de Ruta**
+
+    Sistema genera preview:
+
+    ```
+    HOJA DE RUTA - RUTA 25
+    Válida desde: 08/12/2024
+
+    SALIDA 07:00 (HORA PICO):
+    Terminal A      07:00
+    Paradero Ctral  07:09 (±2)
+    Av. Principal   07:20 (±3)
+    Cruce Hospital  07:30 (±3)
+    Plaza Mayor     07:41 (±3)
+    Terminal B      07:50 (±2)
+    Tiempo total: 50 minutos
+
+    SALIDA 11:00 (HORA VALLE):
+    Terminal A      11:00
+    Paradero Ctral  11:07 (±2)
+    Av. Principal   11:15 (±3)
+    Cruce Hospital  11:22 (±3)
+    Plaza Mayor     11:30 (±3)
+    Terminal B      11:37 (±2)
+    Tiempo total: 37 minutos
+    ```
+
+11. **Validación y Confirmación**
+
+    Sistema valida:
+
+    * Tiempos físicamente posibles según distancias
+    * Coherencia entre franjas horarias
+    * Sin conflictos con normativa ATU
+
+    Analista confirma: **"Guardar Configuración"**
+
+12. **Registro en Base de Datos**
+
+    Sistema actualiza:
+
+    **Tb_TiempoPromedioControl:** Tiempos por tramo y franja horaria
+
+    **Tb_RecorridoXControl:** Actualiza tiempos esperados por control
+
+    **TbConfiguracionRecorrido:** Parámetros generales de la ruta
+
+13. **Generación Automática de Hojas de Ruta**
+
+    Sistema produce documentos para impresión:
+
+    **Hoja de Ruta Conductor (PDF):**
+
+    * Listado de controles con horarios
+    * Tolerancias marcadas
+    * Instrucciones especiales
+
+    **Hoja de Control Inspector (PDF):**
+
+    * Matriz de horarios de todas las salidas del día
+    * Espacios para registrar hora real de paso
+    * Sección de observaciones
+
+14. **Aplicación en Programación de Salidas**
+
+    Cuando Analista carga programación (CU-ANL-001):
+
+    * Sistema calcula automáticamente horarios de paso usando configuración
+    * Genera hojas de ruta individuales por salida
+    * Prepara sistema para detectar retrasos/adelantos
+
+**Postcondiciones:**
+
+* Tiempos de recorrido actualizados por franja horaria en sistema
+* Matriz de horarios de paso configurada para cada control
+* Tolerancias de retraso/adelanto definidas
+* Hojas de ruta generadas automáticamente
+* Sistema preparado para detectar desviaciones operativas
+* Base para cálculo de retrasos y adelantos establecida
+* Documentación disponible para conductores e inspectores
+* Auditoría de cambios registrada con justificación
+
 
 ---
 
@@ -1191,7 +1808,12 @@ Se inicia el turno y el Supervisor debe verificar asistencia, o se presenta una 
 
 ---
 
-### **CU-SUP-004: Coordinar con Autoridades Externas**
+### **CU-SUP-004: Coordinar con Autoridades Externas** 
+
+***Nota*** : 
+- Por revisar que tan crítico es para el negocio un módulo como este, debido a q se acerca a una especie de gestión de ticket/incidencias.
+
+
 
 **ID:** CU-SUP-004
 
@@ -2049,7 +2671,7 @@ El sistema detecta una restricción leve durante validación pre-despacho, o el 
 
 ---
 
-### **CU-DES-004: Ejecutar Programación Predefinida**
+### **CU-DES-004: Ejecutar Programación Predefinida** (Forma asistida / semi automático)
 
 **ID:** CU-DES-004
 
@@ -2822,7 +3444,11 @@ Se presenta una situación urgente que requiere cambiar el orden de despacho, o 
 
 ---
 
-### **CU-DES-007: Registrar Incidencias en Terminal**
+### **CU-DES-007: Registrar Incidencias en Terminal** (omitir)
+ 
+***Nota*** :
+- Esta gestión es poco probable que el despachador la vaya a aprovechar.
+
 
 **ID:** CU-DES-007
 
