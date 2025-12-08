@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +16,14 @@
             background-color: #ffffff;
             color: #24292e;
         }
+
         #content {
             background-color: #ffffff;
             border: 1px solid #d0d7de;
             padding: 30px;
             border-radius: 6px;
         }
+
         img {
             max-width: 100%;
             margin: 20px 0;
@@ -32,7 +35,6 @@
 
 <body>
 
-    <div id="loading">Cargando README.md...</div>
     <div id="content"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -49,33 +51,45 @@
         // -----------------------------
         //  CARGAR TODAS LAS IMÁGENES PNG
         // -----------------------------
+        // -----------------------------
+        //  CARGAR TODAS LAS IMÁGENES PNG DESDE UN ARRAY
+        // -----------------------------
         async function loadImages() {
-            const imagesFolder = "./";  // Carpeta donde tienes tus PNG
 
-            try {
-                const response = await fetch(imagesFolder);
-                const text = await response.text();
+            const basePath = "https://innovadeveloper.github.io/wikidocs/documents/mermaid_flows/";
 
-                // Detectar archivos PNG en el listado autoindex
-                const regex = /href="([^"]+\.png)"/g;
-                let match;
-                let html = "<h2>Imágenes</h2>";
+            // Lista de archivos PNG (solo añades aquí tus imágenes)
+            const images = [
+                "ANALISTA_OPS.png",
+                "ANALISTA_PERSONAL.png",
+                "CONDUCTOR.png",
+                "COORDINADOR_SUMINISTRO.png",
+                "DESPACHADOR.png",
+                "ESPECIALISTA_DOCUMENTOS.png",
+                "JEFE_LIQUIDACION.png",
+                "JEFE_OPS.png",
+                "MONITOREADOR.png",
+                "RECAUDADOR.png",
+                "SUPERVISOR_TERMINAL.png"
+            ];
 
-                while ((match = regex.exec(text)) !== null) {
-                    html += `<img src="${imagesFolder}${match[1]}" alt="${match[1]}">`;
-                }
+            let html = "<h2>DG</h2>";
 
-                document.getElementById("content").innerHTML += html;
+            images.forEach(file => {
+                html += `
+        <div style="margin: 12px 0; text-align:center;">
+            <small><b>${file}</b></small>
+            <br/>
+            <img src="${basePath}${file}" 
+                 alt="${file}" 
+                 style="width: auto; max-width: 100%; height: auto; display:block; margin:0 auto;">
+        </div>
+    `;
+            });
 
-            } catch (e) {
-                console.error("No se pudo listar las imágenes:", e);
-                document.getElementById("content").innerHTML += `
-                    <p style="color:red;">
-                        ⚠️ No se pudieron cargar las imágenes.<br>
-                        Asegúrate de ejecutar un servidor con <strong>autoindex</strong> activado.
-                    </p>`;
-            }
+            document.getElementById("content").innerHTML += html;
         }
+
 
         // Ejecutar ambos cargadores
         window.addEventListener('DOMContentLoaded', async () => {
@@ -84,4 +98,5 @@
     </script>
 
 </body>
+
 </html>
