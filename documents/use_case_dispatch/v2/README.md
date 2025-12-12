@@ -710,6 +710,33 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 - Monitoreo optimizado para operación
 - Configuración documentada en sistema
 
+### **CU-JOP-007 – Gestionar Restricciones Operativas**
+
+**Actor:** Jefe de Operaciones  
+**Precondición:** Motivo válido para restringir conductor/unidad
+
+**Flujo:**
+1. Jefe detecta situación que amerita restricción
+2. Accede a Operaciones > Restricciones
+3. Busca conductor/unidad
+4. Define restricción:
+   - **Tipo:** Temporal / Indefinida
+   - **Duración:** Minutos/Horas/Días/Meses/Infinito
+   - **Motivo:** Caja pendiente / Sanción / Investigación / Deuda / Mantenimiento
+   - **Severidad:** Advertencia / Bloqueo total
+5. Sistema registra en `TbRestriccion`
+6. **Efecto inmediato:** Despachador ve alerta roja al intentar despachar
+7. Para levantar: Jefe verifica resolución del motivo y libera
+
+**Flujo alterno - Restricción automática:**
+- Sistema detecta: Caja sin liquidar >24h
+- Genera restricción automática
+- Notifica Jefe Operaciones
+- Jefe revisa y confirma/libera
+
+**Diferencia con Especialista Documentos:**
+- **Especialista:** Alerta preventiva (doc. vence en 7 días) → No bloquea
+- **Jefe Operaciones:** Restricción coercitiva → Bloquea despacho
 
 ---
 

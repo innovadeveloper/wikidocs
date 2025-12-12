@@ -93,6 +93,12 @@ Gestiona fondos para gastos operativos menores.
 **CU-CAJ-016**: Entregar Vueltos y Cambio  
 Proporciona efectivo para operaciones de conductores.
 
+**CU-CAJ-017**: Entregar Talonarios de Boletos Físicos a Conductores  
+Entrega talonarios a los conductores próximos a salir a ruta
+
+**CU-CAJ-018**: Procesar Devolución de Boletos (Reasignación)  
+Conductor devuelve boletos al cajero y este los reserva para la siguiente asignación. Otro escenario, puede ser cuando el cajero debe reasignar porque en ruta un conductor recibió talonarios de otro conductor (casos en los q se ha acabado su talonario de boletos).
+
 ## JEFE DE LIQUIDADOR
 
 **CU-JLI-001**: Supervisar Liquidaciones Diarias  
@@ -235,31 +241,36 @@ Comunica problemas en cobranza al conductor.
 **CU-COB-R07**: Aplicar Tarifas Especiales  
 Gestiona promociones o descuentos autorizados.
 
-## COORDINADOR SUMINISTROS
 
-**CU-COS-001**: Planificar Distribución de Boletos  
-Programa entrega de tickets a unidades y conductores.
+## ENCARGADO DE ALMACÉN
 
-**CU-COS-002**: Controlar Stock Central  
-Administra inventario principal de boletos.
+**CU-ALM-01**: *Registrar Ingreso de Talonarios*
+Registra la entrada de talonarios desde imprenta, valida series y actualiza el stock central.
 
-**CU-COS-003**: Distribuir Boletos a Unidades  
-Entrega tickets según modalidad (persona/unidad).
+**CU-ALM-02**: *Registrar Salida de Talonarios a Terminal*
+Registra la distribución de talonarios desde el almacén central hacia un terminal, actualizando ambos inventarios.
 
-**CU-COS-004**: Registrar Entregas  
-Documenta boletos entregados con responsable.
+**CU-ALM-03**: *Confirmar Recepción de Traslado en Terminal*
+Gestiona la confirmación del traslado por parte del terminal y valida que el stock recibido coincida con lo enviado.
 
-**CU-COS-005**: Recibir Devoluciones  
-Procesa boletos no utilizados o defectuosos.
+**CU-ALM-04**: *Generar Reporte de Inventario*
+Genera un reporte consolidado del inventario total (central, terminales y conductores), incluyendo valorización.
 
-**CU-COS-006**: Generar Reportes de Movimiento  
-Documenta entradas y salidas de inventario.
 
-**CU-COS-007**: Coordinar con Proveedores  
-Gestiona compras de nuevos boletos.
+## **COORDINADOR DE SUMINISTROS**
 
-**CU-COS-008**: Validar Calidad de Boletos  
+**CU-COS-01**: *Abrir Gestión de Entidad (Inicio de Turno)*
+Abre el turno del terminal, valida stock disponible y habilita operaciones de suministro.
+
+**CU-COS-02**: *Suministrar Talonarios a Conductor*
+Entrega talonarios a un conductor al inicio de su jornada y registra la asignación con las series correspondientes.
+
+**CU-COS-03**: *Transferir Boletos entre Conductores*
+Gestiona la transferencia de boletos entre dos conductores cuando uno presenta una contingencia operativa.
+
+**CU-COS-04**: Validar Calidad de Boletos  
 Verifica estado físico de tickets recibidos.
+
 
 ## INSPECTOR RECAUDO (si aplica)
 

@@ -4,6 +4,8 @@
 - **CU-JOP-003: Coordinar con Gerencia** - Reporta estado operativo y escala decisiones
 - **CU-JOP-004: Gestionar Recursos Operativos** - Asigna personal, unidades y equipos
 - **CU-JOP-005: Evaluar Performance del Equipo** - Analiza indicadores de productividad
+- **CU-JOP-006: Configurar Geocercas y Alertas** - Configura geocercas y alertas de la ruta
+- **CU-JOP-007: Gestionar Restricciones Operativas** - Registra restricciones a conductores o unidades
 
 ## ANALISTA OPERACIONES
 - **CU-ANL-001: Crear Programación de Salidas** - Elabora cronograma de despachos del día siguiente

@@ -31,37 +31,89 @@ Inicio del turno operativo del cajero
 
 
 
-### **CU-CAJ-002: Recibir Entregas Parciales de Conductores**
+### **CU-CAJ-002: Recibir Entregas Parciales de Conductores(SIN TICKETERA)**
 
 **ID:** CU-CAJ-002
 
-**Actor:** Cajero Principal
+**Actor Principal**: Cajero Principal  
+**Actor Secundario**: Conductor  
+**Precondición**: 
+- Conductor completó viaje(s)
+- Tiene efectivo y/o boletos vendidos
 
-**Precondiciones:**
-- Caja abierta
-- Conductor ha completado al menos una vuelta
-- Conductor se presenta en ventanilla
+**Flujo Principal**:
+1. Conductor arriba terminal tras 3 viajes
+2. Se presenta en ventanilla de cajero
+3. Conductor: "Entrega parcial, vendí ESCOLAR del 401 al 409"
+4. Cajero accede a Recaudo > Registro de Producción (F8)
+5. Busca unidad: "089" o conductor por nombre
+6. Sistema muestra asignación activa:
+```
+UNIDAD: 089 F1P-925
+CONDUCTOR: MEDINA R, JORGE LUIS
 
-**Trigger:** 
-Conductor entrega efectivo después de completar una vuelta
+BOLETOS ASIGNADOS:
+1. ESCOLAR 1.00 (A03-401/500): Actual 401, Disponible 100
+2. ESCOLAR 1.00 (A03-501/600): Actual 501, Disponible 100
+3. ADULTO 3.00 (B01-414530/414629): Actual 414530, Disponible 100
+```
 
-**Flujo Principal:**
-1. Conductor se identifica y menciona su unidad
-2. Cajero verifica identidad en sistema
-3. Conductor entrega efectivo recaudado de la vuelta
-4. Si hay ticketera: cajero consulta reporte digital de producción
-5. Si hay boletos físicos: cajero recibe también el talonario para verificación
-6. Cajero cuenta el efectivo recibido
-7. Emite comprobante temporal de recepción al conductor
-8. Guarda efectivo en caja separado por conductor/unidad
+7. Cajero selecciona artículo: ESCOLAR 1.00
+8. Sistema muestra detalle asignación A03-401/500
+9. Conductor entrega:
+    - Efectivo: S/. 9.00
+10. Cajero registra producción:
+    - Serie: A03
+    - Número inicial: 401
+    - Número final: 409
+    - Cantidad: 9 boletos
+11. Sistema calcula automáticamente:
+    - Producción esperada: 9 × S/. 1.00 = S/. 9.00
+12. Cajero cuenta efectivo: S/. 9.00 ✓ Coincide
+13. Confirma registro
+14. Sistema ejecuta:
+    - TbProduccion (tipo "Parcial")
+    - TbAsignacionUnidad (A03-401/500):
+      * NumeroActual: 409
+      * Disponible: 91 boletos
+    - TbCaja: Entrada efectivo S/. 9.00
+15. Sistema imprime comprobante temporal:
+```
+COMPROBANTE PRODUCCIÓN PARCIAL
+Conductor: MEDINA R, JORGE LUIS
+Unidad: 089 F1P-925
+Fecha: 11/12/2025 10:15
 
-**Postcondiciones:**
-- Efectivo recibido y guardado
-- Comprobante de recepción emitido
-- Entrega parcial registrada temporalmente
-- Conductor puede continuar operando
+ESCOLAR 1.00 (A03): 401-409
+Cantidad: 9 boletos
+Monto: S/. 9.00
 
+Saldo pendiente: 191 boletos
+```
 
+16. Cajero entrega comprobante
+17. Conductor continúa operación con boletos restantes
+
+**Postcondición**: 
+- Producción parcial registrada
+- Efectivo recibido y contabilizado
+- Conductor puede seguir operando
+
+**Flujos Alternos**:
+
+**FA1: Diferencia en efectivo entregado**
+- En paso 12, cuenta: S/. 8.00 (falta S/. 1.00)
+- Cajero informa: "Falta S/. 1.00"
+- Conductor verifica, encuentra error
+- Entrega S/. 1.00 adicional
+- Procede con registro correcto
+
+**FA2: Conductor vendió de múltiples series**
+- Conductor: "Vendí ESCOLAR 401-409 y ADULTO 414530-414539"
+- Cajero registra 2 producciones separadas:
+  1. ESCOLAR A03: 401-409 (9 boletos)
+  2. ADULTO B01: 414530-414539 (10 boletos)
+- Sistema actualiza ambas asignaciones
 
 ### **CU-CAJ-003: Contar y Verificar Efectivo Parcial**
 
@@ -269,42 +321,132 @@ Sistema detecta diferencia fuera de tolerancia
 
 ### **CU-CAJ-009: Liquidar al Conductor (Final de Turno)**
 
-**ID:** CU-CAJ-009
+**Actor Principal**: Cajero Principal  
+**Actor Secundario**: Conductor, Sistema  
+**Precondición**: 
+- Conductor finalizó operaciones del día
+- Tiene producción total y gastos registrados
 
-**Actor:** Cajero Principal (actúa como Liquidador)
+**Flujo Principal**:
+1. Conductor finaliza último viaje 22:00
+2. Se presenta para liquidación final
+3. Conductor informa:
+   - "Vendí ESCOLAR 401-430, ADULTO 414530-414539"
+   - Entrega efectivo total
+   - Devuelve boletos sobrantes físicos
+4. Cajero accede a Recaudo > Liquidación Final
+5. Sistema consulta asignaciones y producciones:
+```
+CONDUCTOR: MEDINA R, JORGE LUIS - Unidad 089
+Fecha: 11/12/2025
 
-**Precondiciones:**
-- Conductor finalizó su turno
-- Todas las entregas parciales registradas
-- Caja del conductor cerrada
-- Producción total consolidada
+ASIGNADO:
+- ESCOLAR A03-401/500 (100)
+- ESCOLAR A03-501/600 (100)  
+- ADULTO B01-414530/414629 (100)
 
-**Trigger:** 
-Conductor se presenta para liquidación final de turno
+PRODUCCIÓN REGISTRADA:
+Parcial 1: ESCOLAR 401-409 (9) - S/. 9.00
+Pendiente: ESCOLAR 410-430 + ADULTO 414530-414539
+```
 
-**Flujo Principal:**
-1. Cajero/Liquidador consulta todas las entregas del conductor del día
-2. Sistema suma producción total acumulada
-3. Consulta descuentos pendientes:
-   - Anticipos otorgados
-   - Combustible
-   - Multas
-   - Gastos administrativos
-4. Ejecuta proceso de liquidación en sistema
-5. Sistema calcula según acuerdo laboral:
-   - Porcentaje del conductor (ej: 30%)
-   - Porcentaje del propietario (ej: 70%)
-6. Aplica descuentos al neto del conductor
-7. Calcula monto final a entregar
-8. Muestra desglose completo en pantalla
-9. Verifica cálculo con conductor
-10. Prepara documentación de liquidación
+6. Cajero registra producción final:
+   - ESCOLAR A03: 410-430 (21 boletos)
+   - ADULTO B01: 414530-414539 (10 boletos)
+7. Conductor entrega efectivo:
+   - Efectivo entregado: S/. 51.00
+8. Cajero cuenta:
+   - ESCOLAR 21 × S/. 1.00 = S/. 21.00
+   - ADULTO 10 × S/. 3.00 = S/. 30.00
+   - Total esperado: S/. 51.00 ✓
+9. Confirma producción final
+10. Cuenta boletos físicos devueltos:
+    - ESCOLAR A03-431 a 500: 70 boletos ✓
+    - ESCOLAR A03-501 a 600: 100 boletos ✓
+    - ADULTO B01-414540 a 414629: 90 boletos ✓
+11. Sistema consolida producción total día:
+```
+PRODUCCIÓN TOTAL:
+- ESCOLAR: 30 boletos × S/. 1.00 = S/. 30.00
+- ADULTO: 10 boletos × S/. 3.00 = S/. 30.00
+TOTAL PRODUCCIÓN: S/. 60.00
+```
 
-**Postcondiciones:**
-- Liquidación calculada
-- Desglose detallado disponible
-- Monto a pagar determinado
-- Sistema listo para emitir comprobante
+12. Cajero consulta gastos del día:
+    - Combustible: S/. 45.00
+    - Peajes: S/. 5.00
+    - TOTAL GASTOS: S/. 50.00
+13. Sistema calcula liquidación:
+```
+LIQUIDACIÓN CONDUCTOR:
+Producción bruta: S/. 60.00
+(-) Gastos operativos: S/. 50.00
+(=) Producción neta: S/. 10.00
+(×) % Conductor (30%): S/. 3.00
+(-) Anticipos del día: S/. 0.00
+(=) A PAGAR CONDUCTOR: S/. 3.00
+```
+
+14. Cajero presenta liquidación en pantalla
+15. Conductor revisa y acepta
+16. Cajero entrega efectivo: S/. 3.00
+17. Conductor firma conformidad (tablet/papel)
+18. Sistema registra:
+    - TbLiquidacion (cierre completo)
+    - TbDevolucion (boletos sobrantes para reasignación)
+    - Estado asignaciones: "Completado"
+19. Imprime comprobante de liquidación:
+```
+LIQUIDACIÓN FINAL
+Conductor: MEDINA R, JORGE LUIS
+Unidad: 089 F1P-925
+Fecha: 11/12/2025
+
+PRODUCCIÓN:
+ESCOLAR (30): S/. 30.00
+ADULTO (10): S/. 30.00
+Total: S/. 60.00
+
+GASTOS: S/. 50.00
+NETO: S/. 10.00
+30% Conductor: S/. 3.00
+
+FIRMA: _____________
+```
+
+20. Archiva documentación
+
+**Postcondición**: 
+- Conductor liquidado
+- Boletos sobrantes devueltos y registrados
+- Jornada cerrada en sistema
+
+**Flujos Alternos**:
+
+**FA1: Diferencia en producción (faltante)**
+- En paso 8, cuenta efectivo: S/. 48.00 (faltan S/. 3.00)
+- Cajero: "Falta S/. 3.00 según boletos vendidos"
+- Conductor: "No lo tengo, posible error"
+- Cajero:
+  - Registra diferencia: -S/. 3.00
+  - Descuenta de liquidación conductor
+  - Marca para investigación
+  - Procede con liquidación ajustada
+
+**FA2: Conductor no devuelve boletos físicos**
+- En paso 10, conductor: "No tengo los boletos, los perdí"
+- Cajero:
+  - Registra pérdida de boletos: A03-431/500 (70)
+  - Sistema anula series perdidas
+  - Cobra valor a conductor: 70 × S/. 1.00 = S/. 70.00
+  - Descuenta de liquidación
+  - Genera reporte de pérdida para auditoría
+
+**FA3: Solicitud de reasignación inmediata**
+- En paso 10, cajero evalúa: 170 boletos sobrantes
+- Hay conductor esperando que necesita boletos
+- Ejecuta transferencia inmediata (CU-TERM-03)
+- No guarda en caja fuerte, entrega directo
 
 
 
@@ -591,6 +733,51 @@ Conductor se presenta antes de salida para recibir talonario
 - Formato de recepción firmado y archivado
 - Control de inventario actualizado
 - Talonario vinculado para verificación en liquidación
+
+
+### **CU-CAJ-018: Procesar Devolución de Boletos (Reasignación)**
+
+**Actor Principal**: Cajero Principal  
+**Precondición**: 
+- Conductor devolvió boletos no vendidos
+- Decisión: Reasignar (no anular)
+
+**Flujo Principal**:
+1. Cajero tiene boletos físicos devueltos:
+   - ESCOLAR A03: 431-500 (70 boletos)
+2. Accede a Suministro > Transferir Boleto
+3. Define operación:
+   - Origen: Unidad 089 (devuelto)
+   - Destino: "Reserva Terminal"
+4. Sistema valida series:
+   - ✓ Boletos no vendidos confirmados
+   - ✓ Numeración correlativa correcta
+5. Registra transferencia a reserva
+6. Sistema ejecuta:
+   - TbDevolucion (Destino: "Reasignación")
+   - TbReservaTerminal (nuevo registro):
+     * Serie: A03-431/500
+     * Cantidad: 70 boletos
+     * Estado: "Disponible"
+     * OrigenConductor: MEDINA (trazabilidad)
+7. Cajero guarda boletos físicos en caja de reserva
+8. Etiqueta: "ESCOLAR A03-431/500 (70) - Disponible"
+
+**Al día siguiente (12/12):**
+
+9. Nuevo conductor solicita boletos
+10. Coordinador detecta boletos en reserva
+11. Sistema pregunta: "¿Asignar reserva A03-431/500?"
+12. Coordinador: "Sí"
+13. Sistema asigna a nuevo conductor
+14. Actualiza trazabilidad:
+    - Asignado originalmente: MEDINA (11/12)
+    - Reasignado a: GONZALES (12/12)
+
+**Postcondición**: 
+- Boletos disponibles para reutilización
+- Sin merma
+- Trazabilidad completa
 
 ## JEFE DE LIQUIDADOR
 
@@ -1943,410 +2130,512 @@ Pasajero reclama devolución por servicio no completado
 - Producción ajustada
 - Evidencia guardada para justificación
 
+--- 
+## ENCARGADO DE ALMACÉN
 
+### **CU-ALM-01: Registrar Ingreso de Talonarios desde Imprenta**
 
+**Actor Principal**: Encargado de Almacén  
+**Actor Secundario**: Proveedor (Imprenta)  
+**Precondición**: 
+- Recepción física de talonarios con guía de remisión
+- Boleto ya configurado en sistema (CU-01)
+
+**Flujo Principal**:
+1. Encargado recibe físicamente talonarios de imprenta
+2. Verifica orden de compra vs guía de remisión
+3. Accede a módulo Almacén > Ingreso de Almacén
+4. Selecciona "Nuevo"
+5. Ingresa datos de compra:
+   - Tipo ingreso: "Compra"
+   - Proveedor: "Imprenta XYZ"
+   - Documento: "Guía N° 001234"
+   - Fecha: 10/12/2025
+6. Selecciona artículo: "ESCOLAR 1.00"
+7. Ingresa detalles de series:
+   - Serie: A03
+   - Número inicial: 000001
+   - Cantidad paquetes: 500 talonarios
+8. Sistema calcula automáticamente:
+   - Número final: 050000
+   - Cantidad boletos: 50,000
+   - Valor total: 50,000 × S/. 1.00 = S/. 50,000
+9. Encargado verifica físicamente:
+   - Cuenta muestra aleatoria de talonarios
+   - Verifica numeración correlativa
+   - Revisa calidad de impresión
+10. Confirma y selecciona "Guardar"
+11. Sistema registra:
+    - TbAlmacen (actualiza stock central)
+    - TbMovimientoAlmacen (entrada)
+    - TbInventario (valorización)
+12. Sistema actualiza indicador visual: 🟢 Verde
+13. Sistema genera comprobante de ingreso
+14. Encargado imprime comprobante
+15. Archiva documentación física (guía + comprobante)
+
+**Postcondición**: 
+- Stock actualizado en almacén central
+- Talonarios disponibles para distribución a terminales
+
+**Flujos Alternos**:
+
+**FA1: Cantidad recibida no coincide con guía**
+- En paso 9, detecta diferencia
+- Registra observación: "Recibido 480 talonarios, guía indica 500"
+- Sistema marca ingreso como "Parcial con observación"
+- Notifica a área de compras
+- Genera requerimiento de completar faltante
+
+**FA2: Series con numeración incorrecta**
+- En paso 9, detecta numeración duplicada o salteada
+- Rechaza ingreso físico
+- Registra incidencia en sistema
+- Coordina devolución con imprenta
+- No actualiza stock
+
+**FA3: Stock máximo excedido**
+- En paso 8, sistema alerta: "Stock excederá máximo (1,000 talonarios)"
+- Encargado evalúa:
+  - Si es pedido planificado: autoriza excepción
+  - Si no: coordina diferir ingreso
+- Registra justificación en sistema
+
+### **CU-ALM-02: Registrar Salida de Almacén a Terminal (Suministro)**
+
+**Actor Principal**: Encargado de Almacén  
+**Actor Secundario**: Coordinador de Suministros (Terminal)  
+**Precondición**: 
+- Stock disponible en almacén central
+- Solicitud de reposición de terminal (automática o manual)
+
+**Flujo Principal**:
+1. Sistema genera alerta automática:
+   - "Terminal Chuquitanta: Stock ESCOLAR 1.00 bajo (80 talonarios)"
+2. Encargado accede a Almacén > Salida de Almacén
+3. Selecciona "Nuevo"
+4. Define destino: "Terminal Chuquitanta 2411"
+5. Sistema muestra stock actual terminal: 80 talonarios 🟡
+6. Encargado define cantidad a distribuir: 200 talonarios
+7. Selecciona artículo: "ESCOLAR 1.00"
+8. Ingresa series a distribuir:
+   - Serie A03: 010001-030000 (200 talonarios)
+9. Sistema valida:
+   - ✓ Series disponibles en almacén central
+   - ✓ Numeración correlativa continua
+   - ✓ No hay asignaciones activas de esas series
+10. Registra responsable receptor: "Coordinador Juan Pérez"
+11. Sistema calcula:
+    - Stock central después: 800 talonarios
+    - Stock terminal después: 280 talonarios
+12. Encargado confirma "Guardar"
+13. Sistema ejecuta:
+    - TbAlmacen (reduce stock central)
+    - TbMovimientoAlmacen (salida central)
+    - TbAlmacenTerminal (aumenta stock terminal)
+    - TbTraslado (registro de movimiento)
+14. Sistema genera guía de traslado interno
+15. Encargado imprime guía (2 copias)
+16. Prepara físicamente talonarios para envío
+17. Empaca y precinta con guía adjunta
+18. Coordina transporte a terminal
+19. Entrega paquete sellado a transportista
+
+**Postcondición**: 
+- Stock reducido en almacén central
+- Stock incrementado en terminal destino (pendiente confirmación)
+- Guía de traslado generada
+
+**Flujos Alternos**:
+
+**FA1: Stock insuficiente en almacén central**
+- En paso 9, sistema alerta: "Stock disponible: 150, solicitado: 200"
+- Opciones:
+  - Reducir cantidad a distribuir (150)
+  - Diferir hasta nueva compra
+  - Redistribuir desde otro terminal con exceso
+- Registra decisión
+
+**FA2: Terminal no requiere reposición urgente**
+- En paso 5, stock terminal: 250 talonarios 🟢
+- Sistema sugiere: "Terminal no requiere reposición"
+- Encargado puede:
+  - Cancelar salida
+  - Proceder con reposición anticipada (justificar)
+
+**FA3: Error en numeración de series**
+- En paso 9, sistema detecta: "Serie A03-010001 ya asignada a Terminal Norte"
+- Bloquea salida
+- Encargado debe corregir rango de series
+- Re-valida antes de guardar
+
+### **CU-ALM-03: Confirmar Recepción de Traslado**
+
+**Actor Principal**: Coordinador de Suministros (Terminal)  
+**Actor Secundario**: Encargado de Almacén  
+**Precondición**: 
+- Traslado registrado en sistema (CU-ALM-02)
+- Talonarios recibidos físicamente en terminal
+
+**Flujo Principal**:
+1. Transportista entrega paquete sellado en terminal
+2. Coordinador verifica:
+   - Precinto intacto
+   - Guía de traslado adjunta
+3. Accede a sistema: Almacén > Recepciones Pendientes
+4. Sistema muestra traslados en tránsito:
+   - "Traslado T-001234 - Fecha salida: 10/12/2025"
+   - "Origen: Almacén Central"
+   - "Artículo: ESCOLAR 1.00, Serie A03: 010001-030000"
+   - "Cantidad: 200 talonarios"
+5. Selecciona traslado a confirmar
+6. Abre paquete y cuenta físicamente:
+   - Verifica cantidad de talonarios
+   - Revisa series: A03-010001 a A03-030000
+   - Verifica estado físico (sin daños)
+7. Ingresa en sistema:
+   - Cantidad recibida: 200 ✓
+   - Estado: "Conforme"
+   - Fecha/hora recepción: 10/12/2025 14:30
+8. Firma guía física (copia 1 para archivo, copia 2 devuelve)
+9. Confirma "Recepción Conforme"
+10. Sistema actualiza:
+    - TbTraslado: Estado "Completado"
+    - TbAlmacenTerminal: Stock confirmado 280
+    - TbMovimientoAlmacen: Entrada terminal registrada
+11. Sistema notifica a Encargado Almacén Central
+12. Coordinador almacena físicamente talonarios en caja fuerte
+
+**Postcondición**: 
+- Traslado confirmado
+- Stock terminal actualizado y disponible para suministro
+- Trazabilidad completa del movimiento
+
+**Flujos Alternos**:
+
+**FA1: Cantidad recibida menor a enviada**
+- En paso 6, cuenta: 195 talonarios (faltan 5)
+- Registra diferencia:
+  - Cantidad recibida: 195
+  - Estado: "Diferencia de inventario"
+  - Observación: "Faltan 5 talonarios, series A03-025001 a 025500"
+- Sistema:
+  - Marca traslado "Con diferencia"
+  - Genera alerta a Encargado Almacén
+  - Inicia proceso de investigación
+  - Actualiza stock solo con 195 confirmados
+
+**FA2: Talonarios con daño físico**
+- En paso 6, detecta: 10 talonarios mojados/rotos
+- Registra:
+  - Cantidad conforme: 190
+  - Cantidad dañada: 10
+  - Series afectadas: A03-020001 a 021000
+- Sistema:
+  - Actualiza stock: 190 disponibles
+  - Marca 10 talonarios como "Merma por daño"
+  - Genera requerimiento reposición
+
+**FA3: Series no coinciden**
+- En paso 6, detecta series incorrectas:
+  - Guía indica: A03-010001 a 030000
+  - Físico recibido: A03-015001 a 035000
+- Rechaza recepción
+- Notifica error a Almacén Central
+- Coordina corrección o devolución
+
+### **CU-ALM-04: Generar Reporte de Inventario**
+
+**Actor Principal**: Encargado de Almacén  
+**Precondición**: Movimientos registrados en sistema
+
+**Flujo Principal**:
+1. Encargado accede a Almacén > Reportes > Inventario
+2. Selecciona parámetros:
+   - Tipo reporte: "Consolidado por artículo"
+   - Fecha corte: 11/12/2025
+   - Incluir: Todos los almacenes
+3. Sistema consulta:
+   - TbAlmacen (stock central)
+   - TbAlmacenTerminal (stock terminales)
+   - TbAsignacionUnidad (boletos en poder conductores)
+4. Genera reporte:
+```
+REPORTE INVENTARIO - ESCOLAR 1.00
+Fecha: 11/12/2025
+
+ALMACÉN CENTRAL:
+Serie A03: 030001-080000 (500 talonarios) 🟢
+
+TERMINALES:
+- Chuquitanta: 280 talonarios 🟢
+- Villa Salvador: 150 talonarios 🟡
+- San Juan: 320 talonarios 🟢
+
+ASIGNADO A CONDUCTORES:
+- En operación: 45 talonarios
+- Disponible para vender: 3,200 boletos
+
+TOTAL SISTEMA:
+- Stock físico: 1,250 talonarios
+- En circulación: 45 talonarios
+- Total controlado: 1,295 talonarios (129,500 boletos)
+
+VALORIZACIÓN:
+Total inventario: S/. 129,500.00
+```
+
+5. Encargado analiza indicadores
+6. Genera alertas si es necesario
+7. Exporta a Excel para análisis detallado
+8. Archiva reporte mensual
+
+**Postcondición**: Inventario documentado y auditado
+
+---
 
 ## COORDINADOR SUMINISTROS
 
-### **CU-COS-001: Planificar Distribución de Boletos**
+### **CU-COS-01: Abrir Gestión de Entidad (Inicio de Turno)**
 
-**ID:** CU-COS-001
+**Actor Principal**: Coordinador de Suministros  
+**Precondición**: 
+- Inicio de turno (3:00-4:00 AM)
+- Stock disponible en terminal
 
-**Actor:** Coordinador de Suministros
+**Flujo Principal**:
+1. Coordinador llega a terminal 3:30 AM
+2. Accede al sistema: Login con credenciales
+3. Navega a Suministro > Gestión de Entidad
+4. Sistema muestra entidades de suministro:
+   - "Terminal Chuquitanta 2411" - Estado: Cerrado
+5. Selecciona terminal y click "Nuevo"
+6. Sistema valida:
+   - ✓ No hay gestión abierta previa
+   - ✓ Usuario autorizado para terminal
+   - ✓ Horario válido para apertura
+7. Ingresa datos de apertura:
+   - Fecha: 11/12/2025
+   - Turno: "Mañana"
+   - Responsable: Confirmado automáticamente
+8. Sistema muestra dashboard inicial:
+```
+GESTIÓN TERMINAL CHUQUITANTA - 11/12/2025
+Estado: ABIERTA
 
-**Precondiciones:**
-- Coordinador autenticado en el sistema
-- Programación de unidades del día siguiente disponible
-- Stock de talonarios suficiente
-- Sistema operativo disponible
+Stock Disponible:
+- ESCOLAR 1.00 (A03): 280 talonarios 🟢
+- ADULTO 3.00 (B01): 150 talonarios 🟡
+- DIRECTO 4.00 (C02): 320 talonarios 🟢
 
-**Trigger:** 
-Día anterior a la operación (usualmente por la tarde/noche)
+Conductores programados hoy: 45
+Suministros pendientes: 0
+```
+9. Confirma apertura
+10. Sistema registra:
+    - TbGestionEntidad (Estado: Abierta)
+    - Hora apertura: 03:35:00
+    - Usuario: Coordinador Juan
+11. Sistema habilita funciones:
+    - ✓ Suministro a conductores
+    - ✓ Transferencias entre unidades
+    - ✓ Anulaciones
+12. Coordinador prepara área de trabajo:
+    - Abre caja fuerte con talonarios
+    - Organiza por denominación
+    - Prepara formatos de entrega
 
-**Flujo Principal:**
-1. Coordinador consulta programación del día siguiente:
-   - Unidades que operarán
-   - Rutas asignadas
-   - Turnos programados
-   - Conductores asignados
-2. Revisa stock disponible de talonarios:
-   - Series disponibles
-   - Rangos de numeración
-   - Estado de cada talonario
-3. Para cada unidad programada:
-   - Asigna talonario específico
-   - Registra en sistema:
-     * CodUnidad
-     * NumSerie (A, B, C, etc.)
-     * NumInicio
-     * NumFin
-     * Cantidad de boletos
-4. Sistema valida:
-   - No duplicar asignación de talonarios
-   - Stock suficiente
-   - Talonarios en buen estado
-5. Genera lista de asignación:
-   ```
-   DISTRIBUCIÓN DÍA: 08/12/2024
-   
-   Unidad BUS-245 → Talonario Serie A: 001-100
-   Unidad BUS-189 → Talonario Serie A: 101-200
-   Unidad BUS-312 → Talonario Serie B: 001-100
-   ...
-   ```
-6. Imprime o visualiza lista de distribución
-7. Sistema marca talonarios como "Asignados-Pendiente entrega"
+**Postcondición**: 
+- Terminal operativa para suministrar boletos
+- Sistema listo para registrar asignaciones
 
-**Postcondiciones:**
-- Distribución planificada para el día siguiente
-- Talonarios asignados a unidades específicas
-- Lista de distribución generada
-- Sistema actualizado con asignaciones
+**Flujos Alternos**:
 
+**FA1: Gestión previa no cerrada**
+- En paso 6, sistema detecta: "Gestión del turno anterior aún abierta"
+- Bloquea nueva apertura
+- Opciones:
+  - Cerrar gestión anterior (requiere supervisor)
+  - Esperar cierre automático
 
-
-### **CU-COS-002: Controlar Stock Central**
-
-**ID:** CU-COS-002
-
-**Actor:** Coordinador de Suministros
-
-**Precondiciones:**
-- Inventario de boletos en almacén central
-- Sistema de control de stock operativo
-- Talonarios organizados por series
-
-**Trigger:** 
-Revisión periódica de inventario o consulta de disponibilidad
-
-**Flujo Principal:**
-1. Coordinador accede a módulo de inventario central
-2. Sistema muestra stock actual:
-   - Por serie (A, B, C, D, etc.)
-   - Total de talonarios disponibles
-   - Talonarios asignados no entregados
-   - Talonarios en uso
-   - Talonarios devueltos
-3. Revisa niveles de stock:
-   - Stock actual vs stock mínimo
-   - Proyección de consumo semanal
-   - Alertas de reabastecimiento
-4. Realiza conteo físico periódico:
-   - Cuenta talonarios físicamente
-   - Compara con registro del sistema
-   - Identifica diferencias
-5. Si encuentra diferencias:
-   - Investiga causa (pérdida, robo, error registro)
-   - Documenta hallazgo
-   - Ajusta inventario en sistema
-   - Notifica a supervisor si es significativo
-6. Actualiza estado de talonarios:
-   - Disponibles
-   - Asignados
-   - En uso
-   - Agotados
-   - Defectuosos
-   - Anulados
-7. Genera alertas si stock bajo:
-   - Notifica necesidad de compra
-   - Calcula cantidad a solicitar
-
-**Postcondiciones:**
-- Stock central actualizado
-- Diferencias identificadas y ajustadas
-- Alertas generadas si stock bajo
-- Inventario físico concordante con sistema
+**FA2: Stock crítico detectado**
+- En paso 8, sistema alerta: "ADULTO 3.00: Solo 150 talonarios 🟡"
+- Coordinador:
+  - Genera solicitud urgente a Almacén Central
+  - Registra alerta en sistema
+  - Procede con apertura
 
 
+### **CU-COS-02: Suministrar Talonarios a Conductor (Inicio Jornada)**
 
-### **CU-COS-003: Distribuir Boletos a Cajeros**
+**Actor Principal**: Coordinador de Suministros  
+**Actor Secundario**: Conductor  
+**Precondición**: 
+- Gestión de entidad abierta
+- Conductor identificado y autorizado
+- Stock disponible en terminal
 
-**ID:** CU-COS-003
+**Flujo Principal**:
+1. Conductor llega a terminal 4:30 AM
+2. Se presenta con Coordinador: "Buenos días, Unidad 089 F1P-925"
+3. Coordinador accede a Suministro > Suministrar Boleto
+4. Busca unidad: "089" o conductor: "MEDINA R, JORGE LUIS"
+5. Sistema muestra información:
+```
+UNIDAD: 089 F1P-925
+CONDUCTOR: MEDINA R, JORGE LUIS
+RUTA: 1059 (San Gabriel - Lima)
 
-**Actor:** Coordinador de Suministros
+Validaciones:
+✓ Licencia vigente hasta 15/06/2026
+✓ Certificado médico vigente
+✓ SOAT vigente
+✓ Revisión técnica OK
+✓ Sin restricciones activas
 
-**Precondiciones:**
-- Planificación de distribución completada (CU-COS-001)
-- Talonarios preparados según asignación
-- Tapers/bolsas disponibles
-- Hora de preparación: madrugada (3-5 AM aprox.)
+Suministro previo:
+- ESCOLAR 1.00 (A03-401/500): 32 disponibles
+- ESCOLAR 1.00 (A03-501/600): 100 disponibles
+```
 
-**Trigger:** 
-Horas antes del inicio de operación (madrugada)
+6. Coordinador evalúa suministro necesario:
+   - Ya tiene 132 boletos ESCOLAR disponibles
+   - Necesita otras denominaciones
+7. Selecciona artículos a suministrar:
+   - ☑ ADULTO 3.00: 1 talonario
+   - ☑ DIRECTO 4.00: 1 talonario
+   - ☐ ESCOLAR 1.00: No (ya tiene suficiente)
+8. Sistema asigna automáticamente:
+   - ADULTO 3.00 (B01): 414530-414629 (1 talonario)
+   - DIRECTO 4.00 (C02): 556501-556600 (1 talonario)
+9. Coordinador entrega físicamente talonarios
+10. Conductor cuenta y verifica:
+    - ADULTO B01: 414530-414629 ✓
+    - DIRECTO C02: 556501-556600 ✓
+11. Conductor firma acta de recepción digital (tablet)
+12. Sistema registra:
+    - TbSuministro (cabecera con timestamp)
+    - TbSuministroDetalle (2 líneas con series)
+    - TbAsignacionUnidad (crea/actualiza registros activos)
+13. Sistema actualiza stock terminal:
+    - ADULTO 3.00: 149 disponibles
+    - DIRECTO 4.00: 319 disponibles
+14. Sistema marca unidad: 🟢 Suministrada completa
+15. Imprime comprobante de suministro (opcional)
+16. Conductor sale a operar con 3 denominaciones activas
 
-**Flujo Principal:**
-1. Coordinador llega en la madrugada (3-4 AM)
-2. Consulta lista de distribución planificada del día
-3. Para cada unidad programada:
-   - Localiza físicamente el talonario asignado
-   - Verifica serie y rango (NumInicio - NumFin)
-   - Inspecciona estado físico de boletos
-4. Prepara empaque por unidad:
-   - Introduce talonario en taper o bolsa
-   - Etiqueta con:
-     * Código de unidad (ej: BUS-245)
-     * Serie y rango (ej: A: 001-100)
-     * Fecha
-   - Engrapa o sella bolsa para seguridad
-5. Organiza tapers/bolsas:
-   - Agrupa por orden de salida
-   - Facilita acceso para cajeros
-6. Espera llegada de cajeros (4-5 AM aproximadamente)
-7. Entrega conjunto de tapers/bolsas a cada cajero:
-   - Cajero recibe tapers de unidades de su zona/turno
-   - Verifica cantidad recibida
-8. Registra entrega en sistema:
-   - Ejecuta registro de traspaso
-   - Marca talonarios como "Entregados a cajero"
-   - Registra:
-     * Cajero receptor
-     * Cantidad de tapers entregados
-     * Hora de entrega
-9. Cajero firma acta de recepción
-10. Cajero almacena tapers hasta entrega a conductores
+**Postcondición**: 
+- Conductor tiene boletos para vender
+- Asignación registrada y trazable
+- Stock terminal actualizado
 
-**Postcondiciones:**
-- Talonarios organizados en tapers/bolsas por unidad
-- Tapers entregados a cajeros correspondientes
-- Entrega registrada en sistema
-- Acta de recepción firmada
-- Cajeros listos para entregar a conductores en sus salidas
+**Flujos Alternos**:
 
+**FA1: Conductor con suministro previo abundante**
+- En paso 6, sistema muestra: "ESCOLAR 132 disponibles"
+- Sistema sugiere: "No requiere reposición ESCOLAR"
+- Coordinador puede:
+  - Omitir suministro ESCOLAR
+  - Forzar suministro adicional (justificar: ruta larga, alta demanda)
 
+**FA2: Stock insuficiente en terminal**
+- En paso 8, sistema alerta: "ADULTO 3.00: Solo 5 talonarios disponibles"
+- Coordinador:
+  - Suministra lo disponible (5 talonarios)
+  - Registra observación: "Stock limitado, suministro parcial"
+  - Programa reposición urgente
+  - Notifica a Encargado Almacén
 
-### **CU-COS-004: Registrar Entregas**
+**FA3: Conductor con restricción activa**
+- En paso 5, sistema detecta: "⚠️ Licencia vence en 3 días"
+- Muestra alerta roja
+- Coordinador:
+  - Puede suministrar con observación
+  - Instruye conductor renovar urgente
+  - Registra entrega condicional
+  - Programa seguimiento
 
-**ID:** CU-COS-004
-
-**Actor:** Coordinador de Suministros
-
-**Precondiciones:**
-- Talonarios entregados a cajeros o conductores
-- Sistema de registro operativo
-- Documentación de entrega disponible
-
-**Trigger:** 
-Confirmación de entrega de talonarios
-
-**Flujo Principal:**
-1. Coordinador accede a módulo de registro de entregas
-2. Selecciona tipo de entrega:
-   - A cajero (entrega masiva madrugada)
-   - A conductor (entrega directa excepcional)
-3. Para entrega a cajero:
-   - Registra cajero receptor
-   - Lista de talonarios entregados:
-     * Serie, NumInicio, NumFin por cada talonario
-     * Unidad asignada
-   - Cantidad total de tapers/bolsas
-   - Hora de entrega
-4. Para entrega a conductor (excepcional):
-   - Registra conductor receptor
-   - Unidad asignada
-   - Talonario específico entregado
-   - Motivo de entrega directa
-5. Sistema ejecuta `ProcAlmacenBoleto`:
-   - Actualiza estado de talonarios
-   - Vincula a responsable (cajero o conductor)
-   - Registra trazabilidad
-6. Genera comprobante de entrega:
-   - Detalle de talonarios
-   - Responsable receptor
-   - Firma de conformidad
-7. Archiva documentación:
-   - Comprobante firmado
-   - Registro digital en sistema
-8. Actualiza inventario central:
-   - Reduce stock "Disponible"
-   - Incrementa stock "En circulación"
-
-**Postcondiciones:**
-- Entrega documentada en sistema
-- Comprobante generado y firmado
-- Trazabilidad completa establecida
-- Inventario actualizado
-- Responsable identificado
+**FA4: Solicitud de denominación específica**
+- En paso 7, conductor: "Necesito 3 talonarios ESCOLAR (ruta escolar hoy)"
+- Coordinador ajusta:
+  - ESCOLAR 1.00: 3 talonarios adicionales
+- Sistema asigna correlativo:
+  - A03-601/700, 701/800, 801/900
+- Procede con suministro aumentado
 
 
+### **CU-COS-03: Transferir Boletos entre Conductores**
 
-### **CU-COS-005: Recibir Devoluciones**
+**Actor Principal**: Coordinador de Suministros  
+**Actor Secundario**: 2 Conductores  
+**Precondición**: 
+- Conductor origen tiene boletos disponibles
+- Conductor destino necesita boletos
+- Ambos conductores identificados
 
-**ID:** CU-COS-005
+**Flujo Principal**:
+1. Conductor A llama por radio: "Ticketera averiada, necesito boletos ADULTO"
+2. Coordinador evalúa situación:
+   - Conductor A (U-125): Ticketera sin funcionar
+   - Necesita: ADULTO 3.00
+3. Coordinador busca conductor cercano con boletos disponibles
+4. Accede a Suministro > Transferir Boleto
+5. Selecciona origen:
+   - Conductor B (U-089): ADULTO B01-428702/428801 (4 disponibles)
+6. Sistema valida:
+   - ✓ Boletos no vendidos
+   - ✓ Estado "Disponible para transferencia"
+7. Define transferencia:
+   - Origen: U-089 (Conductor B)
+   - Destino: U-125 (Conductor A)
+   - Artículo: ADULTO 3.00
+   - Serie: B01-428702/428705 (4 boletos)
+8. Coordinador contacta ambos conductores:
+   - A Conductor B: "Entrega 4 boletos ADULTO a U-125"
+   - A Conductor A: "Recibirás B01-428702 a 428705"
+9. Ambos confirman coordinación física
+10. Coordinador ejecuta transferencia en sistema
+11. Sistema registra:
+    - TbTransferencia (operación)
+    - TbAsignacionUnidad (U-089): Reduce disponible
+    - TbAsignacionUnidad (U-125): Aumenta asignación
+    - TbAuditoria: Motivo "Ticketera averiada U-125"
+12. Sistema actualiza en tiempo real:
+```
+U-089 (ORIGEN):
+ADULTO B01-428702/428801
+Antes: 4 disponibles
+Después: 0 disponibles (todos transferidos)
 
-**Actor:** Coordinador de Suministros
+U-125 (DESTINO):
+ADULTO B01-428702/428705  
+Antes: 0
+Después: 4 disponibles (nuevos)
+```
+13. Notifica ambos conductores vía app/GPS
+14. Registra entrega física cuando conductores confirman
 
-**Precondiciones:**
-- Talonarios en circulación
-- Conductor/cajero devuelve boletos
-- Motivo de devolución identificado
+**Postcondición**: 
+- Conductor A puede continuar vendiendo
+- Trazabilidad completa de transferencia
+- Sin pérdida de control de numeración
 
-**Trigger:** 
-Devolución de talonarios no utilizados o defectuosos
+**Flujos Alternos**:
 
-**Flujo Principal:**
-1. Conductor/cajero se presenta con talonario a devolver
-2. Coordinador recibe talonario y pregunta motivo:
-   - Boletos no utilizados (sobrante de día)
-   - Boletos defectuosos (impresión mala, rotos)
-   - Cambio de unidad
-   - Fin de uso de serie
-3. Realiza inspección física:
-   - Cuenta boletos restantes
-   - Verifica numeración correlativa
-   - Identifica boletos dañados/defectuosos
-4. Consulta en sistema registro original:
-   - Serie y rango entregado originalmente
-   - Boletos que debería tener
-5. Calcula boletos utilizados:
-   - Boletos entregados - Boletos devueltos = Boletos usados
-6. Registra devolución en sistema:
-   - Ejecuta `ProcAlmacenBoleto` para devolución
-   - Marca boletos devueltos
-   - Indica estado:
-     * Reutilizables (buen estado)
-     * Defectuosos (para destrucción)
-   - Registra cantidad de boletos utilizados
-7. Si hay boletos defectuosos:
-   - Separa físicamente
-   - Registra como "Para anulación"
-   - Documenta cantidad y motivo
-8. Actualiza inventario:
-   - Retorna boletos buenos a stock disponible
-   - Marca defectuosos para baja
-9. Emite comprobante de devolución al conductor/cajero
-10. Archiva documentación de trazabilidad
+**FA1: No hay conductores con boletos disponibles**
+- En paso 3, no encuentra conductor con ADULTO disponible
+- Coordinador debe:
+  - Suministrar nuevo talonario desde terminal
+  - Enviar apoyo físico con boletos
+  - Registrar entrega extraordinaria
 
-**Postcondiciones:**
-- Devolución registrada en sistema
-- Boletos reutilizables devueltos a stock
-- Boletos defectuosos separados para baja
-- Inventario actualizado
-- Trazabilidad de uso completada
-- Comprobante emitido
-
-
-
-### **CU-COS-006: Generar Reportes de Movimiento**
-
-**ID:** CU-COS-006
-
-**Actor:** Coordinador de Suministros
-
-**Precondiciones:**
-- Movimientos de inventario registrados
-- Período de reporte definido
-- Sistema con datos consolidados
-
-**Trigger:** 
-Cierre diario, semanal o mensual de inventario
-
-**Flujo Principal:**
-1. Coordinador accede a módulo de reportes de inventario
-2. Selecciona tipo de reporte:
-   - **Reporte Diario**: movimientos del día
-   - **Reporte de Entregas**: talonarios distribuidos
-   - **Reporte de Devoluciones**: boletos retornados
-   - **Reporte de Stock**: estado actual de inventario
-   - **Reporte de Consumo**: boletos utilizados por período
-3. Define parámetros:
-   - Período (fecha inicio - fecha fin)
-   - Serie específica (A, B, C) o todas
-   - Tipo de movimiento (entradas/salidas)
-4. Sistema genera reporte con:
-   - **Entradas al inventario**:
-     * Compras a proveedores
-     * Devoluciones de conductores
-   - **Salidas del inventario**:
-     * Entregas a cajeros
-     * Entregas directas a conductores
-   - **Stock inicial del período**
-   - **Stock final del período**
-   - **Boletos utilizados** (vendidos)
-   - **Boletos defectuosos** (dados de baja)
-   - **Talonarios en circulación**
-   - **Diferencias detectadas**
-5. Incluye análisis:
-   - Consumo promedio diario
-   - Proyección de reabastecimiento
-   - Series más utilizadas
-   - Tasa de boletos defectuosos
-6. Revisa y valida información
-7. Exporta reporte (PDF, Excel)
-8. Distribuye a:
-   - Gerencia Operaciones
-   - Jefe de Contabilidad
-   - Jefe de Liquidador
-9. Archiva reporte para auditoría
-
-**Postcondiciones:**
-- Reporte de movimientos generado
-- Análisis de consumo disponible
-- Información distribuida a stakeholders
-- Archivo almacenado para control
+**FA2: Transferencia múltiple denominaciones**
+- Conductor necesita: ADULTO + ESCOLAR
+- Coordinador ejecuta 2 transferencias separadas
+- Sistema registra ambas operaciones
 
 
-
-### **CU-COS-007: Coordinar con Proveedores**
-
-**ID:** CU-COS-007
-
-**Actor:** Coordinador de Suministros
-
-**Precondiciones:**
-- Stock bajo o agotándose
-- Proveedores autorizados registrados
-- Presupuesto aprobado para compra
-
-**Trigger:** 
-Alerta de stock mínimo o planificación de reabastecimiento
-
-**Flujo Principal:**
-1. Coordinador detecta necesidad de reabastecimiento:
-   - Alerta automática del sistema (stock < mínimo)
-   - Proyección de consumo indica agotamiento
-2. Calcula cantidad a solicitar:
-   - Consumo promedio mensual
-   - Stock de seguridad requerido
-   - Capacidad de almacenamiento
-3. Revisa especificaciones de boletos:
-   - Series requeridas (A, B, C, etc.)
-   - Rangos de numeración deseados
-   - Características técnicas (papel, impresión, medidas)
-4. Contacta a proveedores autorizados:
-   - Solicita cotizaciones
-   - Especifica cantidad y características
-   - Consulta tiempos de entrega
-5. Compara ofertas:
-   - Precio por talonario/millar
-   - Calidad ofrecida
-   - Tiempo de entrega
-   - Condiciones de pago
-6. Selecciona proveedor y emite orden de compra:
-   - Cantidad exacta
-   - Especificaciones técnicas
-   - Fecha de entrega requerida
-   - Condiciones acordadas
-7. Realiza seguimiento del pedido:
-   - Confirma producción
-   - Verifica avance
-   - Coordina fecha de entrega
-8. Recibe notificación de despacho del proveedor
-9. Coordina recepción en almacén:
-   - Fecha y hora
-   - Personal para descarga
-   - Espacio de almacenamiento
-10. Registra orden de compra en sistema para control
-
-**Postcondiciones:**
-- Orden de compra emitida a proveedor
-- Pedido en seguimiento
-- Fecha de entrega coordinada
-- Recepción planificada
-- Registro en sistema actualizado
-
-
-
-### **CU-COS-008: Validar Calidad de Boletos**
+### **CU-COS-04: Validar Calidad de Boletos**
 
 **ID:** CU-COS-008
 
