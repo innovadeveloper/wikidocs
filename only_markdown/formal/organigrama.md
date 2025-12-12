@@ -11,6 +11,13 @@ flowchart TB
     PROV --> GG
 
     %% =======================
+    %%      TI / SISTEMAS
+    %% =======================
+    GG --> GTI("Gerente de TI")
+
+    GTI --> ATSIS("Administrador de Sistemas")
+
+    %% =======================
     %%      RRHH
     %% =======================
     GG --> GRRHH("Gerente RRHH")
@@ -37,9 +44,10 @@ flowchart TB
     JLIQ --> CSUM("Coordinador Suministros")
     CSUM --> CP("Cajero Principal")
 
-    %% Subárea: Almacén (nuevo)
+    %% Subárea: Almacén
     GFIN --> EALM("Encargado de Almacén")
     EALM --> CSUM
+
     %% =======================
     %%      OPERACIONES
     %% =======================
@@ -74,6 +82,7 @@ flowchart TB
     class JLIQ,CSUM,CP naranjaClaro;
     class JRRHH,AP,EDOC naranjaClaro;
     class EALM naranjaClaro;
+    class GTI,ATSIS naranjaClaro;
 
     classDef grisClaro fill:#E0E0E0,stroke:#333,stroke-width:1px;
     class AUT,PROV,POL,PASAJ grisClaro;

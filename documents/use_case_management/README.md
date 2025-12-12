@@ -1,6 +1,36 @@
 
 # 📌 **Síntesis de Casos de Uso – Módulo Administrativo RRHH**
 
+## **PROVEEDOR DE SISTEMAS**
+
+**CU-PRS-001: Configurar Dispositivo GPS en Unidad**
+Registra e integra un GPS a una unidad, configurando IMEI, SIM, parámetros de transmisión, pruebas y envío obligatorio a la ATU.
+
+## **ADMINISTRADOR DE SISTEMAS**
+
+**CU-ADM-001:** *Crear Usuario del Sistema*
+Permite registrar un nuevo usuario del sistema asignando perfil, sucursal y credenciales temporales.
+
+**CU-ADM-002:** *Asignar Permisos por Perfil*
+Configura o ajusta permisos de acceso por cada perfil de usuario, aplicándose de forma inmediata.
+
+**CU-ADM-003:** *Gestionar Claves de Acceso*
+Permite resetear claves, desbloquear cuentas o aplicar políticas de expiración según el caso.
+
+**CU-ADM-004:** *Consultar Usuarios Conectados*
+Muestra en tiempo real todos los usuarios activos, sesiones abiertas, IP y permite cerrar sesiones remotas.
+
+**CU-ADM-005:** *Desactivar Usuario*
+Permite suspender o desactivar permanentemente un usuario, cerrando sesiones y manteniendo historial.
+
+**CU-ADM-006:** *Auditar Actividad de Usuarios*
+Consulta logs de acciones realizadas por cada usuario, permitiendo detectar eventos anómalos o sospechosos.
+
+**CU-ADM-007:** *Configurar Parámetros del Sistema*
+Gestiona parámetros técnicos globales como vigencia de claves, tiempo de sesión, backups y retención de logs.
+
+---
+
 ## **JEFE RRHH**
 
 1. **CU-JRH-001 – Aprobar Contratación de Conductores**
@@ -30,6 +60,11 @@
 6. **CU-ANP-008 – Administrar Vacaciones y Permisos**
    *Actor:* Analista Personal.
    *Síntesis:* Registra, evalúa y aprueba permisos o vacaciones del personal.
+
+7. **CU-ANP-009: Registrar Personal General**
+   *Actor:* Analista Personal.
+   *Síntesis:* Registra inspectores, ayudantes, administrativos o mecánicos con datos personales, laborales y documentos básicos.
+
 
 ---
 
@@ -66,6 +101,10 @@
 14. **CU-ESD-008 – Coordinar con Autoridades**
     *Actor:* Especialista Documentos.
     *Síntesis:* Gestiona trámites ante autoridades (MTC, PNP, Salud, Migraciones).
+
+15. **CU-ESD-009: Configurar Reglas de Restricción Documental**
+    *Actor:* Especialista Documentos.
+    *Síntesis:* Define umbrales de alerta y reglas de bloqueo para licencias, SOAT, revisión técnica, etc., activando notificaciones y sugerencias automáticas de restricción.
 
 ---
 

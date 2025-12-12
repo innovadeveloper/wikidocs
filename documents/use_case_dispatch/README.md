@@ -6,6 +6,12 @@
 - **CU-JOP-005: Evaluar Performance del Equipo** - Analiza indicadores de productividad
 - **CU-JOP-006: Configurar Geocercas y Alertas** - Configura geocercas y alertas de la ruta
 - **CU-JOP-007: Gestionar Restricciones Operativas** - Registra restricciones a conductores o unidades
+- **CU-JOP-008: Diseñar Ruta Operativa** - Diseño de ruta operativa
+- **CU-JOP-009: Registrar Nueva Unidad** - Registra una nueva unidad vehicular con datos técnicos, operativos y documentación, quedando lista para configuración GPS y propietario.
+- **CU-JOP-010: Enlazar Unidad a Propietario** - Asocia una unidad a uno o varios propietarios, define porcentajes de participación y habilita acceso móvil de consulta al propietario.
+- **CU-JOP-011: Aplicar Restricciones por Documentación** - Aplica restricciones preventivas o críticas a conductores según alertas automáticas por documentos vencidos o próximos a vencer.
+
+
 
 ## ANALISTA OPERACIONES
 - **CU-ANL-001: Crear Programación de Salidas** - Elabora cronograma de despachos del día siguiente
@@ -14,6 +20,7 @@
 - **CU-ANL-004: Identificar Cuellos de Botella** - Detecta puntos críticos operativos
 - **CU-ANL-005: Proponer Mejoras Operativas** - Sugiere cambios basados en análisis
 - **CU-ANL-006: Configurar Parámetros del Sistema** - Ajusta tiempos, frecuencias y reglas
+
 
 ## SUPERVISOR TERMINAL
 - **CU-SUP-001: Resolver Excepciones Escaladas** - Autoriza/rechaza casos que exceden autoridad del despachador
@@ -44,7 +51,6 @@
 - **CU-MON-005: Rastrear Unidades Perdidas** - Localiza vehículos con GPS inactivo
 - **CU-MON-006: Generar Reportes de Tracking** - Documenta recorridos, alertas y comunicaciones
 - **CU-MON-007: Coordinar Respuesta a Emergencias** - Gestiona apoyo ante accidentes o averías
-- **CU-MON-008: Configurar Geocercas y Alertas** - Ajusta parámetros de monitoreo
 
 ## CONDUCTOR
 - **CU-CON-001: Ingresar a Cola de Despacho** - Se posiciona en terminal y espera autorización

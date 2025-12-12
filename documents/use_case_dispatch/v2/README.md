@@ -652,7 +652,6 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 
 ---
 
-
 ### **CU-JOP-006: Configurar Geocercas y Alertas**
 
 **ID:** CU-JOP-006
@@ -710,6 +709,8 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 - Monitoreo optimizado para operación
 - Configuración documentada en sistema
 
+---
+
 ### **CU-JOP-007 – Gestionar Restricciones Operativas**
 
 **Actor:** Jefe de Operaciones  
@@ -737,6 +738,169 @@ Se programa evaluación periódica del equipo (semanal/mensual), o se requiere e
 **Diferencia con Especialista Documentos:**
 - **Especialista:** Alerta preventiva (doc. vence en 7 días) → No bloquea
 - **Jefe Operaciones:** Restricción coercitiva → Bloquea despacho
+
+---
+
+### **CU-JOP-008 – Diseñar Ruta Operativa**
+
+**Actor:** Jefe de Operaciones  
+**Actor Secundario:** Analista Operaciones (ejecuta técnicamente)  
+**Precondición:** Autorización de ruta por ATU vigente
+
+**Flujo Principal:**
+
+1. Jefe recibe resolución ATU autorizando nueva ruta: **1065 (Puente Piedra - Miraflores)**
+2. Delega a Analista Operaciones el diseño técnico
+3. Analista accede a **Parámetros Operación > Diseño de Ruta**
+4. Click **"Nueva Ruta"**
+5. Ingresa datos básicos:
+   - **Código:** 1065
+   - **Nombre:** Puente Piedra - Miraflores
+   - **Sentido A:** Puente Piedra → Miraflores
+   - **Sentido B:** Miraflores → Puente Piedra
+   - **Tipo:** Urbano regular
+   - **Distancia estimada:** 32 km
+6. **Traza recorrido Sentido A** en mapa:
+   - Click en origen: Terminal Puente Piedra
+   - Define puntos intermedios (calles principales)
+   - Click en destino: Terminal Miraflores
+   - Sistema genera línea azul con 45 puntos GPS
+7. **Valida recorrido:**
+   - Revisa con Google Maps
+   - Verifica coincide con resolución ATU
+8. **Traza recorrido Sentido B** (retorno):
+   - Puede ser misma ruta o diferente
+   - Sistema genera línea roja
+9. **Guarda diseño**
+10. Sistema registra en **TbRuta** + **TbRutaTrazado** (coordenadas)
+
+**Postcondición:**
+- Ruta lista para configurar geocercas (CU-ANO-002)
+- Habilitada para crear controles de paso
+- Disponible para programación de servicios
+
+**Flujos Alternos:**
+
+**FA1: Ruta con variantes**
+- Define ruta principal + 2 variantes (obras, eventos)
+- Sistema almacena 3 trazados alternativos
+- Programación puede elegir cuál usar por fecha
+
+**FA2: Modificación ruta existente**
+- Selecciona ruta 1059
+- Ajusta tramo por cambio vial
+- Guarda como nueva versión
+- Mantiene histórico trazados anteriores
+
+---
+
+### **CU-JOP-009 – Registrar Nueva Unidad**
+
+**Actor:** Jefe de Operaciones
+
+**Flujo:**
+1. Accede a T-REG > Unidades > Nuevo
+2. Ingresa datos técnicos:
+   - **Padrón:** 089 (número interno)
+   - **Placa:** F1P-925
+   - **Marca/Modelo:** Mercedes-Benz / OF-1721
+   - **Año fabricación:** 2018
+   - **Capacidad:** 45 pasajeros sentados
+   - **Combustible:** Diésel
+   - **N° motor / chasis**
+3. Datos operativos:
+   - **Ruta asignada:** 1059 (San Gabriel - Lima)
+   - **Terminal base:** Chuquitanta
+   - **Tipo servicio:** Regular urbano
+4. Documentación vehículo:
+   - Tarjeta propiedad
+   - SOAT vigencia
+   - Revisión técnica
+   - Certificado GNV (si aplica)
+5. Estado inicial: "Activo - Sin GPS"
+6. Sistema registra en TbUnidad
+7. Genera ficha técnica imprimible
+
+**Pendiente:** Enlace GPS (CU-ANO-006) y propietario (CU-JOP-008)
+
+---
+
+### **CU-JOP-010 – Enlazar Unidad a Propietario**
+
+**Actor:** Jefe de Operaciones
+
+**Flujo:**
+1. Accede a T-REG > Enlace de Unidad
+2. Busca unidad: 089 F1P-925
+3. Busca propietario en TbPersonas (tipo: Propietario)
+4. Si no existe propietario:
+   - Crea persona tipo "Propietario"
+   - DNI/RUC, razón social
+5. Enlaza unidad → propietario
+6. Define participación:
+   - **Propietario único:** 100%
+   - **Accionistas múltiples:** % distribución (ej: 60% + 40%)
+7. Registra contrato vigencia
+8. Sistema crea TbEnlaceUnidadPropietario
+9. Habilita acceso móvil para propietario:
+   - Usuario: dni.propietario@empresa
+   - Perfil: "Propietario" (solo consulta su unidad)
+10. Propietario puede ver desde app:
+    - Producción diaria de su unidad
+    - Ubicación GPS
+    - Reportes de rendimiento
+
+**Validación:** Suma de participaciones = 100%
+
+---
+
+
+### **CU-JOP-011 – Aplicar Restricciones por Documentación**
+
+**Actor:** Jefe de Operaciones  
+**Trigger:** Alerta automática del sistema
+
+**Flujo:**
+1. Sistema genera alerta diaria 6:00 AM:
+```
+CONDUCTORES CON DOCUMENTACIÓN CRÍTICA:
+
+MEDINA, Jorge - Licencia vence en 5 días ⚠️
+- Acción sugerida: Restricción parcial
+- Última renovación: 10/12/2020
+
+GONZALES, Luis - SOAT vencido hace 2 días 🔴
+- Acción sugerida: Bloqueo total
+- Última renovación: 09/12/2025
+```
+
+2. Jefe revisa cada caso
+3. **Caso MEDINA (preventivo):**
+   - Accede a Operaciones > Restricciones
+   - Busca conductor: MEDINA, Jorge
+   - Aplica restricción:
+     * Tipo: Temporal
+     * Duración: 7 días (hasta renovación)
+     * Motivo: "Licencia vence 10/12"
+     * Severidad: Advertencia
+   - Despachador verá: 🟡 "Renovar licencia urgente"
+   - Puede despachar, pero queda registrado
+4. **Caso GONZALES (crítico):**
+   - Aplica restricción:
+     * Tipo: Indefinida
+     * Motivo: "SOAT vencido"
+     * Severidad: Bloqueo total
+   - Despachador verá: 🔴 "BLOQUEADO - SOAT vencido"
+   - **No puede despachar** hasta renovación
+5. Notifica a conductores vía SMS/WhatsApp
+6. Sistema registra en TbRestriccion
+7. **Para levantar restricción:**
+   - Especialista Documentos valida documento renovado
+   - Notifica Jefe Operaciones
+   - Jefe marca restricción "Liberada"
+   - Conductor vuelve operativo
+
+**Trazabilidad completa:** Quién bloqueó, cuándo, por qué, quién liberó.
 
 ---
 

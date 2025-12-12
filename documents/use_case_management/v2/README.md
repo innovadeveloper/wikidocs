@@ -1,5 +1,279 @@
-# 📋 CASOS DE USO DETALLADOS - MÓDULO ADMINISTRATIVO RRHH
-## PARTE 1: JEFE RRHH Y ANALISTA PERSONAL
+# 📋 CASOS DE USO DETALLADOS - MÓDULO ADMINISTRATIVO RRHH + TI
+
+---
+
+## PROVEEDOR DE SISTEMAS
+
+### **CU-PRS-001: Configurar Dispositivo GPS en Unidad**
+
+**Actor:** Proveedor de Sistemas (técnico)
+
+**Flujo:**
+1. Recibe dispositivo GPS nuevo: MG-00523
+2. Accede a T-REG > Enlace de Unidad (Virtual/GPS)
+3. Busca unidad: 089 F1P-925
+4. Ingresa datos dispositivo:
+   - **ID Equipo:** MG-00523
+   - **IMEI:** 356938035643809
+   - **N° SIM:** 987654321
+   - **Operador:** Claro
+   - **Firmware:** v3.2.1
+5. Configura parámetros transmisión:
+   - Intervalo envío: 30 seg
+   - Eventos: Ignición ON/OFF, exceso velocidad, geocerca
+7. Prueba comunicación:
+   - Envía comando test → Dispositivo responde
+   - Verifica posición en mapa
+8. Asocia en sistema:
+   - TbEnlaceGPS (Unidad ↔ Dispositivo)
+   - Estado: "Activo - Transmitiendo"
+9. Unidad lista para monitoreo en tiempo real
+
+**Desenlace (mantenimiento/cambio):**
+- Misma opción, marca "Desenlazar"
+- Libera dispositivo para otra unidad
+
+
+---
+
+## ADMINISTRADOR DE SISTEMAS
+
+### **CU-ADM-001 – Crear Usuario del Sistema**
+
+**Actor:** Administrador de Sistemas  
+**Actor Secundario:** Jefe de área solicitante  
+**Precondición:** Solicitud formal de nuevo usuario aprobada
+
+**Flujo Principal:**
+1. Jefe de área solicita: "Nuevo usuario para Despachador Juan Pérez"
+2. Admin accede a T-REG > Usuarios
+3. Click "Nuevo Usuario"
+4. Selecciona empleado: "PÉREZ, JUAN" (debe existir en Personas)
+5. Define parámetros:
+   - **Tipo perfil:** Despachador
+   - **Sucursal:** Terminal Chuquitanta
+   - **Usuario:** jperez@empresa
+   - **Clave temporal:** Auto-generada
+6. Sistema valida:
+   - ✓ Empleado no tiene usuario activo
+   - ✓ Usuario no duplicado
+7. Confirma creación
+8. Sistema registra en `TbUsuario`:
+   - Estado: "Activo - Primera vez"
+   - Requiere cambio clave en primer login
+9. Sistema envía credenciales a email/WhatsApp del empleado
+10. Admin notifica a Jefe de área
+11. Empleado inicia sesión, cambia clave obligatoriamente
+
+**Postcondición:** Usuario operativo con perfil asignado
+
+**Flujos Alternos:**
+
+**FA1: Empleado no existe en Personas**
+- Sistema alerta: "Empleado no registrado"
+- Admin solicita a Analista Personal registrar primero
+- Retoma proceso cuando esté disponible
+
+**FA2: Usuario duplicado**
+- Sistema detecta: "jperez@empresa ya existe"
+- Genera alternativa: jperez2@empresa
+- Admin confirma o modifica
+
+---
+
+### **CU-ADM-002 – Asignar Permisos por Perfil**
+
+**Actor:** Administrador de Sistemas  
+**Precondición:** Perfil de usuario configurado
+
+**Flujo Principal:**
+1. Admin accede a T-REG > Permisos
+2. Selecciona perfil: "Despachador"
+3. Sistema muestra matriz de módulos:
+
+```
+MÓDULO DESPACHO:
+☑ Ver cola de despacho
+☑ Autorizar salidas
+☑ Registrar incidencias
+☐ Modificar programación
+☐ Anular despachos
+
+MÓDULO RECAUDO:
+☑ Consultar producción
+☐ Modificar producción
+☐ Anular registros
+
+MÓDULO SUMINISTRO:
+☑ Consultar asignaciones
+☐ Suministrar boletos
+☐ Transferir boletos
+```
+
+4. Admin ajusta permisos según necesidad operativa
+5. Guarda configuración
+6. Sistema actualiza `TbPermisos` para ese perfil
+7. Todos los usuarios con ese perfil reciben cambios inmediatamente
+
+**Postcondición:** Perfil con permisos actualizados
+
+**Flujo Alterno:**
+
+**FA1: Crear perfil personalizado**
+- Click "Nuevo Perfil"
+- Nombre: "Despachador Nocturno"
+- Copia permisos base de "Despachador"
+- Ajusta específicos (ej: sin permiso anular)
+- Guarda perfil personalizado
+
+---
+
+### **CU-ADM-003 – Gestionar Claves de Acceso**
+
+**Actor:** Administrador de Sistemas  
+**Actor Secundario:** Usuario solicitante  
+**Precondición:** Usuario registrado en sistema
+
+**Flujo Principal:**
+
+**Escenario 1: Usuario olvidó clave**
+1. Usuario contacta: "Olvidé mi clave"
+2. Admin accede a T-REG > Gestión de Claves
+3. Busca usuario: jperez@empresa
+4. Valida identidad (DNI, datos personales)
+5. Click "Resetear Clave"
+6. Sistema genera clave temporal
+7. Envía a email/WhatsApp del usuario
+8. Usuario recibe, ingresa, sistema fuerza cambio inmediato
+9. Usuario define nueva clave permanente
+
+**Escenario 2: Bloqueo por intentos fallidos**
+1. Sistema detecta: 5 intentos fallidos - Usuario bloqueado
+2. Usuario contacta Admin
+3. Admin verifica:
+   - ¿Fue el usuario legítimo? → Desbloquea
+   - ¿Intento de intrusión? → Mantiene bloqueado, investiga
+4. Si desbloquea: Resetea clave temporal
+5. Registra en auditoría
+
+**Escenario 3: Cambio de clave periódico (política)**
+1. Sistema alerta: "Clave de jperez@empresa vence en 3 días"
+2. Usuario cambia proactivamente
+3. Si no cambia: Sistema bloquea al vencer
+4. Usuario solicita reseteo a Admin
+
+**Postcondición:** Usuario con acceso restaurado
+
+---
+
+### **CU-ADM-004 – Consultar Usuarios Conectados**
+
+**Actor:** Administrador de Sistemas  
+**Precondición:** Sistema operativo
+
+**Flujo Principal:**
+1. Admin accede a T-REG > Consulta de Usuarios
+2. Sistema muestra usuarios activos:
+
+```
+USUARIOS CONECTADOS - 11/12/2025 15:45
+
+Usuario          | Perfil        | Terminal      | Último acceso | IP
+-----------------|---------------|---------------|---------------|-------------
+jperez@empresa   | Despachador   | Chuquitanta   | 15:44:23     | 192.168.1.45
+mluna@empresa    | Cajero        | Villa Salvador| 15:43:10     | 192.168.2.30
+rgarcia@empresa  | Supervisor    | Chuquitanta   | 15:40:05     | 192.168.1.50
+```
+
+3. Admin puede:
+   - Filtrar por perfil, terminal, fecha
+   - Ver última consulta realizada por usuario
+   - Detectar sesiones inactivas
+   - Cerrar sesión remotamente (si necesario)
+
+4. Identifica sesión sospechosa:
+   - IP no reconocida
+   - Acceso fuera de horario
+   - Usuario en 2 lugares simultáneamente
+5. Investiga y toma acción (cerrar sesión, bloquear usuario)
+
+**Postcondición:** Monitoreo de accesos activo
+
+---
+### **CU-ADM-005 – Desactivar Usuario**
+
+**Flujo Principal (continuación):**
+3. Busca usuario: jperez@empresa
+4. Verifica no tiene sesiones activas
+5. Click "Cambiar Estado"
+6. Opciones:
+   - **Suspender temporalmente** (licencia, vacaciones)
+   - **Desactivar permanente** (cese laboral)
+7. Selecciona: "Desactivar permanente"
+8. Registra motivo: "Cese laboral - 11/12/2025"
+9. Sistema ejecuta:
+   - Cierra sesiones activas
+   - TbUsuario: Estado "Inactivo"
+   - Bloquea acceso inmediato
+   - **NO elimina registro** (auditoría)
+10. Mantiene histórico de operaciones del usuario
+11. Notifica a jefes de área
+
+**Postcondición:** Usuario sin acceso, datos preservados para auditoría
+
+---
+
+### **CU-ADM-006 – Auditar Actividad de Usuarios**
+
+**Actor:** Administrador de Sistemas  
+**Precondición:** Sistema con logs habilitados
+
+**Flujo Principal:**
+1. Admin accede a Sistema > Auditoría > Logs
+2. Define filtros:
+   - Usuario: jperez@empresa
+   - Fecha: 01/12 - 11/12/2025
+   - Módulo: Todos
+3. Sistema muestra:
+
+```
+FECHA/HORA       | USUARIO       | ACCIÓN               | MÓDULO    | IP
+-----------------|---------------|----------------------|-----------|-------------
+11/12 14:30:15   | jperez        | Autorizó salida U-089| Despacho  | 192.168.1.45
+11/12 14:25:10   | jperez        | Consultó cola        | Despacho  | 192.168.1.45
+11/12 10:15:03   | jperez        | Login exitoso        | Sistema   | 192.168.1.45
+10/12 22:30:45   | jperez        | Modificó programación| Despacho  | 192.168.1.45 ⚠️
+```
+
+4. Detecta anomalía:
+   - Modificó programación (sin permiso)
+5. Investiga, escala a Jefe Operaciones
+6. Exporta reporte para evidencia
+
+**Postcondición:** Trazabilidad completa de acciones
+
+---
+
+### **CU-ADM-007 – Configurar Parámetros del Sistema**
+
+**Actor:** Administrador de Sistemas
+
+**Flujo Principal:**
+1. Accede a Sistema > Configuración General
+2. Ajusta parámetros técnicos:
+   - Tiempo sesión inactiva: 30 min
+   - Intentos fallidos antes bloqueo: 5
+   - Vigencia clave: 90 días
+   - Backup automático: Diario 02:00 AM
+   - Retención logs: 365 días
+3. Guarda configuración
+4. Sistema aplica cambios globalmente
+
+---
+
+Nota :
+- Todo usuario requiere empleado existente en TbPersonas (Registro Inmutable de Creaciones para auditar)
+- Flujo de Aprobación Dual (Admin + Jefe de operaciones)
 
 ---
 
@@ -240,6 +514,30 @@ El conductor presenta una solicitud de vacaciones o permiso.
 - La solicitud queda registrada en el sistema
 - El saldo de días de vacaciones se actualiza
 - Se generan notificaciones a las partes involucradas
+
+---
+### **CU-ANP-009: Registrar Personal General**
+
+**Actor:** Analista Personal  
+**Alcance:** Inspectores, ayudantes, administrativos, mecánicos
+
+**Flujo:**
+1. Accede a T-REG > Personas > Nuevo
+2. Selecciona tipo: Inspector / Ayudante / Administrativo / Mecánico
+3. Ingresa datos básicos:
+   - DNI, nombres, apellidos, fecha nacimiento
+   - Contacto: celular, email, dirección
+   - Datos laborales: fecha ingreso, área, cargo
+4. Adjunta documentos según tipo:
+   - **Inspector:** Certificación ATU, capacitación
+   - **Ayudante:** Examen médico, capacitación
+   - **Administrativo:** CV, certificados estudios
+5. Sistema genera código empleado automático
+6. Guarda en TbPersonas con TipoPersona específico
+7. Habilita para creación de usuario (CU-ADM-001)
+
+**Diferencia con conductores:** Menos documentos obligatorios (no requieren 14 docs).
+
 
 ---
 
@@ -519,6 +817,39 @@ Se requiere obtener o renovar documento oficial ante entidad gubernamental.
 - El trámite queda registrado con código único
 - Se mantiene expediente digital completo
 - El documento obtenido queda digitalizado y archivado
+
+---
+
+### **CU-ESD-009 – Configurar Reglas de Restricción Documental**
+
+**Actor:** Especialista Documentos
+
+**Flujo:**
+1. Accede a T-REG > Configuración General > Restricciones Documentales
+2. Define umbrales por tipo documento:
+
+```
+DOCUMENTO          | ALERTA 1  | ALERTA 2  | RESTRICCIÓN
+-------------------|-----------|-----------|-------------
+Licencia conducir  | 30 días   | 15 días   | 7 días
+Certificado médico | 30 días   | 15 días   | 5 días
+SOAT               | 45 días   | 20 días   | 10 días
+Revisión técnica   | 60 días   | 30 días   | 15 días
+Antecedentes       | 90 días   | 60 días   | 30 días
+```
+
+3. Configura acciones automáticas:
+   - **30 días:** Email/SMS conductor
+   - **15 días:** Notificación supervisor
+   - **7 días:** Alerta crítica + restricción sugerida
+4. Define severidad restricción:
+   - **Advertencia:** Despacho con observación
+   - **Bloqueo parcial:** Solo turnos diurnos
+   - **Bloqueo total:** No puede ser despachado
+5. Guarda configuración en TbConfigRestriccion
+6. Sistema activa monitoreo automático diario
+
+**El sistema sugiere, Jefe Operaciones ejecuta (CU-ESD-009).**
 
 ---
 
