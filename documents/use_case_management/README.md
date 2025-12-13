@@ -1,5 +1,5 @@
 
-# 📌 **Síntesis de Casos de Uso – Módulo Administrativo RRHH**
+# **Síntesis de Casos de Uso – Módulo Administrativo RRHH**
 
 ## **PROVEEDOR DE SISTEMAS**
 

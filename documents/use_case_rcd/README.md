@@ -1,351 +1,171 @@
-# LISTA COMPLETA DE CASOS DE USO - MÓDULO RECAUDO
+# **LISTA COMPLETA DE CASOS DE USO – MÓDULO RECAUDO**
 
-## JEFE CONTABILIDAD
+## **JEFE CONTABILIDAD**
 
-**CU-JCO-001**: Planificar Recaudo Diario  
-Establece metas de ingresos y coordina procesos de cobranza del día.
+1. **CU-JCO-001 – Planificar Recaudo Diario**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Establece metas de ingresos y coordina procesos de cobranza del día.
 
-**CU-JCO-002**: Supervisar Liquidaciones  
-Controla que todas las unidades liquiden correctamente su producción diaria.
+2. **CU-JCO-002 – Supervisar Liquidaciones**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Controla que todas las unidades liquiden correctamente su producción diaria.
 
-**CU-JCO-003**: Autorizar Ajustes de Producción  
-Aprueba correcciones en liquidaciones por diferencias o incidencias.
+3. **CU-JCO-003 – Autorizar Ajustes de Producción**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Aprueba correcciones en liquidaciones por diferencias o incidencias.
 
-**CU-JCO-004**: Generar Reportes Financieros  
-Consolida ingresos diarios, semanales y mensuales para gerencia.
+4. **CU-JCO-004 – Generar Reportes Financieros**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Consolida ingresos diarios, semanales y mensuales para gerencia.
 
-**CU-JCO-005**: Controlar Cumplimiento Tributario  
-Supervisa emisión de comprobantes y cumplimiento fiscal.
+5. **CU-JCO-005 – Controlar Cumplimiento Tributario**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Supervisa emisión de comprobantes y cumplimiento fiscal.
 
-**CU-JCO-006**: Gestionar Cuentas por Cobrar  
-Administra deudas pendientes de conductores o terceros.
+6. **CU-JCO-006 – Gestionar Cuentas por Cobrar**
+   *Actor:* Jefe Contabilidad.
+   *Síntesis:* Administra deudas pendientes de conductores o terceros.
 
-## CONTADOR GENERAL
+---
 
-**CU-CON-001**: Registrar Ingresos Diarios  
-Contabiliza todos los ingresos por venta de boletos y servicios.
+## **CONTADOR GENERAL**
 
-**CU-CON-002**: Conciliar Caja vs Producción  
-Verifica que el efectivo recaudado coincida con boletos reportados.
+7. **CU-CON-001 – Registrar Ingresos Diarios**
+   *Actor:* Contador General.
+   *Síntesis:* Contabiliza todos los ingresos por venta de boletos y servicios.
 
-**CU-CON-003**: Procesar Diferencias de Caja  
-Investiga y documenta faltantes o sobrantes en liquidaciones.
+8. **CU-CON-002 – Conciliar Caja vs Producción**
+   *Actor:* Contador General.
+   *Síntesis:* Verifica que el efectivo recaudado coincida con boletos reportados.
 
-**CU-CON-004**: Generar Estados Financieros  
-Elabora balances y estados de resultados operativos.
+9. **CU-CON-003 – Procesar Diferencias de Caja**
+   *Actor:* Contador General.
+   *Síntesis:* Investiga y documenta faltantes o sobrantes en liquidaciones.
 
-**CU-CON-005**: Controlar Inventario de Boletos  
-Administra stock de boletos físicos y digitales.
+10. **CU-CON-004 – Generar Estados Financieros**
+    *Actor:* Contador General.
+    *Síntesis:* Elabora balances y estados de resultados operativos.
 
-**CU-CON-006**: Calcular Impuestos y Tasas  
-Determina obligaciones tributarias sobre ingresos operativos.
+11. **CU-CON-005 – Controlar Inventario de Boletos**
+    *Actor:* Contador General.
+    *Síntesis:* Administra stock de boletos físicos y digitales.
 
-**CU-CON-007**: Archivar Documentación  
-Organiza y resguarda comprobantes, liquidaciones y reportes.
+12. **CU-CON-006 – Calcular Impuestos y Tasas**
+    *Actor:* Contador General.
+    *Síntesis:* Determina obligaciones tributarias sobre ingresos operativos.
 
-## CAJERO PRINCIPAL (Recaudador/Liquidador)
+13. **CU-CON-007 – Archivar Documentación**
+    *Actor:* Contador General.
+    *Síntesis:* Organiza y resguarda comprobantes, liquidaciones y reportes.
 
-**CU-CAJ-001**: Abrir Caja de Recaudo  
-Inicia caja para recibir entregas parciales durante el día de operación.
+---
 
-**CU-CAJ-002**: Recibir Entregas Parciales de Conductores  
-Registra efectivo después de cada vuelta del conductor durante el día.
+## **CAJERO PRINCIPAL (Recaudador/Liquidador)**
 
-**CU-CAJ-003**: Contar y Verificar Efectivo Parcial  
-Valida montos entregados vs producción del sistema por vuelta.
+14. **CU-CAJ-001 – Abrir Caja de Recaudo**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Inicia caja para recibir entregas parciales durante el día de operación.
 
-**CU-CAJ-004**: Comparar Producción con Ticketera  
-Confronta efectivo vs boletos digitales registrados por la máquina.
+15. **CU-CAJ-002 – Recibir Entregas Parciales de Conductores**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Registra efectivo después de cada vuelta del conductor durante el día.
 
-**CU-CAJ-005**: Contabilizar Boletos Físicos Vendidos  
-Verifica series de boletos utilizados cuando no hay ticketera.
+16. **CU-CAJ-003 – Contar y Verificar Efectivo Parcial**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Valida montos entregados vs producción del sistema por vuelta.
 
-**CU-CAJ-006**: Registrar Entregas en el Sistema  
-Documenta cada entrega parcial con hora, monto y conductor.
+17. **CU-CAJ-004 – Comparar Producción con Ticketera**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Confronta efectivo vs boletos digitales registrados por la máquina.
 
-**CU-CAJ-007**: Detectar Billetes Falsos  
-Verifica autenticidad del dinero recibido en cada entrega.
+18. **CU-CAJ-005 – Contabilizar Boletos Físicos Vendidos**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Verifica series de boletos utilizados cuando no hay ticketera.
 
-**CU-CAJ-008**: Manejar Diferencias en Entregas  
-Gestiona faltantes o sobrantes durante entregas parciales.
+19. **CU-CAJ-006 – Registrar Entregas en el Sistema**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Documenta cada entrega parcial con hora, monto y conductor.
 
-**CU-CAJ-009**: Liquidar al Conductor (Final de Turno)  
-Actúa como liquidador al cierre del turno del conductor.
+20. **CU-CAJ-007 – Detectar Billetes Falsos**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Verifica autenticidad del dinero recibido en cada entrega.
 
-**CU-CAJ-010**: Cerrar Caja del Conductor  
-Finaliza la caja abierta y calcula totales del día.
+21. **CU-CAJ-008 – Manejar Diferencias en Entregas**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Gestiona faltantes o sobrantes durante entregas parciales.
 
-**CU-CAJ-011**: Calcular Liquidación Final  
-Determina monto a pagar al conductor según acuerdos.
+22. **CU-CAJ-009 – Liquidar al Conductor (Final de Turno)**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Actúa como liquidador al cierre del turno del conductor.
 
-**CU-CAJ-012**: Emitir Comprobante de Liquidación  
-Genera recibo oficial de liquidación al conductor.
+23. **CU-CAJ-010 – Cerrar Caja del Conductor**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Finaliza la caja abierta y calcula totales del día.
 
-**CU-CAJ-013**: Cuadrar Caja Propia Diaria  
-Reconcilia total recibido vs total registrado en sistema.
+24. **CU-CAJ-011 – Calcular Liquidación Final**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Determina monto a pagar al conductor según acuerdos.
 
-**CU-CAJ-014**: Depositar en Banco  
-Traslada efectivo consolidado a entidades financieras.
+25. **CU-CAJ-012 – Emitir Comprobante de Liquidación**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Genera recibo oficial de liquidación al conductor.
 
-**CU-CAJ-015**: Administrar Caja Chica  
-Gestiona fondos para gastos operativos menores.
+26. **CU-CAJ-013 – Cuadrar Caja Propia Diaria**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Reconcilia total recibido vs total registrado en sistema.
 
-**CU-CAJ-016**: Entregar Vueltos y Cambio  
-Proporciona efectivo para operaciones de conductores.
+27. **CU-CAJ-014 – Depositar en Banco**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Traslada efectivo consolidado a entidades financieras.
 
-**CU-CAJ-017**: Entregar Talonarios de Boletos Físicos a Conductores  
-Entrega talonarios a los conductores próximos a salir a ruta
+28. **CU-CAJ-015 – Administrar Caja Chica**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Gestiona fondos para gastos operativos menores.
 
-**CU-CAJ-018**: Procesar Devolución de Boletos (Reasignación)  
-Conductor devuelve boletos al cajero y este los reserva para la siguiente asignación. Otro escenario, puede ser cuando el cajero debe reasignar porque en ruta un conductor recibió talonarios de otro conductor (casos en los q se ha acabado su talonario de boletos).
+29. **CU-CAJ-016 – Entregar Vueltos y Cambio**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Proporciona efectivo para operaciones de conductores.
 
-## JEFE DE LIQUIDADOR
+30. **CU-CAJ-017 – Entregar Talonarios de Boletos Físicos a Conductores**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Entrega talonarios a los conductores próximos a salir a ruta
 
-**CU-JLI-001**: Supervisar Liquidaciones Diarias  
-Controla que todas las liquidaciones se realicen correctamente.
+31. **CU-CAJ-018 – Procesar Devolución de Boletos (Reasignación)**
+    *Actor:* Cajero Principal.
+    *Síntesis:* Conductor devuelve boletos al cajero y este los reserva para la siguiente asignación. Otro escenario, puede ser cuando el cajero debe reasignar porque en ruta un conductor recibió talonarios de otro conductor (casos en los q se ha acabado su talonario de boletos).
 
-**CU-JLI-002**: Revisar Cajas Liquidadas  
-Valida post-liquidación que los cálculos estén correctos.
+---
 
-**CU-JLI-003**: Registrar Gastos Administrativos  
-Documenta descuentos adicionales (combustible, mantenimiento, multas).
+## **JEFE DE LIQUIDADOR**
 
-**CU-JLI-004**: Calcular Liquidación al Propietario  
-Determina monto final después de gastos administrativos.
+32. **CU-JLI-001 – Supervisar Liquidaciones Diarias**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Controla que todas las liquidaciones se realicen correctamente.
 
-**CU-JLI-005**: Resolver Conflictos de Liquidación  
-Media disputas entre conductores y cajeros por diferencias.
+33. **CU-JLI-002 – Revisar Cajas Liquidadas**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Valida post-liquidación que los cálculos estén correctos.
 
-**CU-JLI-006**: Autorizar Ajustes Especiales  
-Aprueba correcciones excepcionales en liquidaciones.
+34. **CU-JLI-003 – Registrar Gastos Administrativos**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Documenta descuentos adicionales (combustible, mantenimiento, multas).
 
-**CU-JLI-007**: Generar Reportes de Liquidación  
-Consolida información diaria de todas las liquidaciones.
+35. **CU-JLI-004 – Calcular Liquidación al Propietario**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Determina monto final después de gastos administrativos.
 
-**CU-JLI-008**: Coordinar con Propietarios  
-Comunica resultados y gestiona pagos a dueños de unidades.
+36. **CU-JLI-005 – Resolver Conflictos de Liquidación**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Media disputas entre conductores y cajeros por diferencias.
 
-## ANALISTA FINANCIERO
+37. **CU-JLI-006 – Autorizar Ajustes Especiales**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Aprueba correcciones excepcionales en liquidaciones.
 
-**CU-ANF-001**: Analizar Productividad por Unidad  
-Evalúa rendimiento económico individual de cada vehículo.
+38. **CU-JLI-007 – Generar Reportes de Liquidación**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Consolida información diaria de todas las liquidaciones.
 
-**CU-ANF-002**: Comparar Ingresos Históricos  
-Identifica tendencias y variaciones en la recaudación.
-
-**CU-ANF-003**: Calcular Indicadores Financieros  
-Determina KPIs como ingreso por kilómetro, por servicio, por hora.
-
-**CU-ANF-004**: Detectar Anomalías en Recaudo  
-Identifica patrones irregulares o sospechas de fraude.
-
-**CU-ANF-005**: Proyectar Ingresos  
-Estima recaudación futura basada en datos históricos.
-
-**CU-ANF-006**: Analizar Rentabilidad por Ruta  
-Evalúa performance económica de diferentes recorridos.
-
-**CU-ANF-007**: Generar Dashboard Financiero  
-Crea indicadores visuales para toma de decisiones.
-
-## AUDITOR INTERNO
-
-**CU-AUD-001**: Revisar Procesos de Recaudo  
-Evalúa controles internos en manejo de efectivo.
-
-**CU-AUD-002**: Auditar Liquidaciones Aleatorias  
-Verifica aleatoriamente entregas de conductores específicos.
-
-**CU-AUD-003**: Investigar Irregularidades  
-Profundiza en casos sospechosos o reportes de fraude.
-
-**CU-AUD-004**: Validar Inventarios de Boletos  
-Confirma existencias físicas vs registros contables.
-
-**CU-AUD-005**: Evaluar Cumplimiento de Procedimientos  
-Verifica adherencia a políticas internas de recaudo.
-
-**CU-AUD-006**: Recomendar Mejoras de Control  
-Propone fortalecimiento de procesos financieros.
-
-## CONDUCTOR (Lado Recaudo)
-
-**CU-CON-R01**: Abrir Caja al Inicio de Turno  
-Inicia caja en sistema para registrar recaudación del día.
-
-**CU-CON-R02**: Inicializar Ticketera  
-Configura máquina expendedora y sincroniza con caja abierta.
-
-**CU-CON-R03**: Vender Boletos con Tarifa Normal  
-Expende tickets a pasajeros regulares (ticketera o manual).
-
-**CU-CON-R04**: Vender Boletos con Tarifa Diferenciada  
-Aplica descuentos a estudiantes, adultos mayores, discapacitados.
-
-**CU-CON-R05**: Manejar Vueltos  
-Gestiona cambio de dinero en ventas manuales.
-
-**CU-CON-R06**: Registrar Ventas Manuales  
-Documenta boletos físicos vendidos cuando no hay ticketera.
-
-**CU-CON-R07**: Controlar Stock de Boletos Físicos  
-Verifica inventario de tickets manuales disponible.
-
-**CU-CON-R08**: Reportar Fallas de Ticketera  
-Comunica problemas técnicos y continúa venta manual.
-
-**CU-CON-R09**: Entregar Recaudo Parcial (Por Vuelta)  
-Lleva efectivo al cajero después de cada recorrido.
-
-**CU-CON-R10**: Abrir Nueva Caja (Por Salida)  
-Inicia nueva caja si trabaja múltiples salidas en el día.
-
-**CU-CON-R11**: Cerrar Caja Temporal  
-Finaliza caja cuando para por descanso o entre salidas.
-
-**CU-CON-R12**: Justificar Diferencias en Entregas  
-Explica faltantes o sobrantes al cajero en cada entrega.
-
-**CU-CON-R13**: Cerrar Caja Final de Turno  
-Termina la última caja del día y va a liquidación final.
-
-**CU-CON-R14**: Recibir Liquidación Final  
-Obtiene pago final del cajero-liquidador al terminar turno.
-
-**CU-CON-R15**: Solicitar Reposición de Boletos  
-Pide nuevos tickets físicos cuando se agota stock.
-
-**CU-CON-R16**: Manejar Devoluciones  
-Procesa reclamos de pasajeros por servicios no prestados.
-
-## COBRADOR (si aplica)
-
-**CU-COB-R01**: Cobrar Pasajes en Efectivo  
-Recibe dinero de pasajeros y entrega boletos.
-
-**CU-COB-R02**: Validar Boletos Precomprados  
-Verifica tickets adquiridos previamente.
-
-**CU-COB-R03**: Controlar Aforo del Vehículo  
-Gestiona capacidad máxima según normativa.
-
-**CU-COB-R04**: Manejar Conflictos de Pago  
-Resuelve disputas sobre tarifas con pasajeros.
-
-**CU-COB-R05**: Rendir Cuentas al Conductor  
-Entrega efectivo recolectado durante el servicio.
-
-**CU-COB-R06**: Reportar Incidencias de Recaudo  
-Comunica problemas en cobranza al conductor.
-
-**CU-COB-R07**: Aplicar Tarifas Especiales  
-Gestiona promociones o descuentos autorizados.
-
-
-## ENCARGADO DE ALMACÉN
-
-**CU-ALM-01**: *Registrar Ingreso de Talonarios*
-Registra la entrada de talonarios desde imprenta, valida series y actualiza el stock central.
-
-**CU-ALM-02**: *Registrar Salida de Talonarios a Terminal*
-Registra la distribución de talonarios desde el almacén central hacia un terminal, actualizando ambos inventarios.
-
-**CU-ALM-03**: *Confirmar Recepción de Traslado en Terminal*
-Gestiona la confirmación del traslado por parte del terminal y valida que el stock recibido coincida con lo enviado.
-
-**CU-ALM-04**: *Generar Reporte de Inventario*
-Genera un reporte consolidado del inventario total (central, terminales y conductores), incluyendo valorización.
-
-
-## **COORDINADOR DE SUMINISTROS**
-
-**CU-COS-01**: *Abrir Gestión de Entidad (Inicio de Turno)*
-Abre el turno del terminal, valida stock disponible y habilita operaciones de suministro.
-
-**CU-COS-02**: *Suministrar Talonarios a Conductor*
-Entrega talonarios a un conductor al inicio de su jornada y registra la asignación con las series correspondientes.
-
-**CU-COS-03**: *Transferir Boletos entre Conductores*
-Gestiona la transferencia de boletos entre dos conductores cuando uno presenta una contingencia operativa.
-
-**CU-COS-04**: Validar Calidad de Boletos  
-Verifica estado físico de tickets recibidos.
-
-
-## INSPECTOR RECAUDO (si aplica)
-
-**CU-INR-001**: Verificar Ventas en Ruta  
-Supervisa proceso de cobranza durante servicios.
-
-**CU-INR-002**: Controlar Tarifas Aplicadas  
-Verifica que se cobren tarifas correctas.
-
-**CU-INR-003**: Detectar Evasión de Pago  
-Identifica pasajeros sin boleto válido.
-
-**CU-INR-004**: Auditar Ticketeras  
-Revisa funcionamiento de máquinas expendedoras.
-
-**CU-INR-005**: Reportar Irregularidades  
-Documenta fraudes o malas prácticas detectadas.
-
-**CU-INR-006**: Capacitar Personal  
-Entrena conductores en procedimientos de recaudo.
-
-## SISTEMA (Automatizaciones Recaudo)
-
-**CU-SIS-R01**: Gestionar Apertura de Caja  
-Registra inicio de caja del conductor con hora y datos iniciales.
-
-**CU-SIS-R02**: Calcular Producción por Ticketera  
-Determina ingresos automáticamente desde boletos digitales.
-
-**CU-SIS-R03**: Validar Series de Boletos Físicos  
-Verifica secuencia de boletos manuales vendidos.
-
-**CU-SIS-R04**: Comparar Efectivo vs Producción  
-Confronta dinero entregado vs ingresos calculados por caja.
-
-**CU-SIS-R05**: Generar Alertas de Diferencias  
-Notifica discrepancias entre efectivo y producción esperada.
-
-**CU-SIS-R06**: Consolidar Entregas Parciales  
-Suma recaudos por vuelta dentro de la misma caja.
-
-**CU-SIS-R07**: Calcular Liquidación Final  
-Determina monto a pagar al conductor según acuerdos.
-
-**CU-SIS-R08**: Registrar Cierre de Caja  
-Documenta finalización de caja con totales y diferencias.
-
-**CU-SIS-R09**: Generar Comprobantes de Liquidación  
-Emite documentos oficiales de liquidación automáticamente.
-
-**CU-SIS-R10**: Detectar Fraudes en Cajas  
-Identifica patrones sospechosos en apertura/cierre de cajas.
-
-**CU-SIS-R11**: Actualizar Inventarios de Boletos  
-Ajusta stock físico según boletos reportados como vendidos.
-
-**CU-SIS-R12**: Consolidar Recaudación Diaria  
-Suma todas las cajas liquidadas del día por unidad/conductor.
-
-## ESPECIALISTA COBRANZAS
-
-**CU-ESC-001**: Gestionar Cuentas Vencidas  
-Administra deudas pendientes de conductores.
-
-**CU-ESC-002**: Negociar Planes de Pago  
-Establece acuerdos de pago con deudores.
-
-**CU-ESC-003**: Ejecutar Cobranza Judicial  
-Inicia procesos legales por deudas mayores.
-
-**CU-ESC-004**: Actualizar Estados de Cuenta  
-Mantiene registro actualizado de deudas.
-
-**CU-ESC-005**: Reportar Incobrables  
-Identifica deudas imposibles de recuperar.
-
-**CU-ESC-006**: Coordinar con Legal  
-Trabaja con abogados en casos complejos.
+39. **CU-JLI-008 – Coordinar con Propietarios**
+    *Actor:* Jefe de Liquidador.
+    *Síntesis:* Comunica resultados y gestiona pagos a dueños de unidades.
