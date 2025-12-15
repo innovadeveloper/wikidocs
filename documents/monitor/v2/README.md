@@ -477,6 +477,31 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 
 ---
 
+### **stop_event**
+
+**Descripción:** Eventos de paso por paraderos (llegada/salida). Registra timestamp, pasajeros y tiempo de detención para análisis operativo.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| stop_event_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| stop_id | INT | NOT NULL, FK → stop | Paradero asociado |
+| vehicle_id | INT | NOT NULL, FK → vehicle | Vehículo |
+| driver_id | INT | FK → driver | Conductor |
+| trip_id | BIGINT | FK → trip | Viaje asociado |
+| event_type | VARCHAR(20) | NOT NULL | ARRIVAL, DEPARTURE |
+| latitude | DECIMAL(10,8) | NOT NULL | Latitud del evento |
+| longitude | DECIMAL(11,8) | NOT NULL | Longitud del evento |
+| distance_to_stop_meters | INT | | Distancia al centro paradero |
+| passengers_boarded | INT | DEFAULT 0 | Pasajeros subidos |
+| passengers_alighted | INT | DEFAULT 0 | Pasajeros bajados |
+| dwell_time_seconds | INT | | Tiempo detenido (para DEPARTURE) |
+| is_on_schedule | BOOLEAN | | Dentro de horario esperado |
+| schedule_deviation_seconds | INT | | Desviación del horario |
+| event_timestamp | TIMESTAMPTZ | NOT NULL | Timestamp del evento |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
+
+---
+
 ### **23. checkpoint**
 
 **Descripción:** Controles de paso con tiempos máximos/mínimos esperados. Validan cumplimiento de recorrido y detectan desvíos o demoras excesivas.
@@ -500,6 +525,30 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 
 ---
 
+### **checkpoint_event**
+
+**Descripción:** Eventos de paso por controles de tiempo. Valida cumplimiento de tiempos esperados y detecta retrasos/adelantos.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| checkpoint_event_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| checkpoint_id | INT | NOT NULL, FK → checkpoint | Control asociado |
+| vehicle_id | INT | NOT NULL, FK → vehicle | Vehículo |
+| driver_id | INT | FK → driver | Conductor |
+| trip_id | BIGINT | FK → trip | Viaje asociado |
+| latitude | DECIMAL(10,8) | NOT NULL | Latitud del evento |
+| longitude | DECIMAL(11,8) | NOT NULL | Longitud del evento |
+| distance_to_checkpoint_meters | INT | | Distancia al centro control |
+| elapsed_time_minutes | INT | NOT NULL | Minutos desde inicio viaje |
+| expected_time_minutes | INT | | Tiempo esperado (promedio min/max) |
+| is_on_time | BOOLEAN | NOT NULL | Dentro de rango min/max |
+| deviation_minutes | INT | | Desviación del tiempo óptimo |
+| status | VARCHAR(20) | NOT NULL | ON_TIME, EARLY, LATE |
+| event_timestamp | TIMESTAMPTZ | NOT NULL | Timestamp del evento |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
+
+---
+
 ### **24. speed_zone**
 
 **Descripción:** Zonas con límites de velocidad específicos. Genera alertas cuando unidades exceden velocidad máxima permitida en sectores determinados.
@@ -516,67 +565,6 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | is_active | BOOLEAN | DEFAULT true | Zona activa |
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
 | updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
-
----
-
-### **25. geofence**
-
-**Descripción:** Geocercas del sistema (rutas, paraderos, terminales, zonas prohibidas). Define áreas geográficas para validaciones automáticas en tiempo real.
-
-| Campo | Tipo | Restricciones | Descripción |
-|-------|------|---------------|-------------|
-| geofence_id | SERIAL | PRIMARY KEY | Identificador único |
-| geofence_type_id | INT | NOT NULL, FK → geofence_type | Tipo de geocerca |
-| route_id | INT | FK → route | Ruta asociada (opcional) |
-| name | VARCHAR(255) | NOT NULL | Nombre de la geocerca |
-| description | TEXT | | Descripción detallada |
-| geometry_type | VARCHAR(20) | NOT NULL | CIRCLE, POLYGON, CORRIDOR |
-| coordinates_json | JSONB | NOT NULL | Definición geométrica |
-| radius_meters | INT | | Radio (para CIRCLE) |
-| buffer_meters | INT | | Ancho corredor (para CORRIDOR) |
-| is_active | BOOLEAN | DEFAULT true | Geocerca activa |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
-| updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
-
----
-
-### **26. geofence_type**
-
-**Descripción:** Catálogo de tipos de geocercas con comportamiento esperado. Define qué eventos se generan al entrar/salir de cada tipo.
-
-| Campo | Tipo | Restricciones | Descripción |
-|-------|------|---------------|-------------|
-| geofence_type_id | SERIAL | PRIMARY KEY | Identificador único |
-| code | VARCHAR(50) | UNIQUE, NOT NULL | Código (ROUTE, STOP, TERMINAL, FORBIDDEN) |
-| name | VARCHAR(100) | NOT NULL | Nombre del tipo |
-| description | TEXT | | Descripción del comportamiento |
-| trigger_on_entry | BOOLEAN | DEFAULT true | Generar evento al entrar |
-| trigger_on_exit | BOOLEAN | DEFAULT true | Generar evento al salir |
-| alert_severity | VARCHAR(20) | | INFO, WARNING, CRITICAL |
-| is_active | BOOLEAN | DEFAULT true | Tipo activo |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
-
----
-
-### **27. geofence_event**
-
-**Descripción:** Eventos de entrada/salida de geocercas detectados por GPS. Registra timestamp, ubicación y duración de permanencia en cada área.
-
-| Campo | Tipo | Restricciones | Descripción |
-|-------|------|---------------|-------------|
-| event_id | BIGSERIAL | PRIMARY KEY | Identificador único |
-| geofence_id | INT | NOT NULL, FK → geofence | Geocerca afectada |
-| vehicle_id | INT | NOT NULL | Vehículo que generó evento |
-| trip_id | BIGINT | FK → trip | Viaje asociado (opcional) |
-| event_type | VARCHAR(20) | NOT NULL | ENTRY, EXIT |
-| latitude | DECIMAL(10,8) | NOT NULL | Latitud del evento |
-| longitude | DECIMAL(11,8) | NOT NULL | Longitud del evento |
-| speed_kmh | DECIMAL(5,2) | | Velocidad al momento |
-| event_timestamp | TIMESTAMPTZ | NOT NULL | Timestamp del evento |
-| duration_seconds | INT | | Duración dentro (para EXIT) |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
-
-**Particionada por:** event_timestamp (mensual)
 
 ---
 
@@ -603,7 +591,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 
 ### **29. operational_restriction**
 
-**Descripción:** Restricciones operativas aplicadas a conductores o vehículos. Bloquean despacho hasta resolución (documentos vencidos, deuda, mantenimiento).
+**Descripción:** Restricciones operativas aplicadas a conductores o vehículos. Pueden bloquear despacho (depende de restriction_type.blocks_dispatch) hasta resolución (documentos vencidos, deuda, mantenimiento).
 
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
@@ -772,29 +760,6 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
 
 **Particionada por:** start_timestamp (mensual)
-
----
-
-### **37. trip_event**
-
-**Descripción:** Eventos registrados durante viaje (paradas en paraderos, paso por checkpoints). Permite análisis detallado de cumplimiento de recorrido.
-
-| Campo | Tipo | Restricciones | Descripción |
-|-------|------|---------------|-------------|
-| event_id | BIGSERIAL | PRIMARY KEY | Identificador único |
-| trip_id | BIGINT | NOT NULL, FK → trip | Viaje asociado |
-| event_type | VARCHAR(20) | NOT NULL | STOP, CHECKPOINT, GEOFENCE |
-| stop_id | INT | FK → stop | Paradero (si aplica) |
-| checkpoint_id | INT | FK → checkpoint | Control (si aplica) |
-| geofence_id | INT | FK → geofence | Geocerca (si aplica) |
-| latitude | DECIMAL(10,8) | NOT NULL | Latitud del evento |
-| longitude | DECIMAL(11,8) | NOT NULL | Longitud del evento |
-| event_timestamp | TIMESTAMPTZ | NOT NULL | Timestamp del evento |
-| duration_seconds | INT | | Duración en punto |
-| is_expected | BOOLEAN | DEFAULT true | Evento esperado |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
-
-**Particionada por:** event_timestamp (mensual)
 
 ---
 
