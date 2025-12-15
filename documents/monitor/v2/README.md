@@ -1420,7 +1420,6 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 | ownership_percentage | DECIMAL(5,2) | NOT NULL | Porcentaje de propiedad (0.00-100.00) |
 | valid_from | DATE | NOT NULL | Inicio de vigencia |
 | valid_until | DATE | | Fin de vigencia |
-| has_mobile_access | BOOLEAN | DEFAULT false | Acceso a app móvil |
 | is_active | BOOLEAN | DEFAULT true | Participación activa |
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
 | updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
@@ -1467,7 +1466,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 | sim_provider | VARCHAR(50) | | Proveedor de SIM |
 | firmware_version | VARCHAR(50) | | Versión de firmware |
 | vehicle_id | INT | FK → vehicle | Vehículo instalado |
-| posting_interval_seconds | INT | DEFAULT 30 | Intervalo de transmisión |
+| posting_interval_seconds | INT | DEFAULT 8 | Intervalo de transmisión |
 | last_communication_at | TIMESTAMPTZ | | Última transmisión |
 | status | VARCHAR(20) | DEFAULT 'ACTIVE' | ACTIVE, INACTIVE, ERROR, MAINTENANCE |
 | is_operational | BOOLEAN | DEFAULT true | Dispositivo operativo |
@@ -1478,7 +1477,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-### **67. beacon**
+### **67. beacon** (optional)
 
 **Descripción:** Beacons BLE (Bluetooth Low Energy) para identificación segura de vehículos. Evita suplantación en eventos GPS.
 
@@ -1500,7 +1499,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-### **68. beacon_pairing_request**
+### **68. beacon_pairing_request** (optional)
 
 **Descripción:** Solicitudes de emparejamiento beacon-vehículo desde tablets. Requiere verificación de identidad del solicitante antes de aprobar.
 
@@ -1526,7 +1525,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-### **69. vehicle_beacon**
+### **69. vehicle_beacon** (optional)
 
 **Descripción:** Beacon actualmente emparejado con cada vehículo. Solo se aceptan eventos GPS si coincide MAC del beacon registrado.
 
@@ -1663,7 +1662,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-### **75. gps_processed_location**
+### **75. gps_processed_location** (opcional, utiliza stop_events, checkpoint_events)
 
 **Descripción:** Ubicaciones GPS procesadas y validadas. Eventos filtrados, geocodificados y enriquecidos con contexto operativo.
 
@@ -1690,7 +1689,8 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-## SCHEMA: `hr`
+## SCHEMA: `hr` 
+- **Nota :** Ignorar algunas tablas superficiales para este alcance como las de pago de nóminas. Más si centrarse en loan, documents, porque pueden afectar la liquidación de una caja (modo básico) y despacho de una unidad.
 
 Gestión de recursos humanos: personal, documentación, asistencia, nómina y capacitación.
 
@@ -2153,7 +2153,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ### **95. loan**
 
-**Descripción:** Préstamos y anticipos otorgados a personal. Control de créditos con cronograma de cuotas y descuentos en planilla.
+**Descripción:** Préstamos y anticipos otorgados a personal. Control de créditos con cronograma de cuotas y descuentos en planilla. También se usa para registrar saldos por liquidar de los viajes realizados por los conductores (este será impedimento de liquidar caja).
 
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
@@ -2177,7 +2177,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-### **96. loan_installment**
+### **96. loan_installment** (ignorar)
 
 **Descripción:** Cuotas de préstamos. Cronograma de pagos con control de estado y vinculación a descuentos en nómina.
 
@@ -2198,7 +2198,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-### **97. training_program**
+### **97. training_program** (ignorar)
 
 **Descripción:** Programas de capacitación disponibles. Cursos, talleres y entrenamientos para desarrollo del personal.
 
@@ -2219,7 +2219,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-### **98. training_attendance**
+### **98. training_attendance** (ignorar)
 
 **Descripción:** Asistencia a capacitaciones. Registro de participación de empleados en programas de formación con resultados.
 
@@ -2243,7 +2243,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-### **99. biometric_fingerprint**
+### **99. biometric_fingerprint** (ignorar)
 
 **Descripción:** Huellas dactilares para control de acceso. Almacena templates biométricos para autenticación física.
 
@@ -2264,7 +2264,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-### **100. access_card**
+### **100. access_card** (ignorar)
 
 **Descripción:** Tarjetas de acceso físico. Control de tarjetas RFID/NFC para entrada a instalaciones y marcación.
 
@@ -2286,7 +2286,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 
 ---
 
-## SCHEMA: `inspection`
+## SCHEMA: `inspection` (futura versión)
 
 Inspecciones de campo, verificación de cumplimiento operativo y generación de reportes.
 
