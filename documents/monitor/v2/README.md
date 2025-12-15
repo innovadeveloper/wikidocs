@@ -981,6 +981,32 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 
 ---
 
+### `ticket_supply_movement`
+
+**Descripción:** Historial de movimientos de talonarios entre actores. Registra transferencias, entregas parciales y devoluciones.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| movement_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| supply_id | BIGINT | NOT NULL, FK → ticket_supply | Suministro origen |
+| movement_type | VARCHAR(20) | NOT NULL | INITIAL_SUPPLY, PARTIAL_RETURN, TRANSFER, FULL_RETURN |
+| from_actor_type | VARCHAR(20) | | CASHIER, DRIVER |
+| from_actor_id | BIGINT | | ID del entregador |
+| to_actor_type | VARCHAR(20) | NOT NULL | CASHIER, DRIVER |
+| to_actor_id | BIGINT | NOT NULL | ID del receptor |
+| from_vehicle_id | INT | FK → vehicle | Vehículo origen (si aplica) |
+| to_vehicle_id | INT | FK → vehicle | Vehículo destino (si aplica) |
+| series | VARCHAR(10) | NOT NULL | Serie del talonario |
+| start_number | BIGINT | NOT NULL | Número inicial transferido |
+| end_number | BIGINT | NOT NULL | Número final transferido |
+| quantity | INT | NOT NULL | Cantidad transferida |
+| reason | TEXT | | Motivo del movimiento |
+| movement_timestamp | TIMESTAMPTZ | DEFAULT NOW() | Timestamp del movimiento |
+| registered_by | BIGINT | FK → user | Usuario que registró |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
+
+---
+
 ### **48. validator**
 
 **Descripción:** Ticketeras/validadores electrónicos (máquinas expendedoras). Dispositivos instalados en vehículos para venta digital de boletos.
@@ -1042,6 +1068,51 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
 
 **Particionada por:** recorded_at (mensual)
+
+---
+
+### **expense_type**
+
+**Descripción:** Catálogo de tipos de gastos operativos permitidos. Define categorías y validaciones para gastos reportados por conductores.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| expense_type_id | SERIAL | PRIMARY KEY | Identificador único |
+| code | VARCHAR(50) | UNIQUE, NOT NULL | Código (TOLL, FUEL, FINE, PARKING, MEAL, MAINTENANCE, OTHER) |
+| name | VARCHAR(100) | NOT NULL | Nombre del tipo |
+| description | TEXT | | Descripción detallada |
+| requires_receipt | BOOLEAN | DEFAULT false | Requiere comprobante |
+| max_amount_per_trip | DECIMAL(10,2) | | Monto máximo permitido por viaje |
+| is_reimbursable | BOOLEAN | DEFAULT true | Reembolsable al conductor |
+| is_active | BOOLEAN | DEFAULT true | Tipo activo |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
+
+---
+
+### **trip_expense**
+
+**Descripción:** Gastos operativos reportados por conductor durante viaje. Se descuentan de la producción en liquidación final.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| expense_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| trip_id | BIGINT | NOT NULL, FK → trip | Viaje asociado |
+| driver_id | INT | NOT NULL, FK → driver | Conductor que reportó |
+| vehicle_id | INT | NOT NULL, FK → vehicle | Vehículo operado |
+| expense_type_id | INT | NOT NULL, FK → expense_type | Tipo de gasto |
+| amount | DECIMAL(10,2) | NOT NULL | Monto del gasto |
+| description | TEXT | | Descripción del gasto |
+| location | VARCHAR(255) | | Ubicación donde se realizó |
+| receipt_number | VARCHAR(100) | | Número de comprobante |
+| receipt_file_id | BIGINT | FK → file_storage | Foto del comprobante |
+| reported_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de reporte |
+| approved_by | BIGINT | FK → user | Jefe que aprobó |
+| approved_at | TIMESTAMPTZ | | Fecha de aprobación |
+| status | VARCHAR(20) | DEFAULT 'PENDING' | PENDING, APPROVED, REJECTED |
+| rejection_reason | TEXT | | Motivo de rechazo |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
+
+
 
 ---
 

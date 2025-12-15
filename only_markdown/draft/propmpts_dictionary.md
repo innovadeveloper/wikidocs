@@ -1209,4 +1209,510 @@ WHERE restriction_id = 123;
 ---
 
 # PROMPT 8 (QUESTION)
+Como trabajaría esta tabla de suministro? 
+
+47. ticket_supply
+Descripción: Suministro de talonarios de cajero a conductor antes de salida. Registra entrega de boletos físicos para venta en ruta.
+Campo	Tipo	Restricciones	Descripción
+supply_id	BIGSERIAL	PRIMARY KEY	Identificador único
+assignment_id	BIGINT	NOT NULL, FK → ticket_batch_assignment	Asignación origen
+driver_id	INT	NOT NULL	Conductor receptor
+vehicle_id	INT	NOT NULL	Vehículo asignado
+dispatch_id	BIGINT	FK → dispatch	Despacho asociado
+series	VARCHAR(10)	NOT NULL	Serie del talonario
+start_number	BIGINT	NOT NULL	Número inicial entregado
+end_number	BIGINT	NOT NULL	Número final entregado
+quantity_supplied	INT	NOT NULL	Cantidad entregada
+supplied_by	BIGINT	NOT NULL, FK → user	Cajero que entregó
+supplied_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de entrega
+returned_at	TIMESTAMPTZ		Fecha de devolución
+status	VARCHAR(20)	DEFAULT 'ACTIVE'	ACTIVE, RETURNED, SETTLED
+created_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de creación
+
+
+me hace algo de ruido pensar en como usar el atributo "returned_at" si sé q en ocasiones puede el conductor no retornar el talonario por si lo vendió por completo..
+
+
+# PROMPT 8 (ANSWER)
+
+## `ticket_supply` - Flujo de Trabajo
+
+### **Escenarios:**
+
+**1. Suministro normal (talonario completo)**
+```sql
+-- Cajero entrega talonario A-001 a A-100 (100 boletos)
+INSERT INTO ticket_supply VALUES (
+  assignment_id=50,
+  driver_id=10,
+  vehicle_id=25,
+  series='A',
+  start_number=1,
+  end_number=100,
+  quantity_supplied=100,
+  supplied_by=cajero_id,
+  status='ACTIVE'
+);
+```
+
+**2. Conductor vende todo (caso común)**
+```sql
+-- En liquidación:
+-- Reporta vendidos: A-001 a A-100 (100 boletos)
+-- returned_at = NULL (no devuelve físicamente)
+-- status = 'SETTLED' (liquidado, no retornado)
+
+UPDATE ticket_supply SET status='SETTLED' WHERE supply_id=X;
+```
+
+**3. Conductor vende parcial**
+```sql
+-- Vendió A-001 a A-075 (75 boletos)
+-- Devuelve A-076 a A-100 (25 boletos sin usar)
+
+UPDATE ticket_supply 
+SET returned_at=NOW(), status='RETURNED' 
+WHERE supply_id=X;
+
+-- Los 25 boletos restantes quedan disponibles para reasignar
+```
+
+**4. Conductor cambia de vehículo en ruta**
+```sql
+-- Transfiere talonario a otro conductor
+-- supply_id=X: status='RETURNED', returned_at=NOW()
+-- Nuevo supply_id=Y: mismo series/start_number, nuevo driver_id
+```
+
+### **Interpretación de `returned_at`:**
+
+| Valor | Significado |
+|-------|-------------|
+| `NULL` + `status='SETTLED'` | Vendió todo, no devolvió físicamente |
+| `NULL` + `status='ACTIVE'` | En uso (aún no liquida) |
+| `timestamp` + `status='RETURNED'` | Devolvió boletos sin vender |
+
+### **Validación en liquidación:**
+```sql
+-- Cajero registra venta: A-001 a A-075
+-- Sistema verifica:
+IF end_number_sold < end_number_supplied THEN
+  -- Debe devolver A-076 a A-100 o justificar
+END IF;
+```
+
+**Conclusión:** `returned_at` solo se usa cuando hay devolución física. Si vende todo, queda `NULL` con `status='SETTLED'`.
+
+---
+
+# PROMPT 8 (QUESTION)
+ese movimiento de asignación o suministro de tickets no podría seguirse de forma histórica porque pasos o eventos cruzó a menos q agregue una nueva tabla ? Eso debería poder considerar los escenarios donde : 
+- Conductor entrega un número de boletos de una serie, recaudo parcial en una salida y ya a la siguiente entragará lo restante.
+- Conductor transfiere su talonario a otra unidad q no tiene boletos
+- Suministro inicial
+
+# PROMPT 8 (ANSWER)
+
+Correcto. Necesitas tabla de trazabilidad:
+
+## `ticket_supply_movement`
+
+**Descripción:** Historial de movimientos de talonarios entre actores. Registra transferencias, entregas parciales y devoluciones.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| movement_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| supply_id | BIGINT | NOT NULL, FK → ticket_supply | Suministro origen |
+| movement_type | VARCHAR(20) | NOT NULL | INITIAL_SUPPLY, PARTIAL_RETURN, TRANSFER, FULL_RETURN |
+| from_actor_type | VARCHAR(20) | | CASHIER, DRIVER |
+| from_actor_id | BIGINT | | ID del entregador |
+| to_actor_type | VARCHAR(20) | NOT NULL | CASHIER, DRIVER |
+| to_actor_id | BIGINT | NOT NULL | ID del receptor |
+| from_vehicle_id | INT | FK → vehicle | Vehículo origen (si aplica) |
+| to_vehicle_id | INT | FK → vehicle | Vehículo destino (si aplica) |
+| series | VARCHAR(10) | NOT NULL | Serie del talonario |
+| start_number | BIGINT | NOT NULL | Número inicial transferido |
+| end_number | BIGINT | NOT NULL | Número final transferido |
+| quantity | INT | NOT NULL | Cantidad transferida |
+| reason | TEXT | | Motivo del movimiento |
+| movement_timestamp | TIMESTAMPTZ | DEFAULT NOW() | Timestamp del movimiento |
+| registered_by | BIGINT | FK → user | Usuario que registró |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de registro |
+
+**Ejemplos:**
+
+```sql
+-- Suministro inicial
+movement_type='INITIAL_SUPPLY', from_actor_type='CASHIER', to_actor_type='DRIVER'
+
+-- Entrega parcial en ruta (recaudo)
+movement_type='PARTIAL_RETURN', from_actor_type='DRIVER', to_actor_type='CASHIER'
+
+-- Transferencia entre conductores
+movement_type='TRANSFER', from_actor_type='DRIVER', to_actor_type='DRIVER', 
+from_vehicle_id=25, to_vehicle_id=30
+```
+
+**Consulta de trazabilidad:**
+```sql
+SELECT * FROM ticket_supply_movement 
+WHERE supply_id = X 
+ORDER BY movement_timestamp;
+```
+
+---
+
+# PROMPT 8 (QUESTION)
+
+explícame el flujo de trabajo de estas tablas q creo están asociadas:
+
+50. trip_production
+Descripción: Producción por viaje (boletos vendidos y monto recaudado). Generado automáticamente por validador o registrado manualmente por conductor.
+
+Campo	Tipo	Restricciones	Descripción
+production_id	BIGSERIAL	PRIMARY KEY	Identificador único
+trip_id	BIGINT	NOT NULL, FK → trip	Viaje asociado
+validator_id	INT	FK → validator	Validador usado (si aplica)
+supply_id	BIGINT	FK → ticket_supply	Suministro manual (si aplica)
+ticket_type_id	INT	NOT NULL, FK → ticket_type	Tipo de boleto
+quantity_sold	INT	NOT NULL	Boletos vendidos
+unit_price	DECIMAL(10,2)	NOT NULL	Precio unitario
+total_amount	DECIMAL(10,2)	NOT NULL	Monto total
+start_ticket_number	BIGINT		Número inicial (manual)
+end_ticket_number	BIGINT		Número final (manual)
+recorded_at	TIMESTAMPTZ	DEFAULT NOW()	Timestamp de registro
+created_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de creación
+Particionada por: recorded_at (mensual)
+
+51. partial_delivery
+Descripción: Entregas parciales de efectivo durante jornada. Conductor entrega efectivo al cajero después de cada vuelta sin cerrar caja.
+
+Campo	Tipo	Restricciones	Descripción
+delivery_id	BIGSERIAL	PRIMARY KEY	Identificador único
+trip_id	BIGINT	FK → trip	Viaje asociado
+driver_id	INT	NOT NULL	Conductor que entrega
+vehicle_id	INT	NOT NULL	Vehículo operado
+received_by	BIGINT	NOT NULL, FK → user	Cajero receptor
+amount_delivered	DECIMAL(10,2)	NOT NULL	Efectivo entregado
+expected_amount	DECIMAL(10,2)		Producción esperada
+difference_amount	DECIMAL(10,2)		Diferencia (faltante/sobrante)
+delivery_timestamp	TIMESTAMPTZ	DEFAULT NOW()	Timestamp de entrega
+notes	TEXT		Observaciones
+created_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de registro
+52. cashier_box
+Descripción: Caja del cajero por turno. Control de efectivo recibido de conductores durante jornada laboral con apertura y cierre.
+
+Campo	Tipo	Restricciones	Descripción
+box_id	BIGSERIAL	PRIMARY KEY	Identificador único
+cashier_user_id	BIGINT	NOT NULL, FK → user	Cajero responsable
+company_id	INT	NOT NULL, FK → company	Empresa operadora
+terminal_id	INT	NOT NULL, FK → terminal	Terminal asignado
+opening_amount	DECIMAL(10,2)	NOT NULL	Efectivo inicial
+opened_at	TIMESTAMPTZ	DEFAULT NOW()	Apertura de caja
+closed_at	TIMESTAMPTZ		Cierre de caja
+closing_amount	DECIMAL(10,2)		Efectivo final
+total_received	DECIMAL(10,2)		Total recibido en turno
+total_paid_out	DECIMAL(10,2)		Total pagado (cambio, etc)
+expected_amount	DECIMAL(10,2)		Efectivo esperado
+difference_amount	DECIMAL(10,2)		Diferencia al cierre
+status	VARCHAR(20)	DEFAULT 'OPEN'	OPEN, CLOSED, AUDITED
+created_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de creación
+updated_at	TIMESTAMPTZ	DEFAULT NOW()	Última actualización
+
+
+# PROMPT 8 (ANSWER)
+
+## Flujo de Trabajo: Producción y Recaudo
+
+### **Escenario 1: Recaudo Manual (Boletos Físicos)**
+
+**Jornada del conductor:**
+
+1. **Suministro inicial** (08:00)
+   ```sql
+   ticket_supply: supply_id=100, driver_id=10, series='A', 
+   start=1, end=100, status='ACTIVE'
+   ```
+
+2. **Viaje 1** (08:30 - 09:15)
+   ```sql
+   trip: trip_id=500, driver_id=10, vehicle_id=25
+   trip_production: trip_id=500, supply_id=100, 
+   start_ticket=1, end_ticket=35, quantity=35, total=S/87.50
+   ```
+
+3. **Entrega parcial 1** (09:20 en terminal)
+   ```sql
+   partial_delivery: trip_id=500, driver_id=10, 
+   amount_delivered=S/87.50, received_by=cajero_id
+   
+   cashier_box: box_id=10 (ya abierto)
+   total_received += S/87.50
+   ```
+
+4. **Viaje 2** (09:30 - 10:15)
+   ```sql
+   trip_production: trip_id=501, supply_id=100,
+   start_ticket=36, end_ticket=70, quantity=35, total=S/87.50
+   ```
+
+5. **Entrega parcial 2** (10:20)
+   ```sql
+   partial_delivery: trip_id=501, amount_delivered=S/87.00
+   difference_amount=-S/0.50 (faltante)
+   
+   cashier_box: total_received += S/87.00
+   ```
+
+6. **Fin de turno** (14:00)
+   - Conductor vendió: A-001 a A-070 (70 boletos)
+   - Devuelve: A-071 a A-100 (30 sin usar)
+   ```sql
+   ticket_supply: status='RETURNED', returned_at=NOW()
+   ```
+
+---
+
+### Estrategias de Manejo (Saldo por pagar de un viaje)
+
+**Opción A: Bloquear liquidación hasta cuadre**
+```sql
+-- Validación antes de crear settlement
+total_production = S/174.50
+total_delivered = S/174.00  -- falta S/0.50
+
+IF total_delivered < total_production THEN
+  RAISE ERROR 'Debe entregar S/0.50 faltante antes de liquidar'
+END IF;
+```
+**Pros:** Fuerza cuadre inmediato  
+**Contras:** Conductor no puede irse hasta pagar
+
+---
+
+**Opción C: Liquidar con deuda registrada**
+```sql
+settlement:
+  net_amount = S/174.50  -- sin descontar
+
+payment:
+  amount = S/174.00  -- pago parcial
+
+hr.loan:
+  loan_type = 'SHORTAGE'
+  amount = S/0.50
+  installments = 1
+```
+**Pros:** Conductor puede irse, deuda rastreada  
+**Contras:** Requiere seguimiento de cobro
+
+---
+
+**Resumen:** 
+- `trip_production` = registro por viaje
+- `partial_delivery` = entregas en ruta
+- `cashier_box` = control de turno del cajero
+
+
+
+---
+
+# PROMPT 8 (QUESTION)
+
+q consigue la tabla :
+53. cashier_box_movement
+Descripción: Movimientos de caja del cajero (entradas/salidas). Registra cada transacción de efectivo durante el turno.
+Campo	Tipo	Restricciones	Descripción
+movement_id	BIGSERIAL	PRIMARY KEY	Identificador único
+box_id	BIGINT	NOT NULL, FK → cashier_box	Caja asociada
+movement_type	VARCHAR(20)	NOT NULL	DELIVERY, PAYMENT, ADJUSTMENT
+reference_type	VARCHAR(50)		Tipo de referencia
+reference_id	BIGINT		ID de referencia
+amount	DECIMAL(10,2)	NOT NULL	Monto del movimiento
+description	TEXT		Descripción
+movement_timestamp	TIMESTAMPTZ	DEFAULT NOW()	Timestamp del movimiento
+created_at	TIMESTAMPTZ	DEFAULT NOW()	Fecha de registro
+
+
+# PROMPT 8 (ANSWER)
+
+## `cashier_box_movement` - Propósito
+
+**Trazabilidad detallada de cada transacción en la caja del cajero.**
+
+### **Tipos de movimientos:**
+
+**1. DELIVERY (entrada)**
+```sql
+movement_type='DELIVERY', 
+reference_type='partial_delivery',
+reference_id=delivery_id,
+amount=S/87.50  -- positivo
+```
+
+**2. PAYMENT (salida)**
+```sql
+movement_type='PAYMENT',
+reference_type='settlement',
+reference_id=settlement_id,
+amount=-S/174.00  -- negativo
+```
+
+**3. ADJUSTMENT (corrección)**
+```sql
+movement_type='ADJUSTMENT',
+amount=S/5.00,
+description='Corrección error de registro'
+```
+
+### **Utilidad:**
+
+✅ Auditoría completa del turno  
+✅ Reconciliación exacta (`SUM(amount)` debe = `closing_amount - opening_amount`)  
+✅ Detectar discrepancias  
+
+**Ejemplo de consulta:**
+```sql
+SELECT SUM(amount) FROM cashier_box_movement WHERE box_id=10;
+-- Debe coincidir con: closing_amount - opening_amount
+```
+
+**Conclusión:** Necesaria para control financiero estricto.
+---
+
+# PROMPT 8 (QUESTION)
+realiza un flujo de liquidación a conductor considerando el siguiente contexto : 
+Contexto:
+Conductor: Juan (driver_id=10, person_id=10)
+Vehículo: BUS-025 (vehicle_id=25, owner_id=5)
+Empresa paga conductores: semanal
+
+
+# PROMPT 8 (ANSWER)
+
+## Flujo Corregido
+
+### **Viaje 1** (08:30-09:15)
+```sql
+trip_production: quantity=40, total=S/100.00
+
+trip_expense:
+  expense_id=1, expense_type_id=1 (TOLL)
+  amount=S/5.00
+
+partial_delivery:
+  amount_delivered=S/95.00
+  expected_amount=S/100.00
+  difference_amount=S/0.00  -- S/100 - S/5 gasto = S/95 ✓
+```
+
+### **Viaje 2** (09:30-10:15)
+```sql
+trip_production: quantity=30, total=S/75.00
+
+trip_expense:
+  expense_id=2, expense_type_id=2 (FUEL)
+  amount=S/10.00
+
+partial_delivery:
+  amount_delivered=S/64.50
+  expected_amount=S/75.00
+  difference_amount=-S/0.50  -- S/75 - S/10 = S/65 esperado, entregó S/64.50 ❌
+```
+
+## Liquidación Detallada
+
+```sql
+settlement:
+  settlement_id: 200
+  driver_id: 10
+  vehicle_id: 25
+  company_id: 100
+  settlement_date: '2024-12-15'
+  total_production: S/175.00
+  total_expenses: S/15.00
+  net_amount: S/160.00
+  payment_method: NULL
+  settled_by: 3  -- user_id cajero
+  settled_at: '2024-12-15 14:30:00'
+  status: 'PENDING'
+  notes: 'Liquidación diaria con 2 viajes, faltante S/0.50 registrado como deuda'
+  created_at: '2024-12-15 14:30:00'
+  updated_at: '2024-12-15 14:30:00'
+```
+
+```sql
+settlement_detail:
+  detail_id: 1
+  settlement_id: 200
+  ticket_type_id: 1  -- DIRECTO
+  supply_id: 100
+  series: 'A'
+  start_number: 1
+  end_number: 70
+  quantity_sold: 70
+  unit_price: S/2.50
+  total_amount: S/175.00
+  created_at: '2024-12-15 14:30:00'
+```
+
+```sql
+hr.loan:
+  loan_id: 50
+  person_id: 10
+  loan_type: 'SHORTAGE'
+  loan_amount: S/0.50
+  interest_rate: 0.00
+  total_amount: S/0.50
+  installments: 1
+  installment_amount: S/0.50
+  granted_date: '2024-12-15'
+  first_payment_date: '2024-12-22'
+  granted_by: 3
+  purpose: 'Faltante entrega parcial viaje 2, delivery_id=2'
+  status: 'ACTIVE'
+  paid_installments: 0
+  remaining_balance: S/0.50
+  created_at: '2024-12-15 14:30:00'
+```
+
+---
+
+## Pago Detallado (20/12/2024)
+
+```sql
+payment:
+  payment_id: 300
+  payment_type: 'DRIVER'
+  settlement_id: 200
+  owner_settlement_id: NULL
+  payee_id: 10
+  amount: S/159.50  -- S/160.00 - S/0.50 deuda
+  payment_method: 'TRANSFER'
+  reference_number: 'TRF-20241220-001'
+  bank_account: '191-1234567890'
+  paid_by: 3  -- user_id cajero
+  paid_at: '2024-12-20 18:00:00'
+  status: 'COMPLETED'
+  notes: 'Pago semanal con descuento loan_id=50'
+  created_at: '2024-12-20 18:00:00'
+```
+
+```sql
+UPDATE settlement SET 
+  status='PAID',
+  updated_at='2024-12-20 18:00:00'
+WHERE settlement_id=200;
+
+UPDATE hr.loan SET
+  status='PAID',
+  paid_installments=1,
+  remaining_balance=0.00,
+  updated_at='2024-12-20 18:00:00'
+WHERE loan_id=50;
+```
+
+---
+
+# PROMPT 8 (QUESTION)
 # PROMPT 8 (ANSWER)
