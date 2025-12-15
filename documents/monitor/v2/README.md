@@ -263,28 +263,6 @@ Catálogos compartidos, configuración y entidades organizacionales base del sis
 | is_active | BOOLEAN | DEFAULT true | Autoridad vigente |
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
 
----
-
-### **13. terminal**
-
-**Descripción:** Terminales operativos exclusivos por ruta. Cada ruta tiene sus propios terminales (Lado A y B) con configuración independiente de geocercas.
-
-| Campo | Tipo | Restricciones | Descripción |
-|-------|------|---------------|-------------|
-| terminal_id | SERIAL | PRIMARY KEY | Identificador único |
-| route_id | INT | NOT NULL, FK → route | Ruta propietaria del terminal |
-| company_id | INT | NOT NULL, FK → company | Empresa operadora |
-| name | VARCHAR(255) | NOT NULL | Nombre del terminal |
-| code | VARCHAR(20) | | Código identificador |
-| side_code | VARCHAR(1) | NOT NULL, CHECK | Lado de ruta: 'A' o 'B' |
-| latitude | DECIMAL(10,8) | NOT NULL | Latitud GPS |
-| longitude | DECIMAL(11,8) | NOT NULL | Longitud GPS |
-| geofence_radius_meters | INT | DEFAULT 100 | Radio de geocerca (metros) |
-| address | TEXT | | Dirección física |
-| has_infrastructure | BOOLEAN | DEFAULT false | Infraestructura física disponible |
-| is_active | BOOLEAN | DEFAULT true | Terminal operativo |
-| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
-| updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
 
 ---
 
@@ -387,6 +365,30 @@ Catálogos compartidos, configuración y entidades organizacionales base del sis
 ## SCHEMA: `core_operations`
 
 Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestión de frecuencias.
+
+---
+
+### **terminal**
+
+**Descripción:** Terminales operativos exclusivos por ruta. Cada ruta tiene sus propios terminales (Lado A y B) con configuración independiente de geocercas.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| terminal_id | SERIAL | PRIMARY KEY | Identificador único |
+| route_id | INT | NOT NULL, FK → route | Ruta propietaria del terminal |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
+| name | VARCHAR(255) | NOT NULL | Nombre del terminal |
+| code | VARCHAR(20) | | Código identificador |
+| side_code | VARCHAR(1) | NOT NULL, CHECK | Lado de ruta: 'A' o 'B' |
+| latitude | DECIMAL(10,8) | NOT NULL | Latitud GPS |
+| longitude | DECIMAL(11,8) | NOT NULL | Longitud GPS |
+| geofence_radius_meters | INT | DEFAULT 100 | Radio de geocerca (metros) |
+| address | TEXT | | Dirección física |
+| has_infrastructure | BOOLEAN | DEFAULT false | Infraestructura física disponible |
+| is_active | BOOLEAN | DEFAULT true | Terminal operativo |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
+
 
 ---
 
