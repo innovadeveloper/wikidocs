@@ -1223,7 +1223,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 
 ---
 
-### **56. settlement_adjustment**
+### **56. settlement_adjustment** (pendiente)
 
 **Descripción:** Ajustes autorizados en liquidaciones por diferencias, errores o circunstancias especiales. Requiere autorización de jefe de liquidación.
 
@@ -1240,7 +1240,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 
 ---
 
-### **57. owner_settlement**
+### **57. owner_settlement** (pendiente)
 
 **Descripción:** Liquidación a propietario de vehículo después de descontar gastos administrativos. Cálculo final de utilidad por unidad.
 
@@ -1264,7 +1264,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 
 ---
 
-### **58. administrative_expense**
+### **58. administrative_expense** (pendiente)
 
 **Descripción:** Gastos administrativos descontados en liquidación a propietario (combustible, mantenimiento, multas, seguros). Reduce utilidad neta.
 
