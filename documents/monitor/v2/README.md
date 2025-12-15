@@ -31,6 +31,41 @@ Gestión de autenticación, autorización y auditoría de accesos al sistema.
 
 ---
 
+### **user_company_access**
+
+**Descripción:** Define a qué empresas tiene acceso cada usuario. Base para permisos granulares, permite que un usuario opere en múltiples empresas simultáneamente.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| user_company_access_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| user_id | BIGINT | NOT NULL, FK → user | Usuario con acceso |
+| company_id | INT | NOT NULL, FK → company | Empresa accesible |
+| granted_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de otorgamiento |
+| granted_by | BIGINT | FK → user | Usuario que otorgó acceso |
+| is_active | BOOLEAN | DEFAULT true | Acceso vigente |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | Última actualización |
+
+---
+
+### **user_permission**
+
+**Descripción:** Permisos granulares por usuario y empresa. Permite control detallado: un usuario puede tener permisos diferentes en cada empresa que opera.
+
+| Campo | Tipo | Restricciones | Descripción |
+|-------|------|---------------|-------------|
+| user_permission_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| user_id | BIGINT | NOT NULL | Usuario receptor |
+| company_id | INT | NOT NULL | Empresa donde aplica permiso |
+| permission_id | INT | NOT NULL, FK → permission | Permiso otorgado |
+| granted_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de asignación |
+| granted_by | BIGINT | FK → user | Usuario que otorgó permiso |
+| expires_at | TIMESTAMPTZ | | Fecha de expiración (opcional) |
+| is_active | BOOLEAN | DEFAULT true | Permiso vigente |
+| created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
+
+---
+
 ### **2. user_session**
 
 **Descripción:** Registro de sesiones activas de usuarios para control de accesos concurrentes, cierre remoto de sesiones y auditoría de actividad en tiempo real.
@@ -232,18 +267,20 @@ Catálogos compartidos, configuración y entidades organizacionales base del sis
 
 ### **13. terminal**
 
-**Descripción:** Puntos operativos (terminales/paraderos finales) donde inician/terminan rutas. Corresponde a "Lado A" y "Lado B" de rutas lineales.
+**Descripción:** Terminales operativos exclusivos por ruta. Cada ruta tiene sus propios terminales (Lado A y B) con configuración independiente de geocercas.
 
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | terminal_id | SERIAL | PRIMARY KEY | Identificador único |
+| route_id | INT | NOT NULL, FK → route | Ruta propietaria del terminal |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | name | VARCHAR(255) | NOT NULL | Nombre del terminal |
-| code | VARCHAR(20) | UNIQUE | Código identificador |
-| address | TEXT | | Dirección física |
+| code | VARCHAR(20) | | Código identificador |
+| side_code | VARCHAR(1) | NOT NULL, CHECK | Lado de ruta: 'A' o 'B' |
 | latitude | DECIMAL(10,8) | NOT NULL | Latitud GPS |
 | longitude | DECIMAL(11,8) | NOT NULL | Longitud GPS |
 | geofence_radius_meters | INT | DEFAULT 100 | Radio de geocerca (metros) |
-| terminal_type | VARCHAR(20) | | MAIN, SECONDARY, INTERMEDIATE |
+| address | TEXT | | Dirección física |
 | has_infrastructure | BOOLEAN | DEFAULT false | Infraestructura física disponible |
 | is_active | BOOLEAN | DEFAULT true | Terminal operativo |
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Fecha de creación |
@@ -360,6 +397,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | route_id | SERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | concession_id | INT | FK → concession | Concesión bajo la cual opera |
 | code | VARCHAR(20) | UNIQUE, NOT NULL | Código oficial de ruta |
 | name | VARCHAR(100) | NOT NULL | Nombre descriptivo |
@@ -569,6 +607,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 |-------|------|---------------|-------------|
 | restriction_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | restriction_type_id | INT | NOT NULL, FK → restriction_type | Tipo de restricción |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | entity_type | VARCHAR(20) | NOT NULL | DRIVER, VEHICLE |
 | entity_id | BIGINT | NOT NULL | ID del conductor o vehículo |
 | severity | VARCHAR(20) | NOT NULL | CRITICAL, WARNING, INFO |
@@ -608,6 +647,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | dispatch_schedule_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | route_id | INT | NOT NULL, FK → route | Ruta programada |
 | terminal_id | INT | NOT NULL, FK → terminal | Terminal de salida |
 | schedule_date | DATE | NOT NULL | Fecha programada |
@@ -645,6 +685,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | queue_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | terminal_id | INT | NOT NULL, FK → terminal | Terminal de cola |
 | route_id | INT | NOT NULL, FK → route | Ruta solicitada |
 | vehicle_id | INT | NOT NULL | Vehículo en cola |
@@ -668,6 +709,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 |-------|------|---------------|-------------|
 | dispatch_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | queue_id | BIGINT | FK → dispatch_queue | Cola de origen |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | schedule_detail_id | BIGINT | FK → dispatch_schedule_detail | Programación origen |
 | route_id | INT | NOT NULL, FK → route | Ruta autorizada |
 | vehicle_id | INT | NOT NULL | Vehículo despachado |
@@ -710,6 +752,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 |-------|------|---------------|-------------|
 | trip_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | dispatch_id | BIGINT | NOT NULL, FK → dispatch | Despacho origen |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | route_id | INT | NOT NULL, FK → route | Ruta recorrida |
 | vehicle_id | INT | NOT NULL | Vehículo operado |
 | driver_id | INT | NOT NULL | Conductor asignado |
@@ -760,6 +803,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | incident_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | incident_type_id | INT | NOT NULL, FK → incident_type | Tipo de incidencia |
 | trip_id | BIGINT | FK → trip | Viaje afectado (opcional) |
 | vehicle_id | INT | NOT NULL | Vehículo involucrado |
@@ -805,6 +849,7 @@ Núcleo operativo del sistema: rutas, despachos, viajes, monitoreo GPS y gestió
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | alert_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | alert_type_id | INT | NOT NULL, FK → alert_type | Tipo de alerta |
 | vehicle_id | INT | FK | Vehículo afectado |
 | driver_id | INT | FK | Conductor afectado |
@@ -890,6 +935,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---------------|-------------|
 | inventory_id | BIGSERIAL | PRIMARY KEY | Identificador único |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | ticket_type_id | INT | NOT NULL, FK → ticket_type | Tipo de boleto |
 | series | VARCHAR(10) | NOT NULL | Serie del talonario |
 | start_number | BIGINT | NOT NULL | Número inicial |
@@ -914,6 +960,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 |-------|------|---------------|-------------|
 | batch_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | batch_code | VARCHAR(50) | UNIQUE, NOT NULL | Código del lote |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | ticket_type_id | INT | NOT NULL, FK → ticket_type | Tipo de boleto |
 | total_booklets | INT | NOT NULL | Total de talonarios |
 | total_tickets | INT | NOT NULL | Total de boletos |
@@ -1059,6 +1106,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 |-------|------|---------------|-------------|
 | box_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | cashier_user_id | BIGINT | NOT NULL, FK → user | Cajero responsable |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | terminal_id | INT | NOT NULL, FK → terminal | Terminal asignado |
 | opening_amount | DECIMAL(10,2) | NOT NULL | Efectivo inicial |
 | opened_at | TIMESTAMPTZ | DEFAULT NOW() | Apertura de caja |
@@ -1101,6 +1149,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 | settlement_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | driver_id | INT | NOT NULL | Conductor liquidado |
 | vehicle_id | INT | NOT NULL | Vehículo operado |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | settlement_date | DATE | NOT NULL | Fecha de liquidación |
 | total_production | DECIMAL(10,2) | NOT NULL | Producción total |
 | total_expenses | DECIMAL(10,2) | DEFAULT 0 | Gastos totales |
@@ -1161,6 +1210,7 @@ Gestión financiera: tarifas, boletos, recaudo, liquidaciones y cálculo de prod
 |-------|------|---------------|-------------|
 | owner_settlement_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | vehicle_id | INT | NOT NULL | Vehículo liquidado |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | settlement_period_start | DATE | NOT NULL | Inicio período |
 | settlement_period_end | DATE | NOT NULL | Fin período |
 | total_production | DECIMAL(10,2) | NOT NULL | Producción total período |
@@ -1259,6 +1309,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 | plate_number | VARCHAR(10) | UNIQUE, NOT NULL | Placa oficial del vehículo |
 | internal_code | VARCHAR(20) | UNIQUE, NOT NULL | Código interno de la empresa |
 | route_id | INT | FK → route | Ruta actualmente asignada |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | brand | VARCHAR(100) | | Marca del vehículo |
 | model | VARCHAR(100) | | Modelo del vehículo |
 | year | INT | | Año de fabricación |
@@ -1369,6 +1420,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 | gps_device_id | SERIAL | PRIMARY KEY | Identificador único |
 | device_id | VARCHAR(50) | UNIQUE, NOT NULL | ID único del dispositivo |
 | device_type | VARCHAR(20) | NOT NULL | TRACKER_GPS, ANDROID_ID, IMEI |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | imei | VARCHAR(20) | UNIQUE | IMEI del dispositivo |
 | serial_number | VARCHAR(50) | | Número de serie |
 | model | VARCHAR(100) | | Modelo del dispositivo |
@@ -1709,6 +1761,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 | driver_id | SERIAL | PRIMARY KEY | Identificador único |
 | person_id | INT | UNIQUE, NOT NULL, FK → person | Persona base |
 | user_id | BIGINT | UNIQUE, FK → user | Usuario del sistema |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | driver_code | VARCHAR(20) | UNIQUE, NOT NULL | Código interno conductor |
 | hire_date | DATE | | Fecha de contratación |
 | termination_date | DATE | | Fecha de cese |
@@ -1784,6 +1837,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 |-------|------|---------------|-------------|
 | inspector_id | SERIAL | PRIMARY KEY | Identificador único |
 | person_id | INT | UNIQUE, NOT NULL, FK → person | Persona base |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | user_id | BIGINT | UNIQUE, FK → user | Usuario del sistema |
 | inspector_code | VARCHAR(20) | UNIQUE, NOT NULL | Código interno inspector |
 | assigned_zone | VARCHAR(100) | | Zona asignada |
@@ -1807,6 +1861,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 |-------|------|---------------|-------------|
 | personnel_id | SERIAL | PRIMARY KEY | Identificador único |
 | person_id | INT | UNIQUE, NOT NULL, FK → person | Persona base |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | user_id | BIGINT | UNIQUE, FK → user | Usuario del sistema |
 | employee_code | VARCHAR(20) | UNIQUE, NOT NULL | Código interno empleado |
 | job_title | VARCHAR(100) | NOT NULL | Cargo |
@@ -1979,6 +2034,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 | start_date | DATE | NOT NULL | Inicio del período |
 | end_date | DATE | NOT NULL | Fin del período |
 | payment_date | DATE | NOT NULL | Fecha de pago |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | status | VARCHAR(20) | DEFAULT 'DRAFT' | DRAFT, PROCESSING, APPROVED, PAID |
 | processed_by | BIGINT | FK → user | Usuario que procesó |
 | processed_at | TIMESTAMPTZ | | Fecha de procesamiento |
@@ -2000,6 +2056,7 @@ Gestión de recursos humanos: personal, documentación, asistencia, nómina y ca
 | payroll_record_id | BIGSERIAL | PRIMARY KEY | Identificador único |
 | payroll_period_id | INT | NOT NULL, FK → payroll_period | Período de nómina |
 | person_id | INT | NOT NULL, FK → person | Empleado pagado |
+| company_id | INT | NOT NULL, FK → company | Empresa operadora |
 | base_salary | DECIMAL(10,2) | NOT NULL | Salario base |
 | gross_salary | DECIMAL(10,2) | NOT NULL | Salario bruto |
 | total_deductions | DECIMAL(10,2) | DEFAULT 0 | Total descuentos |

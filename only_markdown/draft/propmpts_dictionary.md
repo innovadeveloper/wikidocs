@@ -128,7 +128,7 @@ Ruta {{route_code}} - Salida {{scheduled_time}}
 ```
 code: RESTRICTION_APPLIED_PUSH
 body:
-⚠️ Restricción aplicada
+  Restricción aplicada
 {{restriction_reason}}
 Contacte a su supervisor.
 ```
@@ -137,7 +137,7 @@ Contacte a su supervisor.
 ```
 code: PAYMENT_PROCESSED_INAPP
 body:
-✅ Liquidación procesada
+  Liquidación procesada
 Monto: S/ {{net_amount}}
 Ref: {{settlement_id}}
 ```
@@ -220,10 +220,10 @@ Si eliges **Opción A**, necesitas:
 
 | Criterio | Terminales Compartidos | Terminales Dedicados |
 |----------|----------------------|---------------------|
-| **Flexibilidad** | ✅ Reutilización | ❌ Duplicación |
-| **Configuración** | ⚠️ Cambio afecta N rutas | ✅ Independiente |
-| **UI Suministro** | ⚠️ Confusión (mismo nombre) | ✅ Claro por ruta |
-| **Mantenimiento** | ✅ Menos registros | ❌ Más registros |
+| **Flexibilidad** |   Reutilización |   Duplicación |
+| **Configuración** |   Cambio afecta N rutas |   Independiente |
+| **UI Suministro** |   Confusión (mismo nombre) |   Claro por ruta |
+| **Mantenimiento** |   Menos registros |   Más registros |
 
 **Solución Híbrida Recomendada:**
 
@@ -250,10 +250,10 @@ route_terminal (
 ```
 
 **Beneficios:**
-- ✅ Terminal físico compartido (ubicación única)
-- ✅ Configuración independiente por ruta (radio, nombre display)
-- ✅ UI de suministro muestra: "Terminal Grau - Ruta 101" (sin confusión)
-- ✅ Cambiar radio en Ruta 101 NO afecta Ruta 102
+-   Terminal físico compartido (ubicación única)
+-   Configuración independiente por ruta (radio, nombre display)
+-   UI de suministro muestra: "Terminal Grau - Ruta 101" (sin confusión)
+-   Cambiar radio en Ruta 101 NO afecta Ruta 102
 
 **Ajustes necesarios:**
 - `dispatch_queue.terminal_id` → `route_terminal_id`
@@ -282,10 +282,399 @@ route_terminal (
 - Segundo, considero q los terminales deben ser independientes y no deben ser compartidos (ni siquiera como estilo híbrido), estos terminales pueden estar referenciados FK a una ruta en concreto y no a otros más.
 
 
-# PROMPT 3 (ANSWER)
+# PROMPT 3 (QUESTION)
+Perfecto, me agradó el middleware de "Validación con Redis" con su función "checkCompanyPermission()" para funciones de edición INSERT, UPDATE, DELETE y el mencionar q para las querys de PGSQL se agregue en cada "where" el atributo "company_id" para restringir alcances.
+Y también me agradó la forma de procesar las lecturas (GET) considerando el alcance por empresas y permisos granulares como indicaste en "Endpoint que respeta permisos de lectura". Ahora tocó el momento de documentar como se vería la tabla con sus registros en pgsql y luego como con redis como CACHE se sincronice por un tiempo de "N" minutos para q las APIS a través de dos middleware puedan procesar las solicitudes (el lenguaje será java y el framework springboot) q entiendo podrían ser :
+- MIDDLEWARE DE LECTURA
+- MIDDLEWARE DE ESCRITURA 
+Ambos verifican permisos granulares y si tienen acceso en determinada "company", pero se diferencian en q el middleware de lectura no detendrá el flujo con un 403 por si se quieren listar todas las liquidaciones pero tuviera acceso solo a una empresa y no a todas (caso de maría) se le retornaría la data q espera como si fueran TODAS y solo se rompería el flujo con un 403 por sino tuviera como mínimo un permiso de lectura de alguna "company" (en java se conoce como un "at least one" para q no rompa el flujo). Sin embargo, en el middleware de escritura siempre se realizará una acción por "company", así q ahí siempre deberá tener ese permiso de escritura en la "company" determinada . Documentemoslo a alto nivel explicando este flujo y si tienes alguna observación planteala
 
+```sql
+-- user_company_access
+user_id | company_id
+--------|------------
+10      | 100          -- Juan
+10      | 101
+20      | 100          -- María
+30      | 100          -- Carlos
+30      | 101
 
+-- user_permission
+user_id | permission_code              | company_id
+--------|------------------------------|------------
+10      | operations.gps.read          | 100
+10      | operations.gps.read          | 101
+20      | finance.settlement.read      | 100
+20      | finance.settlement.update    | 100
+30      | finance.settlement.read      | 100
+30      | finance.settlement.update    | 100
+30      | finance.settlement.read      | 101
+30      | finance.settlement.update    | 101
+
+-- settlement (liquidaciones)
+settlement_id | company_id | driver_id | net_amount
+--------------|------------|-----------|------------
+500           | 100        | 45        | 150.00
+501           | 101        | 78        | 200.00
+```
+
+# PROMPT 4 (ANSWER)
+
+# Arquitectura de Permisos Granulares - Spring Boot
+
+## 0. Autenticación con permisos granulares y multiteniente
+
+```sql
+-- user_company_access
+user_id | company_id
+--------|------------
+10      | 100          -- Juan
+10      | 101
+20      | 100          -- María
+30      | 100          -- Carlos
+30      | 101
+
+-- user_permission
+user_id | permission_code              | company_id
+--------|------------------------------|------------
+10      | operations.gps.read          | 100
+10      | operations.gps.read          | 101
+20      | finance.settlement.read      | 100
+20      | finance.settlement.update    | 100
+30      | finance.settlement.read      | 100
+30      | finance.settlement.update    | 100
+30      | finance.settlement.read      | 101
+30      | finance.settlement.update    | 101
+
+-- settlement (liquidaciones)
+settlement_id | company_id | driver_id | net_amount
+--------------|------------|-----------|------------
+500           | 100        | 45        | 150.00
+501           | 101        | 78        | 200.00
+```
+
+## 1. Modelo de Datos PostgreSQL
+
+```sql
+-- Tabla de acceso base (usuario puede ver empresas)
+CREATE TABLE user_company_access (
+  user_id BIGINT NOT NULL,
+  company_id BIGINT NOT NULL,
+  PRIMARY KEY (user_id, company_id)
+);
+
+-- Permisos granulares por empresa
+CREATE TABLE user_permission (
+  user_id BIGINT NOT NULL,
+  company_id BIGINT NOT NULL,
+  permission_code VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (user_id, company_id, permission_code),
+  FOREIGN KEY (user_id, company_id) 
+    REFERENCES user_company_access(user_id, company_id)
+);
+
+CREATE INDEX idx_user_permission_lookup 
+  ON user_permission(user_id, permission_code);
+```
+
+**Datos de ejemplo:**
+```sql
+-- María (user_id=20): solo empresa 100, read + update
+INSERT INTO user_company_access VALUES (20, 100);
+INSERT INTO user_permission VALUES 
+  (20, 100, 'finance.settlement.read'),
+  (20, 100, 'finance.settlement.update');
+
+-- Carlos (user_id=30): empresas 100 y 101, read + update en ambas
+INSERT INTO user_company_access VALUES (30, 100), (30, 101);
+INSERT INTO user_permission VALUES 
+  (30, 100, 'finance.settlement.read'),
+  (30, 100, 'finance.settlement.update'),
+  (30, 101, 'finance.settlement.read'),
+  (30, 101, 'finance.settlement.update');
+```
 
 ---
+
+## 2. Caché Redis - Estructura
+
+```java
+// Key pattern: "perms:{userId}"
+// TTL: 10 minutos
+// Valor JSON:
+{
+  "byCompany": {
+    "100": ["finance.settlement.read", "finance.settlement.update"],
+    "101": ["finance.settlement.read"]
+  },
+  "allPermissions": ["finance.settlement.read", "finance.settlement.update"]
+}
+```
+
+**Servicio de caché:**
+```java
+@Service
+public class PermissionCacheService {
+    
+    @Autowired
+    private RedisTemplate<String, String> redis;
+    
+    @Autowired
+    private PermissionRepository permRepo;
+    
+    public UserPermissions getPermissions(Long userId) {
+        String key = "perms:" + userId;
+        String cached = redis.opsForValue().get(key);
+        
+        if (cached != null) {
+            return objectMapper.readValue(cached, UserPermissions.class);
+        }
+        
+        // Query PostgreSQL
+        List<PermissionEntity> perms = permRepo.findByUserId(userId);
+        UserPermissions userPerms = mapToUserPermissions(perms);
+        
+        // Cache 10 minutos
+        redis.opsForValue().set(key, 
+            objectMapper.writeValueAsString(userPerms), 
+            10, TimeUnit.MINUTES);
+        
+        return userPerms;
+    }
+    
+    public void invalidate(Long userId) {
+        redis.delete("perms:" + userId);
+    }
+}
+```
+
+---
+
+## 3. Middleware de Lectura (Filter)
+
+**Filosofía:** "At least one" - permite lectura si tiene acceso a *cualquier* empresa.
+
+```java
+@Component
+@Order(1)
+public class ReadPermissionFilter implements Filter {
+    
+    @Autowired
+    private PermissionCacheService permCache;
+    
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) 
+            throws IOException, ServletException {
+        
+        HttpServletRequest request = (HttpServletRequest) req;
+        
+        // Solo aplica a GET requests
+        if (!"GET".equals(request.getMethod())) {
+            chain.doFilter(req, res);
+            return;
+        }
+        
+        Long userId = extractUserIdFromJWT(request);
+        String requiredPermission = extractPermissionFromPath(request); 
+        // Ej: /settlements → "finance.settlement.read"
+        
+        UserPermissions perms = permCache.getPermissions(userId);
+        
+        // Obtener empresas donde tiene el permiso
+        Set<Long> readableCompanies = perms.getCompaniesWith(requiredPermission);
+        
+        if (readableCompanies.isEmpty()) {
+            // Sin acceso a ninguna empresa → 403
+            ((HttpServletResponse) res).sendError(403, 
+                "No read access to any company");
+            return;
+        }
+        
+        // HttpServletRequest request soporta la inyección de atributos también
+        // Inyectar scope en request para el controller
+        request.setAttribute("readableCompanies", readableCompanies);
+        chain.doFilter(req, res);
+    }
+}
+```
+
+**Controller usa el scope:**
+```java
+@GetMapping("/settlements")
+public List<Settlement> list(HttpServletRequest request) {
+    @SuppressWarnings("unchecked")
+    Set<Long> companies = (Set<Long>) request.getAttribute("readableCompanies");
+    
+    // Query automáticamente filtrado
+    return settlementRepo.findByCompanyIdIn(companies);
+}
+```
+
+**Query JPA:**
+```java
+@Query("SELECT s FROM Settlement s WHERE s.companyId IN :companies")
+List<Settlement> findByCompanyIdIn(@Param("companies") Set<Long> companies);
+```
+
+---
+
+## 4. Middleware de Escritura (Interceptor)
+
+**Filosofía:** Validación estricta - requiere permiso en la empresa específica de la operación.
+
+```java
+@Component
+public class WritePermissionInterceptor implements HandlerInterceptor {
+    
+    @Autowired
+    private PermissionCacheService permCache;
+    
+    @Override
+    public boolean preHandle(HttpServletRequest request, 
+                            HttpServletResponse response, 
+                            Object handler) throws Exception {
+        
+        String method = request.getMethod();
+        if ("GET".equals(method)) {
+            return true; // Skip para lecturas
+        }
+        
+        Long userId = extractUserIdFromJWT(request);
+        Long companyId = extractCompanyIdFromRequest(request); 
+        // Del body/params
+        
+        if (companyId == null) {
+            response.sendError(400, "company_id required");
+            return false;
+        }
+        
+        String permission = mapMethodToPermission(method, request.getRequestURI());
+        // POST → "settlement.create"
+        // PUT → "settlement.update"
+        // DELETE → "settlement.delete"
+        
+        UserPermissions perms = permCache.getPermissions(userId);
+        
+        if (!perms.hasPermissionInCompany(permission, companyId)) {
+            response.sendError(403, 
+                String.format("No '%s' permission in company %d", 
+                    permission, companyId));
+            return false;
+        }
+        // HttpServletRequest request soporta la inyección de atributos también
+        // request.setAttribute("readableCompanies", readableCompanies);
+
+        
+        return true;
+    }
+}
+```
+
+**Controller con validación implícita:**
+```java
+@PutMapping("/settlements/{id}")
+public Settlement update(@PathVariable Long id, @RequestBody SettlementDTO dto) {
+    // companyId viene en dto.companyId
+    // El interceptor ya validó el permiso
+    
+    // Query con restricción adicional por seguridad
+    Settlement settlement = settlementRepo
+        .findByIdAndCompanyId(id, dto.getCompanyId())
+        .orElseThrow(() -> new NotFoundException());
+    
+    settlement.setStatus(dto.getStatus());
+    return settlementRepo.save(settlement);
+}
+```
+
+---
+
+## 5. Flujo Completo - Ejemplos
+
+### Caso 1: María lista liquidaciones (GET)
+```
+1. Request: GET /settlements
+2. ReadPermissionFilter:
+   - userId=20 → companies con "settlement.read" = [100]
+   - Inyecta readableCompanies=[100]
+3. Controller:
+   - Query: WHERE company_id IN (100)
+   - Response: [settlement_500]  
+```
+
+### Caso 2: María intenta actualizar settlement_501 (PUT)
+```
+1. Request: PUT /settlements/501 { companyId: 101 }
+2. WritePermissionInterceptor:
+   - userId=20, companyId=101, permission="settlement.update"
+   - perms.byCompany[101] → null
+   - Response: 403 Forbidden  
+```
+
+### Caso 3: Carlos actualiza settlement_500 (PUT)
+```
+1. Request: PUT /settlements/500 { companyId: 100 }
+2. WritePermissionInterceptor:
+   - userId=30, companyId=100, permission="settlement.update"
+   - perms.byCompany[100].includes("settlement.update") → true
+   - Permite continuar  
+3. Controller:
+   - Query: WHERE id=500 AND company_id=100
+   - Update exitoso  
+```
+
+### Caso 4: Juan intenta listar liquidaciones (GET)
+```
+1. Request: GET /settlements
+2. ReadPermissionFilter:
+   - userId=10 → companies con "settlement.read" = []
+   - Response: 403 "No read access"  
+```
+
+---
+
+## 6. Observaciones Críticas
+
+###   Extracción de company_id en escritura
+```java
+// Para POST/PUT con body JSON
+Long companyId = objectMapper.readTree(request.getInputStream())
+    .get("company_id").asLong();
+
+// Para operaciones sobre recursos existentes (DELETE, PATCH)
+Long companyId = settlementRepo.findById(id)
+    .map(Settlement::getCompanyId)
+    .orElse(null);
+```
+
+###   Queries siempre con company_id
+```java
+//   MALO - vulnerable
+settlementRepo.findById(id);
+
+//   BUENO - doble validación
+settlementRepo.findByIdAndCompanyId(id, companyId);
+```
+
+###   Invalidación de caché
+```java
+@Transactional
+public void updatePermissions(Long userId) {
+    permissionRepo.save(...);
+    permCache.invalidate(userId); // Crítico
+}
+```
+
+###   Logging para auditoría
+```java
+log.info("Permission check: user={}, company={}, permission={}, result={}", 
+    userId, companyId, permission, hasAccess);
+```
+
+---
+
+
+
 
 ### Schema: core_operations
