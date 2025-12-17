@@ -9,147 +9,146 @@
 
 ## SCHEMAS (v2) :
 
-
 ### **Schema: `identity`**
 ```
-1.  user
-2.  user_session
-3.  permission
-4.  user_permission
-5.  permission_template
-6.  permission_template_detail
-7.  activity_log
-8.  login_attempt
+1.  user                       -- Usuarios del sistema (LDAP/WSO2)
+2.  user_company_access        -- Acceso de usuarios a empresas
+3.  user_permission            -- Permisos granulares por usuario y empresa
+4.  user_session               -- Sesiones activas y auditoría
+5.  permission                 -- Catálogo de permisos del sistema
+6.  permission_template        -- Plantillas reutilizables de permisos
+7.  permission_template_detail -- Detalle de permisos en plantillas
+8.  activity_log               -- Auditoría de acciones de usuarios
+9.  login_attempt              -- Intentos de autenticación
 ```
 
 ### **Schema: `shared`**
 ```
-9.   company                    -- RUC, razón social del operador
-10.  concession                 -- Concesión otorgada por autoridad
-11.  concessionaire             -- Concesionario (puede = company)
-12.  authority                  -- ATU, Municipalidad
-13.  terminal                   -- Puntos operativos (Lado A/B)
-14.  catalog                    -- Catálogos genéricos
-15.  document_type              -- 14 tipos documentos obligatorios
-16.  configuration              -- Parámetros globales
-17.  notification_template      -- Templates de notificaciones
-18.  file_storage               -- Archivos adjuntos (S3/MinIO)
+10. company                    -- Empresas de transporte
+11. branch                     -- Sucursales de empresa
+12. terminal                   -- Terminales de transporte
+13. file_storage               -- Archivos adjuntos del sistema
+14. system_parameter           -- Parámetros de configuración
+15. catalog                    -- Catálogos generales del sistema
+16. catalog_item               -- Items de catálogos
+17. notification               -- Notificaciones a usuarios
+18. notification_template      -- Plantillas de notificaciones
+19. notification_log           -- Log de envío de notificaciones
 ```
 
 ### **Schema: `core_operations`**
 ```
-19.  route                      -- Ruta (asignada a company)
-20.  route_polyline             -- Geometría visualización
-21.  route_side                 -- Lado A / Lado B (IDA/VUELTA)
-22.  stop                       -- Paraderos
-23.  checkpoint                 -- Controles de paso
-24.  speed_zone                 -- Zonas velocidad máxima
-25.  geofence                   -- Geocercas (ruta, paradero, terminal)
-26.  geofence_type              -- Tipos de geocerca
-27.  geofence_event             -- Eventos de geocerca
-28.  frequency_schedule         -- Frecuencias objetivo por horario
-29.  operational_restriction    -- Restricciones (conductor/vehículo)
-30.  restriction_type           -- Tipos de restricción
-31.  dispatch_schedule          -- Programación de salidas
-32.  dispatch_schedule_detail   -- Detalle horarios programados
-33.  dispatch_queue             -- Cola de despacho
-34.  dispatch                   -- Despachos autorizados
-35.  dispatch_exception         -- Excepciones autorizadas
-36.  trip                       -- Viajes/servicios ejecutados
-37.  trip_event                 -- Eventos en ruta (paradas, checkpoints)
-38.  incident                   -- Incidencias operativas
-39.  incident_type              -- Tipos de incidencia
-40.  alert                      -- Alertas automáticas
-41.  alert_type                 -- Tipos de alerta
+20. route                      -- Rutas (asignadas a empresa)
+21. route_polyline             -- Geometría de visualización
+22. route_stop                 -- Paradas de ruta
+23. route_schedule             -- Horarios programados por ruta
+24. service                    -- Servicios de transporte
+25. dispatch                   -- Despachos programados
+26. trip                       -- Viajes realizados
+27. trip_stop                  -- Paradas de viaje
+28. trip_passenger_count       -- Conteo de pasajeros
+29. trip_location              -- Trackeo GPS del viaje
+30. trip_speed_event           -- Eventos de velocidad
+31. frequency_control          -- Control de frecuencias
+32. route_compliance           -- Cumplimiento de ruta
+33. incident                   -- Incidentes operativos
+34. incident_photo             -- Fotos de incidentes
+35. incident_resolution        -- Resolución de incidentes
+36. operational_report         -- Reportes operativos consolidados
+37. operational_metric         -- Métricas operativas por ruta/servicio
+38. passenger_complaint        -- Quejas de pasajeros
+39. complaint_followup         -- Seguimiento de quejas
+40. timetable                  -- Horarios publicados
+41. timetable_exception        -- Excepciones de horarios
+42. schedule_change_log        -- Historial de cambios de programación
 ```
 
 ### **Schema: `core_finance`**
 ```
-42.  fare                       -- Tarifas por tipo boleto
-43.  ticket_type                -- Tipos de boleto (DIRECTO, URBANO, etc)
-44.  ticket_inventory           -- Almacén boletos físicos
-45.  ticket_batch               -- Lotes de talonarios
-46.  ticket_batch_assignment    -- Salida almacén → cajero
-47.  ticket_supply              -- Suministro cajero → conductor
-48.  validator                  -- Ticketeras/validadores electrónicos
-49.  validator_assignment       -- Asignación validador → vehículo
-50.  trip_production            -- Producción por viaje
-51.  partial_delivery           -- Entregas parciales en ruta
-52.  cashier_box                -- Caja del cajero
-53.  cashier_box_movement       -- Movimientos de caja
-54.  settlement                 -- Liquidación conductor
-55.  settlement_detail          -- Detalle boletos vendidos
-56.  settlement_adjustment      -- Ajustes autorizados
-57.  owner_settlement           -- Liquidación a propietario
-58.  administrative_expense     -- Gastos administrativos
-59.  payment                    -- Pagos a conductores/propietarios
-60.  financial_report           -- Reportes financieros
+43. fare_table                 -- Tabla tarifaria vigente
+44. fare_history               -- Historial de tarifas
+45. ticket_sale                -- Venta de boletos
+46. ticket_transaction         -- Transacciones de boletos
+47. sale_batch                 -- Lotes de ventas consolidados
+48. settlement                 -- Liquidaciones de conductores
+49. settlement_detail          -- Detalle de liquidación
+50. settlement_discrepancy     -- Discrepancias en liquidación
+51. cash_collection            -- Recaudación de efectivo
+52. cash_denomination          -- Denominaciones de billetes/monedas
+53. cash_transfer              -- Transferencias entre cajas
+54. cash_reconciliation        -- Conciliación de caja
+55. bank_deposit               -- Depósitos bancarios
+56. payment                    -- Pagos a terceros
+57. invoice                    -- Facturas emitidas
+58. revenue_report             -- Reportes de ingresos
+59. fare_evasion_report        -- Reportes de evasión tarifaria
+60. financial_closing          -- Cierres financieros
+61. accounting_export          -- Exportaciones contables
 ```
 
 ### **Schema: `fleet`**
 ```
-61.  vehicle                    -- Unidades vehiculares
-62.  vehicle_document           -- Documentos de vehículo (SOAT, revisión)
-63.  vehicle_owner              -- Propietarios de unidades
-64.  vehicle_owner_share        -- Porcentajes de participación
-65.  vehicle_assignment         -- Asignación conductor → vehículo
-66.  gps_device                 -- Dispositivos GPS/trackers
-67.  beacon                     -- BLE beacons
-68.  beacon_pairing_request     -- Solicitudes de emparejamiento
-69.  vehicle_beacon             -- Beacon asignado a vehículo
-70.  maintenance_type           -- Tipos de mantenimiento
-71.  maintenance_schedule       -- Plan de mantenimiento
-72.  maintenance_record         -- Registros de mantenimiento
-73.  fuel_load                  -- Cargas de combustible
-74.  gps_raw_event              -- Eventos GPS brutos (particionada)
-75.  gps_processed_location     -- Ubicaciones procesadas
+62. vehicle                    -- Vehículos de la flota
+63. vehicle_photo              -- Fotos de vehículos
+64. vehicle_assignment         -- Asignación vehículo-conductor
+65. vehicle_maintenance        -- Mantenimientos programados
+66. maintenance_task           -- Tareas de mantenimiento
+67. maintenance_part           -- Repuestos utilizados
+68. vehicle_fuel               -- Carga de combustible
+69. vehicle_tire               -- Control de neumáticos
+70. tire_rotation              -- Rotación de neumáticos
+71. vehicle_insurance          -- Seguros de vehículos
+72. vehicle_document           -- Documentos de vehículos
+73. vehicle_gps_device         -- Dispositivos GPS
+74. vehicle_inspection_schedule-- Programación de inspecciones
+75. vehicle_downtime           -- Tiempos fuera de servicio
+76. vehicle_cost               -- Costos operativos
 ```
 
 ### **Schema: `hr`**
 ```
-76.  person                     -- Personas (base)
-77.  person_document            -- Documentos personales
-78.  person_address             -- Direcciones
-79.  person_contact             -- Contactos
-80.  driver                     -- Conductores (extiende person)
-81.  driver_license             -- Licencias de conducir
-82.  driver_infraction          -- Papeletas/infracciones
-83.  inspector                  -- Inspectores de campo
-84.  personnel                  -- Personal general (admin, mecánicos)
-85.  medical_exam               -- Exámenes psicosomáticos
-86.  background_check           -- Antecedentes penales/policiales
-87.  employment_contract        -- Contratos laborales
-88.  attendance                 -- Asistencia/marcaciones
-89.  absence                    -- Ausencias/permisos
-90.  vacation                   -- Vacaciones
-91.  payroll_period             -- Períodos de nómina
-92.  payroll_record             -- Registros de planilla
-93.  payroll_concept            -- Conceptos (sueldo, bono, descuento)
-94.  payroll_detail             -- Detalle por concepto
-95.  loan                       -- Préstamos/anticipos
-96.  loan_installment           -- Cuotas de préstamo
-97.  training_program           -- Programas de capacitación
-98.  training_attendance        -- Asistencia a capacitaciones
-99.  biometric_fingerprint      -- Huellas dactilares
-100. access_card                -- Tarjetas de acceso
+77. driver                     -- Conductores
+78. driver_document            -- Documentos de conductor
+79. driver_license             -- Licencias de conducir
+80. driver_medical_exam        -- Exámenes médicos
+81. driver_training            -- Capacitaciones
+82. driver_certification       -- Certificaciones
+83. driver_performance         -- Evaluación de desempeño
+84. driver_infraction          -- Infracciones
+85. driver_sanction            -- Sanciones aplicadas
+86. driver_attendance          -- Asistencia de conductores
+87. driver_payroll             -- Nómina de conductores
+88. payroll_deduction          -- Deducciones de nómina
+89. employee                   -- Personal administrativo
+90. employee_document          -- Documentos de empleados
+91. employee_contract          -- Contratos laborales
+92. employee_attendance        -- Asistencia de empleados
+93. employee_payroll           -- Nómina administrativa
+94. leave_request              -- Solicitudes de permisos
+95. overtime_record            -- Registro de horas extra
+96. disciplinary_action        -- Acciones disciplinarias
+97. performance_review         -- Evaluaciones de desempeño
+98. training_program           -- Programas de capacitación
+99. training_enrollment        -- Inscripciones a capacitaciones
+100. salary_advance            -- Adelantos de salario
+101. benefit                   -- Beneficios laborales
 ```
 
 ### **Schema: `inspection`**
 ```
-101. field_inspection           -- Inspecciones de campo
-102. route_verification         -- Verificaciones de cumplimiento ruta
-103. frequency_check            -- Control de frecuencias
-104. vehicle_inspection         -- Inspección estado de unidades
-105. inspection_finding         -- Hallazgos/observaciones
-106. inspection_evidence        -- Evidencias (fotos/videos)
-107. inspection_report          -- Reportes consolidados
+102. field_inspection          -- Inspecciones de campo
+103. route_verification        -- Verificaciones de ruta
+104. vehicle_inspection        -- Inspecciones de vehículos
+105. inspection_finding        -- Hallazgos de inspecciones
+106. inspection_evidence       -- Evidencias fotográficas
+107. inspection_report         -- Reportes consolidados
 ```
 
 ### **Schema: `audit`**
 ```
-108. change_log                 -- Cambios en registros críticos
-109. data_retention_policy      -- Políticas de retención
-110. archived_data              -- Datos archivados
+108. change_log                -- Registro de cambios en entidades
+109. data_retention_policy     -- Políticas de retención
+110. archived_data             -- Datos archivados históricos
 ```
 
 ---
