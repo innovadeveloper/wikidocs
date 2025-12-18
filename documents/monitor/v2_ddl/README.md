@@ -2580,3 +2580,314 @@ INSERT INTO core_finance.financial_report (
 -- FIN REGISTROS - SCHEMA: core_finance
 -- Total: 20 tablas con flujo completo de recaudo y liquidación
 -- ============================================================================
+
+
+-- ============================================================================
+-- REGISTROS DE EJEMPLO - SCHEMA: fleet
+-- Sistema de Gestión de Transporte - TranCorp S.A.
+-- Fecha: 17 Diciembre 2024
+-- ============================================================================
+
+-- ============================================================================
+-- TABLA 1: vehicle
+-- ============================================================================
+
+INSERT INTO fleet.vehicle (
+    vehicle_id, plate_number, internal_code, route_id, company_id, brand, model, year, chassis_number, engine_number, fuel_type, seating_capacity, standing_capacity, color, status, acquisition_date, is_operational, created_at, updated_at
+) VALUES
+(1, 'AXR-825', 'A-101', 1, 1, 'Volvo', 'B290R', 2018, '9BV21234567890123', 'D7E290-001', 'DIESEL', 42, 38, 'Naranja', 'ACTIVE', '2018-03-15', true, '2018-03-15 10:00:00-05', '2024-12-17 08:00:00-05'),
+(2, 'AYT-917', 'A-102', 1, 1, 'Volvo', 'B290R', 2019, '9BV21234567890124', 'D7E290-002', 'DIESEL', 42, 38, 'Naranja', 'ACTIVE', '2019-05-20', true, '2019-05-20 10:00:00-05', '2024-12-17 08:00:00-05'),
+(3, 'BCD-345', 'A-103', 1, 1, 'Mercedes-Benz', 'OF-1721', 2020, 'WDB95033313456789', 'OM924LA-003', 'GNV', 40, 40, 'Naranja', 'ACTIVE', '2020-08-10', true, '2020-08-10 10:00:00-05', '2024-12-17 08:00:00-05'),
+(4, 'CEF-892', 'A-104', 1, 1, 'Volvo', 'B290R', 2019, '9BV21234567890125', 'D7E290-004', 'DIESEL', 42, 38, 'Naranja', 'MAINTENANCE', '2019-07-12', false, '2019-07-12 10:00:00-05', '2024-12-16 14:00:00-05');
+
+-- ============================================================================
+-- TABLA 2: vehicle_document
+-- ============================================================================
+
+INSERT INTO fleet.vehicle_document (
+    vehicle_document_id, vehicle_id, document_type_id, document_number, issuing_entity, issue_date, expiry_date, file_id, status, verified_by, verified_at, notes, created_at, updated_at
+) VALUES
+(1, 1, 9, 'SOAT-2024-AXR825', 'Rímac Seguros', '2024-01-10', '2025-01-09', NULL, 'VALID', 2, '2024-01-10 14:00:00-05', NULL, '2024-01-10 14:00:00-05', '2024-01-10 14:00:00-05'),
+(2, 1, 10, 'RT-2024-1234567', 'CITV Ate', '2024-06-15', '2024-12-14', NULL, 'EXPIRED', 2, '2024-06-15 16:00:00-05', 'Vencido, programar renovación', '2024-06-15 16:00:00-05', '2024-12-15 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 3: vehicle_owner
+-- ============================================================================
+
+INSERT INTO fleet.vehicle_owner (
+    vehicle_owner_id, person_id, tax_id, full_name, email, phone, address, bank_account, is_active, created_at, updated_at
+) VALUES
+(1, 1001, '10234567890', 'Roberto Martínez Silva', 'rmartinez@email.com', '+51 987654321', 'Av. Brasil 1234, Lima', '191-12345678-0-50 BCP', true, '2018-03-15 09:00:00-05', '2024-12-17 08:00:00-05'),
+(2, 1002, '10345678901', 'Carmen Flores Vega', 'cflores@email.com', '+51 976543210', 'Jr. Ancash 567, Lima', '002-34567890-1-40 BBVA', true, '2019-05-20 09:00:00-05', '2024-12-17 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 4: vehicle_owner_share
+-- ============================================================================
+
+INSERT INTO fleet.vehicle_owner_share (
+    share_id, vehicle_id, vehicle_owner_id, ownership_percentage, valid_from, valid_until, is_active, created_at, updated_at
+) VALUES
+(1, 1, 1, 100.00, '2018-03-15', NULL, true, '2018-03-15 09:00:00-05', '2024-12-17 08:00:00-05'),
+(2, 2, 2, 100.00, '2019-05-20', NULL, true, '2019-05-20 09:00:00-05', '2024-12-17 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 5: vehicle_assignment
+-- ============================================================================
+
+INSERT INTO fleet.vehicle_assignment (
+    assignment_id, vehicle_id, driver_id, assigned_at, unassigned_at, assignment_type, assigned_by, unassigned_by, notes, is_active, created_at
+) VALUES
+(1, 1, 5, '2024-12-17 05:30:00-05', NULL, 'REGULAR', 2, NULL, 'Asignación turno mañana', true, '2024-12-17 05:30:00-05'),
+(2, 1, 6, '2024-12-16 05:30:00-05', '2024-12-16 15:00:00-05', 'REGULAR', 2, 2, 'Turno anterior completado', false, '2024-12-16 05:30:00-05');
+
+-- ============================================================================
+-- TABLA 6: gps_device
+-- ============================================================================
+
+INSERT INTO fleet.gps_device (
+    gps_device_id, device_id, device_type, company_id, imei, serial_number, model, manufacturer, sim_card_number, sim_provider, firmware_version, vehicle_id, posting_interval_seconds, last_communication_at, status, is_operational, installed_at, installed_by, created_at, updated_at
+) VALUES
+(1, 'GPS-2023-0458', 'TRACKER_GPS', 1, '860123456789012', 'TRK-458-2023', 'GT06N', 'Concox', '51987654321', 'Claro', 'v3.2.1', 1, 30, '2024-12-17 09:25:45-05', 'ACTIVE', true, '2023-06-15 10:00:00-05', 2, '2023-06-15 10:00:00-05', '2024-12-17 09:25:45-05'),
+(2, 'GPS-2023-0459', 'TRACKER_GPS', 1, '860123456789013', 'TRK-459-2023', 'GT06N', 'Concox', '51987654322', 'Claro', 'v3.2.1', 2, 30, '2024-12-17 09:24:30-05', 'ACTIVE', true, '2023-06-15 10:00:00-05', 2, '2023-06-15 10:00:00-05', '2024-12-17 09:24:30-05');
+
+-- ============================================================================
+-- TABLA 7: beacon
+-- ============================================================================
+
+INSERT INTO fleet.beacon (
+    beacon_id, mac_address, uuid, major, minor, model, manufacturer, battery_level, last_battery_check, status, is_operational, created_at, updated_at
+) VALUES
+(1, 'AA:BB:CC:DD:EE:01', 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825', 1, 101, 'iB001', 'Estimote', 85, '2024-12-10 10:00:00-05', 'ACTIVE', true, '2023-06-20 09:00:00-05', '2024-12-10 10:00:00-05'),
+(2, 'AA:BB:CC:DD:EE:02', 'FDA50693-A4E2-4FB1-AFCF-C6EB07647825', 1, 102, 'iB001', 'Estimote', 92, '2024-12-10 10:00:00-05', 'ACTIVE', true, '2023-06-20 09:00:00-05', '2024-12-10 10:00:00-05');
+
+-- ============================================================================
+-- TABLA 8: vehicle_beacon
+-- ============================================================================
+
+INSERT INTO fleet.vehicle_beacon (
+    vehicle_beacon_id, vehicle_id, beacon_id, beacon_mac_address, paired_at, paired_by_request_id, last_seen_at, is_active, created_at, updated_at
+) VALUES
+(1, 1, 1, 'AA:BB:CC:DD:EE:01', '2023-06-20 10:00:00-05', NULL, '2024-12-17 09:25:45-05', true, '2023-06-20 10:00:00-05', '2024-12-17 09:25:45-05'),
+(2, 2, 2, 'AA:BB:CC:DD:EE:02', '2023-06-20 10:00:00-05', NULL, '2024-12-17 09:24:30-05', true, '2023-06-20 10:00:00-05', '2024-12-17 09:24:30-05');
+
+-- ============================================================================
+-- TABLA 9: maintenance_type
+-- ============================================================================
+
+INSERT INTO fleet.maintenance_type (
+    maintenance_type_id, code, name, description, is_scheduled, default_interval_km, default_interval_days, is_critical, is_active, created_at
+) VALUES
+(1, 'PREVENTIVE_5K', 'Mantenimiento Preventivo 5,000 km', 'Cambio aceite, filtros, revisión general', true, 5000, 90, false, true, '2024-01-10 10:00:00-05'),
+(2, 'PREVENTIVE_10K', 'Mantenimiento Preventivo 10,000 km', 'Servicio completo con cambio de piezas', true, 10000, 180, false, true, '2024-01-10 10:00:00-05'),
+(3, 'CORRECTIVE', 'Mantenimiento Correctivo', 'Reparación de fallas mecánicas', false, NULL, NULL, true, true, '2024-01-10 10:00:00-05'),
+(4, 'INSPECTION_TECHNICAL', 'Revisión Técnica', 'Inspección técnica vehicular oficial', true, NULL, 180, true, true, '2024-01-10 10:00:00-05');
+
+-- ============================================================================
+-- TABLA 10: maintenance_schedule
+-- ============================================================================
+
+INSERT INTO fleet.maintenance_schedule (
+    schedule_id, vehicle_id, maintenance_type_id, scheduled_date, scheduled_km, status, created_by, created_at, updated_at
+) VALUES
+(1, 1, 4, '2024-12-20', 125000, 'PENDING', 2, '2024-12-10 10:00:00-05', '2024-12-10 10:00:00-05'),
+(2, 1, 1, '2024-11-15', 120000, 'COMPLETED', 2, '2024-11-01 10:00:00-05', '2024-11-15 16:00:00-05');
+
+-- ============================================================================
+-- TABLA 11: maintenance_record
+-- ============================================================================
+
+INSERT INTO fleet.maintenance_record (
+    maintenance_record_id, vehicle_id, schedule_id, maintenance_type_id, maintenance_date, odometer_reading, description, parts_replaced, labor_cost, parts_cost, total_cost, workshop, technician_name, invoice_number, next_service_km, next_service_date, registered_by, approved_by, created_at, updated_at
+) VALUES
+(1, 1, 2, 1, '2024-11-15', 120345, 'Cambio de aceite motor, filtro aire, filtro combustible', 'Aceite 15W40 x5, Filtro aire, Filtro combustible', 80.00, 145.00, 225.00, 'Taller Pérez SAC', 'Juan Pérez', 'F001-12345', 125000, '2025-02-15', 2, 2, '2024-11-15 16:00:00-05', '2024-11-15 16:30:00-05');
+
+-- ============================================================================
+-- TABLA 12: fuel_load
+-- ============================================================================
+
+INSERT INTO fleet.fuel_load (
+    fuel_load_id, vehicle_id, driver_id, load_date, load_time, fuel_type, quantity_liters, quantity_gallons, unit_price, total_cost, odometer_reading, station_name, invoice_number, payment_method, registered_by, created_at
+) VALUES
+(1, 1, 5, '2024-12-17', '05:30:00', 'DIESEL', 45.50, NULL, 4.85, 220.68, 124567, 'Grifo Petroperú Av. Próceres', 'B001-78945', 'ACCOUNT', 4, '2024-12-17 05:30:00-05'),
+(2, 1, 5, '2024-12-16', '05:30:00', 'DIESEL', 48.20, NULL, 4.82, 232.32, 124345, 'Grifo Petroperú Av. Próceres', 'B001-78890', 'ACCOUNT', 4, '2024-12-16 05:30:00-05');
+
+-- ============================================================================
+-- TABLA 13: gps_raw_event
+-- ============================================================================
+
+INSERT INTO fleet.gps_raw_event (
+    raw_event_id, gps_device_id, vehicle_id, beacon_mac_address, latitude, longitude, altitude, speed_kmh, heading, accuracy_meters, satellites, gps_timestamp, server_timestamp, battery_level, raw_data, created_at
+) VALUES
+(1, 1, 1, 'AA:BB:CC:DD:EE:01', -11.9847523, -76.9736845, 2450.00, 0.00, 90.00, 5.00, 12, '2024-12-17 06:00:30-05', '2024-12-17 06:00:31-05', 95, '{"event":"gps","acc":true,"spd":0,"dir":90}'::jsonb, '2024-12-17 06:00:31-05'),
+(2, 1, 1, 'AA:BB:CC:DD:EE:01', -11.9956789, -76.9812345, 2380.00, 45.00, 95.00, 4.00, 13, '2024-12-17 06:15:30-05', '2024-12-17 06:15:31-05', 94, '{"event":"gps","acc":true,"spd":45,"dir":95}'::jsonb, '2024-12-17 06:15:31-05'),
+(3, 1, 1, 'AA:BB:CC:DD:EE:01', -12.0234567, -77.0012345, 2150.00, 38.00, 100.00, 5.00, 12, '2024-12-17 06:45:00-05', '2024-12-17 06:45:01-05', 92, '{"event":"gps","acc":true,"spd":38,"dir":100}'::jsonb, '2024-12-17 06:45:01-05'),
+(4, 1, 1, 'AA:BB:CC:DD:EE:01', -12.0464080, -77.0427930, 2050.00, 0.00, 100.00, 6.00, 11, '2024-12-17 07:18:00-05', '2024-12-17 07:18:01-05', 91, '{"event":"gps","acc":true,"spd":0,"dir":100}'::jsonb, '2024-12-17 07:18:01-05');
+
+-- ============================================================================
+-- FIN REGISTROS - SCHEMA: fleet
+-- Total: 13 tablas con gestión completa de flota
+-- ============================================================================
+
+-- ============================================================================
+-- REGISTROS DE EJEMPLO - SCHEMA: hr
+-- Sistema de Gestión de Transporte - TranCorp S.A.
+-- Fecha: 17 Diciembre 2024
+-- ============================================================================
+
+-- ============================================================================
+-- TABLA 1: person
+-- ============================================================================
+
+INSERT INTO hr.person (
+    person_id, tax_id, first_name, last_name, full_name, gender, birth_date, nationality, marital_status, blood_type, email, phone_mobile, phone_home, emergency_contact_name, emergency_contact_phone, photo_url, is_active, created_at, updated_at
+) VALUES
+(1, '43567890', 'Pedro', 'Sánchez López', 'Pedro José Sánchez López', 'M', '1985-06-15', 'Peruana', 'MARRIED', 'O+', 'psanchez@email.com', '+51 987654321', NULL, 'María Sánchez', '+51 976543210', NULL, true, '2024-02-28 10:00:00-05', '2024-12-17 08:00:00-05'),
+(2, '44678901', 'Carlos', 'Mendoza Ríos', 'Carlos Alberto Mendoza Ríos', 'M', '1982-09-22', 'Peruana', 'SINGLE', 'A+', 'cmendoza@email.com', '+51 965432109', NULL, 'Rosa Mendoza', '+51 954321098', NULL, true, '2024-02-28 10:00:00-05', '2024-12-17 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 2: person_document
+-- ============================================================================
+
+INSERT INTO hr.person_document (
+    person_document_id, person_id, document_type_id, document_number, issuing_entity, issue_date, expiry_date, file_id, status, verified_by, verified_at, notes, created_at, updated_at
+) VALUES
+(1, 1, 2, '43567890', 'RENIEC', '2015-06-15', '2025-06-14', 1, 'VALID', 2, '2024-03-01 10:00:00-05', NULL, '2024-03-01 10:00:00-05', '2024-03-01 10:00:00-05'),
+(2, 1, 3, 'AP-2024-567890', 'Policía Nacional', '2024-02-10', '2025-02-09', 3, 'VALID', 2, '2024-03-01 10:00:00-05', NULL, '2024-03-01 10:00:00-05', '2024-03-01 10:00:00-05');
+
+-- ============================================================================
+-- TABLA 3: person_address
+-- ============================================================================
+
+INSERT INTO hr.person_address (
+    address_id, person_id, address_type, address_line1, address_line2, district, city, state, postal_code, country, latitude, longitude, is_primary, is_active, created_at, updated_at
+) VALUES
+(1, 1, 'HOME', 'Av. Los Álamos 456', 'Urb. Santa Rosa', 'San Juan de Lurigancho', 'Lima', 'Lima', '15408', 'PE', -11.9923456, -76.9845678, true, true, '2024-03-01 10:00:00-05', '2024-12-17 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 4: driver
+-- ============================================================================
+
+INSERT INTO hr.driver (
+    driver_id, person_id, user_id, company_id, driver_code, hire_date, termination_date, employment_status, current_vehicle_id, license_points, total_trips, total_km_driven, rating_average, is_available, notes, created_at, updated_at
+) VALUES
+(5, 1, 5, 1, 'DRV-005', '2024-03-01', NULL, 'ACTIVE', 1, 98, 487, 9234.50, 4.75, true, 'Conductor responsable, buen historial', '2024-03-01 14:00:00-05', '2024-12-17 08:00:00-05'),
+(6, 2, NULL, 1, 'DRV-006', '2024-03-01', NULL, 'ACTIVE', NULL, 95, 523, 10567.80, 4.60, true, NULL, '2024-03-01 14:00:00-05', '2024-12-17 08:00:00-05');
+
+-- ============================================================================
+-- TABLA 5: driver_license
+-- ============================================================================
+
+INSERT INTO hr.driver_license (
+    license_id, driver_id, license_number, license_class, issue_date, expiry_date, issuing_authority, restrictions, file_id, status, is_current, created_at, updated_at
+) VALUES
+(1, 5, 'Q43567890', 'A-IIb', '2019-12-15', '2029-12-14', 'MTC - Lima', NULL, 1, 'VALID', true, '2024-03-01 14:30:00-05', '2024-12-15 14:30:00-05');
+
+-- ============================================================================
+-- TABLA 6: driver_infraction
+-- ============================================================================
+
+INSERT INTO hr.driver_infraction (
+    infraction_id, driver_id, vehicle_id, infraction_code, infraction_date, infraction_type, description, location, authority, ticket_number, fine_amount, points_deducted, payment_status, paid_date, paid_amount, payment_reference, file_id, registered_by, created_at, updated_at
+) VALUES
+(1, 5, 1, 'L-01', '2024-08-15', 'Exceso de velocidad', 'Conducir a 75 km/h en zona 60 km/h', 'Av. Próceres km 8', 'Policía Tránsito', 'PT-2024-089456', 216.00, 2, 'PAID', '2024-09-10', 216.00, 'BBVA-456789', NULL, 2, '2024-08-16 10:00:00-05', '2024-09-10 15:00:00-05');
+
+-- ============================================================================
+-- TABLA 7: medical_exam
+-- ============================================================================
+
+INSERT INTO hr.medical_exam (
+    medical_exam_id, driver_id, exam_type, exam_date, expiry_date, medical_center, doctor_name, result, observations, restrictions, certificate_number, file_id, verified_by, verified_at, created_at, updated_at
+) VALUES
+(1, 5, 'PSYCHOSOMATIC', '2024-02-15', '2025-02-14', 'Centro Médico Ocupacional Lima', 'Dr. Roberto García', 'APPROVED', 'Apto para conducir transporte público', NULL, 'CMO-2024-567890', NULL, 2, '2024-03-01 10:00:00-05', '2024-02-15 16:00:00-05', '2024-02-15 16:00:00-05');
+
+-- ============================================================================
+-- TABLA 8: background_check
+-- ============================================================================
+
+INSERT INTO hr.background_check (
+    background_check_id, person_id, check_type, check_date, expiry_date, issuing_authority, certificate_number, result, records_detail, file_id, verified_by, verified_at, created_at
+) VALUES
+(1, 1, 'CRIMINAL', '2024-02-10', '2025-02-09', 'Policía Nacional del Perú', 'AP-2024-567890', 'CLEAN', 'Sin antecedentes penales', 3, 2, '2024-03-01 10:00:00-05', '2024-02-10 14:00:00-05');
+
+-- ============================================================================
+-- TABLA 9: employment_contract
+-- ============================================================================
+
+INSERT INTO hr.employment_contract (
+    contract_id, person_id, contract_type, start_date, end_date, position, salary, salary_currency, work_hours_per_week, benefits, contract_terms, file_id, status, signed_by_employee, signed_by_employer, created_by, created_at, updated_at
+) VALUES
+(1, 1, 'INDEFINITE', '2024-03-01', NULL, 'Conductor de Transporte Público', 1800.00, 'PEN', 48, 'Seguro de salud, SCTR', 'Sujeto a rotación de turnos', NULL, 'ACTIVE', true, true, 2, '2024-03-01 09:00:00-05', '2024-03-01 14:00:00-05');
+
+-- ============================================================================
+-- TABLA 10: attendance
+-- ============================================================================
+
+INSERT INTO hr.attendance (
+    attendance_id, person_id, attendance_date, check_in_time, check_out_time, work_hours, overtime_hours, status, location, device, notes, created_at
+) VALUES
+(1, 1, '2024-12-17', '05:30:00', '15:30:00', 10.00, 1.00, 'PRESENT', 'Terminal Canto Grande', 'TABLET-001', NULL, '2024-12-17 05:30:00-05'),
+(2, 1, '2024-12-16', '05:30:00', '15:00:00', 9.50, 0.50, 'PRESENT', 'Terminal Canto Grande', 'TABLET-001', NULL, '2024-12-16 05:30:00-05');
+
+-- ============================================================================
+-- TABLA 11: absence
+-- ============================================================================
+
+INSERT INTO hr.absence (
+    absence_id, person_id, absence_type, start_date, end_date, days_count, reason, medical_certificate, file_id, requested_at, approved_by, approved_at, status, rejection_reason, created_at
+) VALUES
+(1, 1, 'SICK_LEAVE', '2024-11-20', '2024-11-21', 2, 'Gripe fuerte', true, NULL, '2024-11-19 18:00:00-05', 2, '2024-11-19 19:00:00-05', 'APPROVED', NULL, '2024-11-19 18:00:00-05');
+
+-- ============================================================================
+-- TABLA 12: loan
+-- ============================================================================
+
+INSERT INTO hr.loan (
+    loan_id, person_id, loan_type, loan_amount, interest_rate, total_amount, installments, installment_amount, granted_date, first_payment_date, granted_by, purpose, status, paid_installments, remaining_balance, created_at, updated_at
+) VALUES
+(1, 1, 'ADVANCE', 500.00, 0.00, 500.00, 5, 100.00, '2024-10-01', '2024-10-15', 2, 'Gastos médicos familiares', 'ACTIVE', 3, 200.00, '2024-10-01 10:00:00-05', '2024-12-15 16:00:00-05');
+
+-- ============================================================================
+-- TABLA 13: payroll_period
+-- ============================================================================
+
+INSERT INTO hr.payroll_period (
+    payroll_period_id, period_code, period_type, start_date, end_date, payment_date, company_id, status, processed_by, processed_at, approved_by, approved_at, total_employees, total_amount, created_at, updated_at
+) VALUES
+(1, '2024-12-Q1', 'BIWEEKLY', '2024-12-01', '2024-12-15', '2024-12-20', 1, 'APPROVED', 4, '2024-12-16 10:00:00-05', 2, '2024-12-16 14:00:00-05', 2, 3400.00, '2024-11-25 10:00:00-05', '2024-12-16 14:00:00-05');
+
+-- ============================================================================
+-- TABLA 14: payroll_concept
+-- ============================================================================
+
+INSERT INTO hr.payroll_concept (
+    payroll_concept_id, code, name, concept_type, calculation_method, default_amount, default_percentage, is_taxable, affects_benefits, is_active, created_at
+) VALUES
+(1, 'BASE_SALARY', 'Sueldo Base', 'EARNING', 'FIXED', NULL, NULL, true, true, true, '2024-01-10 10:00:00-05'),
+(2, 'LOAN_DEDUCTION', 'Descuento Préstamo', 'DEDUCTION', 'FIXED', NULL, NULL, false, false, true, '2024-01-10 10:00:00-05'),
+(3, 'HEALTH_INSURANCE', 'Seguro de Salud', 'DEDUCTION', 'PERCENTAGE', NULL, 9.00, false, false, true, '2024-01-10 10:00:00-05'),
+(4, 'BONUS', 'Bonificación', 'BONUS', 'FIXED', NULL, NULL, true, true, true, '2024-01-10 10:00:00-05');
+
+-- ============================================================================
+-- TABLA 15: payroll_record
+-- ============================================================================
+
+INSERT INTO hr.payroll_record (
+    payroll_record_id, payroll_period_id, person_id, company_id, base_salary, gross_salary, total_deductions, total_bonuses, net_salary, payment_method, bank_account, payment_reference, days_worked, hours_worked, overtime_hours, status, paid_at, notes, created_at, updated_at
+) VALUES
+(1, 1, 1, 1, 1800.00, 1800.00, 262.00, 0.00, 1538.00, 'TRANSFER', '191-23456789-0-50 BCP', 'TRF-2024-001', 15, 150.00, 10.00, 'PAID', '2024-12-20 10:00:00-05', NULL, '2024-12-16 10:00:00-05', '2024-12-20 10:00:00-05');
+
+-- ============================================================================
+-- TABLA 16: payroll_detail
+-- ============================================================================
+
+INSERT INTO hr.payroll_detail (
+    payroll_detail_id, payroll_record_id, payroll_concept_id, quantity, unit_amount, total_amount, description, created_at
+) VALUES
+(1, 1, 1, 1.00, 1800.00, 1800.00, 'Sueldo quincenal', '2024-12-16 10:00:00-05'),
+(2, 1, 2, 1.00, 100.00, 100.00, 'Cuota 4/5 préstamo', '2024-12-16 10:00:00-05'),
+(3, 1, 3, 1.00, 162.00, 162.00, 'Descuento salud 9%', '2024-12-16 10:00:00-05');
+
+-- ============================================================================
+-- FIN REGISTROS - SCHEMA: hr
+-- Total: 16 tablas relevantes para despacho y liquidación
+-- ============================================================================
