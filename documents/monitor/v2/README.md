@@ -1810,7 +1810,7 @@ Gestión de flota vehicular, dispositivos GPS, beacons, mantenimiento y combusti
 
 ---
 
-### **75. gps_processed_location** (opcional, utiliza stop_events, checkpoint_events)
+### **75. gps_processed_location** (opcional, utiliza stop_events, checkpoint_events) (pendiente)
 
 **Descripción:** Ubicaciones GPS procesadas y validadas. Eventos filtrados, geocodificados y enriquecidos con contexto operativo.
 
