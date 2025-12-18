@@ -25,15 +25,15 @@
 ### **Schema: `shared`**
 ```
 10. company                    -- Empresas de transporte
-11. branch                     -- Sucursales de empresa
-12. terminal                   -- Terminales de transporte
-13. file_storage               -- Archivos adjuntos del sistema
-14. system_parameter           -- Parámetros de configuración
+11. authority                  -- Autoridades reguladoras del transporte
+12. concession                 -- Concesiones otorgadas para la operación del servicio
+13. concessionaire             -- Empresas concesionarias
+14. terminal                   -- Terminales de transporte
 15. catalog                    -- Catálogos generales del sistema
-16. catalog_item               -- Items de catálogos
-17. notification               -- Notificaciones a usuarios
+16. document_type              -- Tipos de documentos del sistema
+17. configuration              -- Parámetros de configuración del sistema
 18. notification_template      -- Plantillas de notificaciones
-19. notification_log           -- Log de envío de notificaciones
+19. file_storage              -- Archivos adjuntos del sistema
 ```
 
 ### **Schema: `core_operations`**
