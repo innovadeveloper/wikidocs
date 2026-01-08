@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoC: Generación de Contenido Digital con IA - Reporte Técnico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000000;
+            background: #ffffff;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            border-bottom: 3px solid #000000;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #666666;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        
+        .meta {
+            font-size: 14px;
+            color: #999999;
+            font-weight: 300;
+        }
+        
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666666;
+            font-size: 12px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-weight: 300;
+            font-size: 16px;
+        }
+        
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            font-weight: 300;
+            font-size: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            border: 1px solid #000000;
+        }
+        
+        thead {
+            background: #000000;
+            color: #ffffff;
+        }
+        
+        th {
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 300;
+            font-size: 14px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .highlight {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .card {
+            border: 1px solid #e0e0e0;
+            padding: 25px;
+        }
+        
+        .card-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .card-body {
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+        
+        .metric {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            margin: 30px 0;
+        }
+        
+        .comparison-left {
+            background: #000000;
+            color: #ffffff;
+            padding: 30px;
+        }
+        
+        .comparison-right {
+            background: #f5f5f5;
+            color: #000000;
+            padding: 30px;
+        }
+        
+        .comparison h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .comparison .metric {
+            margin: 15px 0;
+        }
+        
+        .comparison ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .workflow {
+            margin: 30px 0;
+        }
+        
+        .workflow-step {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .workflow-step:last-child {
+            border-bottom: none;
+        }
+        
+        .workflow-number {
+            font-size: 28px;
+            font-weight: 700;
+            min-width: 40px;
+        }
+        
+        .workflow-content h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .workflow-content p {
+            font-size: 14px;
+            color: #666666;
+            margin: 0;
+        }
+        
+        .conclusion {
+            background: #000000;
+            color: #ffffff;
+            padding: 40px;
+            margin-top: 50px;
+        }
+        
+        .conclusion h2 {
+            color: #ffffff;
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+        }
+        
+        .conclusion h3 {
+            color: #999999;
+        }
+        
+        .conclusion ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .conclusion li {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #333333;
+            margin: 25px 0;
+        }
+        
+        strong {
+            font-weight: 600;
+        }
+        
+        @media print {
+            body {
+                max-width: 100%;
+                padding: 20px;
+            }
+            
+            .header {
+                page-break-after: avoid;
+            }
+            
+            h2 {
+                page-break-after: avoid;
+            }
+            
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Generación de Contenido Digital con IA</h1>
+        <div class="subtitle">Análisis Comparativo: On-Premise vs Cloud</div>
+        <div class="meta">Proof of Concept · Enero 2026</div>
+    </div>
+
+    <section>
+        <h2>1. Resumen Ejecutivo</h2>
+        <p>
+            Este documento presenta los resultados de un Proof of Concept (PoC) realizado para evaluar la viabilidad 
+            económica y técnica de generar contenido digital (imágenes y videos) mediante inteligencia artificial, 
+            comparando una solución on-premise con servicios cloud disponibles en el mercado.
+        </p>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">Hallazgo Principal</div>
+                <div class="metric">5,000-8,000x</div>
+                <div class="metric-label">Más económico</div>
+                <div class="card-body">La solución on-premise es significativamente más rentable que los servicios cloud.</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Retorno de Inversión</div>
+                <div class="metric">1-2 meses</div>
+                <div class="metric-label">Break-Even Point</div>
+                <div class="card-body">Con producción de 200 videos/mes, la inversión inicial se recupera rápidamente.</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Ahorro Mensual</div>
+                <div class="metric">99.9%</div>
+                <div class="metric-label">Reducción de Costos</div>
+                <div class="card-body">Comparado con servicios cloud a volúmenes de producción escalables.</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Objetivo del Proyecto</h2>
+        <p>
+            Evaluar la viabilidad económica y técnica de generar contenido digital (imágenes y videos) usando IA, 
+            comparando soluciones on-premise con servicios cloud disponibles en el mercado.
+        </p>
+        
+        <div class="grid">
+            <div>
+                <h3>On-Premise</h3>
+                <ul>
+                    <li>ComfyUI + Modelo WAN</li>
+                    <li>GPU RTX 5070</li>
+                    <li>Tarifa eléctrica: S/0.62/kWh</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Cloud Services</h3>
+                <ul>
+                    <li>Google Veo 3</li>
+                    <li>OpenAI Sora 2</li>
+                    <li>Runway Gen-3, Pika Labs, Luma AI</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3>Herramientas</h3>
+                <ul>
+                    <li>Nano Banana (plan gratuito)</li>
+                    <li>Wattímetro para medición</li>
+                    <li>Resolución objetivo: 1280×720</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Workflow Operativo</h2>
+        <p>
+            Proceso de construcción del contenido digital desde el inicio hasta el final, validado durante el PoC.
+        </p>
+        
+        <div class="workflow">
+            <div class="workflow-step">
+                <div class="workflow-number">1</div>
+                <div class="workflow-content">
+                    <h4>Ideación</h4>
+                    <p>Definición del concepto de historieta animada</p>
+                </div>
+            </div>
+            
+            <div class="workflow-step">
+                <div class="workflow-number">2</div>
+                <div class="workflow-content">
+                    <h4>Generación de Imágenes</h4>
+                    <p>Nano Banana: Text-to-Image utilizando plan gratuito</p>
+                </div>
+            </div>
+            
+            <div class="workflow-step">
+                <div class="workflow-number">3</div>
+                <div class="workflow-content">
+                    <h4>Redimensionamiento</h4>
+                    <p>Ajuste a resolución objetivo (1280×720)</p>
+                </div>
+            </div>
+            
+            <div class="workflow-step">
+                <div class="workflow-number">4</div>
+                <div class="workflow-content">
+                    <h4>Animación con ComfyUI</h4>
+                    <p>Modelo WAN + GPU local → Video final</p>
+                </div>
+            </div>
+            
+            <div class="workflow-step">
+                <div class="workflow-number">5</div>
+                <div class="workflow-content">
+                    <h4>Output</h4>
+                    <p>Contenido digital final (~1.7 segundos por video)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Métricas On-Premise</h2>
+        <p>
+            Se probaron tres configuraciones diferentes para determinar la relación óptima entre calidad, 
+            tiempo de procesamiento y costo energético.
+        </p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Configuración</th>
+                    <th>Resolución</th>
+                    <th>Tiempo</th>
+                    <th>Energía</th>
+                    <th>Costo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Config 1</td>
+                    <td>1280×704</td>
+                    <td>513s (8.5min)</td>
+                    <td>0.0264 kWh</td>
+                    <td><strong>S/0.017</strong></td>
+                </tr>
+                <tr>
+                    <td>Config 2</td>
+                    <td>768×768</td>
+                    <td>198s (3.3min)</td>
+                    <td>0.00274 kWh</td>
+                    <td><strong>S/0.0018</strong></td>
+                </tr>
+                <tr class="highlight">
+                    <td><strong>Config 3 ★</strong></td>
+                    <td><strong>1280×720</strong></td>
+                    <td><strong>198s (3.3min)</strong></td>
+                    <td><strong>0.00274 kWh</strong></td>
+                    <td><strong>S/0.0018</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Config 3: Mejor Opción</h3>
+        <ul>
+            <li><strong>89% más económico</strong> que Config 1</li>
+            <li><strong>Resolución HD completa</strong> (1280×720)</li>
+            <li><strong>90% reducción de energía</strong> vs Config 1</li>
+            <li><strong>Duración de video:</strong> ~1.7 segundos</li>
+        </ul>
+        
+        <h3>Datos del Hardware</h3>
+        <ul>
+            <li><strong>GPU:</strong> NVIDIA RTX 5070</li>
+            <li><strong>Tarifa eléctrica:</strong> S/0.62/kWh (promedio 2024-2026)</li>
+            <li><strong>Medición:</strong> Wattímetro en tiempo real</li>
+            <li><strong>Software:</strong> ComfyUI + Modelo WAN</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>5. Precios de Servicios Cloud</h2>
+        <p>
+            Análisis de los principales servicios de generación de video con IA disponibles en el mercado.
+        </p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th>Precio por Segundo</th>
+                    <th>Características</th>
+                    <th>Ejemplo de Costo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Google Veo 3</strong></td>
+                    <td>$0.16/s</td>
+                    <td>1280×720, hasta 30s, API disponible</td>
+                    <td>~S/4.80 por video de 30s</td>
+                </tr>
+                <tr>
+                    <td><strong>OpenAI Sora 2</strong></td>
+                    <td>$0.10/s (720p)<br>$0.15/s (1080p)</td>
+                    <td>Múltiples resoluciones</td>
+                    <td>~S/3.00 por video de 10s</td>
+                </tr>
+                <tr>
+                    <td>Runway Gen-3</td>
+                    <td>$0.05/s</td>
+                    <td>Estándar</td>
+                    <td>$0.50 por 10s</td>
+                </tr>
+                <tr>
+                    <td>Pika Labs</td>
+                    <td>~$0.08/s</td>
+                    <td>Videos cortos</td>
+                    <td>$0.24 por 3s</td>
+                </tr>
+                <tr>
+                    <td>Luma AI</td>
+                    <td>$0.12/s</td>
+                    <td>Alta calidad</td>
+                    <td>$0.60 por 5s</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p><strong>Promedio de mercado:</strong> $0.05-0.16 por segundo de video generado (precios Q4 2024)</p>
+    </section>
+
+    <section>
+        <h2>6. Comparativa On-Premise vs Cloud</h2>
+        
+        <div class="comparison">
+            <div class="comparison-left">
+                <h4>On-Premise</h4>
+                <div class="metric">S/0.0018</div>
+                <div class="metric-label" style="color: #999999;">por video (~1.7s)</div>
+                
+                <h4 style="color: #ffffff; margin-top: 25px;">Ventajas</h4>
+                <ul>
+                    <li>• Control total del proceso</li>
+                    <li>• Costos extremadamente bajos</li>
+                    <li>• Sin límites de uso</li>
+                    <li>• Privacidad garantizada</li>
+                    <li>• Personalización completa</li>
+                </ul>
+                
+                <h4 style="color: #ffffff; margin-top: 20px;">Desventajas</h4>
+                <ul style="color: #999999;">
+                    <li>• Inversión inicial en hardware</li>
+                    <li>• Conocimiento técnico requerido</li>
+                    <li>• Mantenimiento propio</li>
+                </ul>
+            </div>
+            
+            <div class="comparison-right">
+                <h4>Cloud Services</h4>
+                <div class="metric" style="color: #000000;">$3-5</div>
+                <div class="metric-label">por video corto</div>
+                
+                <h4 style="margin-top: 25px;">Ventajas</h4>
+                <ul>
+                    <li>• Sin inversión inicial</li>
+                    <li>• Fácil de usar (API/UI)</li>
+                    <li>• Calidad consistente</li>
+                    <li>• Soporte técnico incluido</li>
+                    <li>• Actualizaciones automáticas</li>
+                </ul>
+                
+                <h4 style="margin-top: 20px;">Desventajas</h4>
+                <ul style="color: #666666;">
+                    <li>• Costos recurrentes altos</li>
+                    <li>• Límites por plan/créditos</li>
+                    <li>• Menos control creativo</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>7. Análisis de Escalabilidad</h2>
+        <p>
+            Proyección de costos mensuales según diferentes volúmenes de producción.
+        </p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Volumen Mensual</th>
+                    <th>Costo On-Premise</th>
+                    <th>Costo Cloud</th>
+                    <th>Ahorro</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>50 videos/mes</td>
+                    <td><strong>S/0.09</strong></td>
+                    <td>S/450-750</td>
+                    <td><strong>99.9%</strong></td>
+                </tr>
+                <tr>
+                    <td>200 videos/mes</td>
+                    <td><strong>S/0.36</strong></td>
+                    <td>S/1,800-3,000</td>
+                    <td><strong>99.9%</strong></td>
+                </tr>
+                <tr class="highlight">
+                    <td><strong>500 videos/mes ★</strong></td>
+                    <td><strong>S/0.90</strong></td>
+                    <td>S/4,500-7,500</td>
+                    <td><strong>99.9%</strong></td>
+                </tr>
+                <tr>
+                    <td>1,000 videos/mes</td>
+                    <td><strong>S/1.80</strong></td>
+                    <td>S/9,000-15,000</td>
+                    <td><strong>99.9%</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Break-Even Point</h3>
+        <ul>
+            <li><strong>Inversión inicial estimada:</strong> S/1,500-3,000</li>
+            <li><strong>Tiempo de recuperación:</strong> 1-2 meses con 200 videos/mes</li>
+            <li><strong>Ahorro mensual:</strong> S/1,800-3,000 (vs servicios cloud)</li>
+        </ul>
+        
+        <h3>Casos de Uso Ideales</h3>
+        <ul>
+            <li>Agencias de contenido digital</li>
+            <li>Creadores de redes sociales</li>
+            <li>Marketing B2B/B2C</li>
+            <li>Producción de e-learning</li>
+            <li>Desarrollo de prototipos internos</li>
+        </ul>
+    </section>
+
+    <div class="conclusion">
+        <h2>8. Conclusiones y Recomendaciones</h2>
+        
+        <h3>Hallazgos Clave</h3>
+        <ul>
+            <li>• La solución on-premise es <strong>5,000-8,000x más económica</strong> que servicios cloud</li>
+            <li>• Inversión inicial se recupera en <strong>1-2 meses</strong> con producción moderada</li>
+            <li>• Workflow validado y <strong>reproducible</strong> para contenido de calidad media-alta</li>
+            <li>• Config 3 (1280×720, S/0.0018/video) identificada como configuración óptima</li>
+        </ul>
+        
+        <div class="divider"></div>
+        
+        <h3>Recomendaciones</h3>
+        <ul>
+            <li>• <strong>Implementar</strong> solución on-premise para producción regular</li>
+            <li>• <strong>Optimizar</strong> workflow para reducir tiempo de generación</li>
+            <li>• <strong>Explorar</strong> modelos adicionales (Stable Diffusion, LCM)</li>
+            <li>• <strong>Documentar</strong> mejores prácticas y crear templates</li>
+            <li>• <strong>Escalar</strong> gradualmente: 200-500 videos/mes en corto plazo</li>
+        </ul>
+        
+        <div class="divider"></div>
+        
+        <h3>Próximos Pasos</h3>
+        <ul>
+            <li><strong>Corto plazo (1-2 meses):</strong> Escalar a 200-500 videos/mes</li>
+            <li><strong>Mediano plazo (3-6 meses):</strong> Automatización completa del pipeline</li>
+            <li><strong>Largo plazo (6-12 meses):</strong> Desarrollo de SaaS basado en PoC</li>
+        </ul>
+        
+        <div class="divider"></div>
+        
+        <h3>Oportunidades de Negocio</h3>
+        <p>
+            Generación de contenido para redes sociales, producción de material educativo, 
+            contenido para e-commerce, videos explicativos automatizados y personalización masiva de contenido.
+        </p>
+    </div>
+</body>
+</html>
