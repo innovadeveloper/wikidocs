@@ -5,6 +5,14 @@
 **Base de Datos:** PostgreSQL 14+  
 **Arquitectura:** 1 BD por cliente (aislamiento total)  
 
+## Notas importantes 
+```
+- Solo existe una tabla de alertas para manejar eventos de alertas causados por el sistema : exceso de velocidad, desvío de ruta, otros. (Analizar si esto cubre las alertas de caducidad de documentos). Considerar crear la tabla 'core_operations.panic_alert' y 'core_operations.panic_alert_type' para registrar las alertas generadas por el conductor desde su dispositivo : gps, etc.
+- La tabla 'core_operations.dispatch_queue' puede lograr ser altamente riesgosa de caer en incidentes si no hay un buen análisis y consideración de q el reordenamiento está sujeto a cambios (manuales, prioritarios, automáticos). Se sugiere poder tener una tabla 'core_operations.dispatch_queue_log' con un trigger amarrados a las ediciones o aplicar un registro de logs en el mismo backend para la comprobación exitosa del reordenamiento.
+- La tabla 'dispatch_exception' no requiere tener FK a un despacho debido a q esta actuará como indicador de hacer un bypass de N despachos durante el ciclo de vida del DispatchException.
+
+```
+
 ---
 
 ## ÍNDICE - SCHEMA: identity (9 tablas)
