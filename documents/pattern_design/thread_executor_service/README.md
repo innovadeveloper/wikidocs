@@ -256,3 +256,88 @@ El pool es una herramienta para:
   * Latencia esperada
 
 ---
+
+
+# TIPOS DE PROCESOS DE CPU
+
+# CPU-Intensive / CPU-Bound
+
+Significan prácticamente lo mismo.
+
+## Definición
+
+Un proceso es **CPU-bound** cuando:
+
+> La mayor parte del tiempo está usando activamente la CPU para calcular cosas.
+
+No está esperando red.
+No está esperando disco.
+No está esperando base de datos.
+
+Está calculando.
+
+---
+
+## Ejemplos reales
+
+* Cifrado / desencriptado
+* Compresión de archivos
+* Procesamiento de imágenes
+* Machine learning
+* Cálculos matemáticos grandes
+* Generación de PDFs pesados
+* Hashing masivo
+
+---
+
+## Regla importante
+
+Si algo es CPU-bound:
+
+```
+Número ideal de hilos ≈ número de núcleos
+```
+
+Porque:
+
+Un núcleo solo puede ejecutar 1 hilo al mismo tiempo.
+
+Si tienes:
+
+* 8 núcleos
+* 200 hilos CPU-bound
+
+No vas más rápido.
+Solo generas context switching.
+
+---
+
+# IO-Bound
+
+Lo contrario.
+
+Un proceso es **IO-bound** cuando:
+
+> La mayor parte del tiempo está esperando algo externo.
+
+Puede ser:
+
+* Base de datos
+* Disco
+* Red
+* API externa
+* Microservicio
+* Kafka
+* Redis
+
+---
+
+## Ejemplos reales
+
+* Guardar en DB
+* Llamar REST externo
+* Leer archivo grande
+* Esperar respuesta HTTP
+* Leer desde socket
+
+---
