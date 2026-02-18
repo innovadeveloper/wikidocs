@@ -22,6 +22,7 @@
   "documents/pattern_design/aop_pattern/aop_explanation.html",
   "documents/pattern_design/thread_executor_service/multithreading_executor_service.html",
   "documents/pgsql/management_types_functions/gestion_tipos_funciones_pgsql.html",
+  "documents/pgsql/notification_listener/notificaciones_listener_psql.html",
   "documents/use_case_dispatch/dispatch_use_cases_v1.html",
   "documents/use_case_dispatch/v2/dispatch_use_cases_v2.html",
   "documents/use_case_management/administrativo_use_cases_v1.html",
