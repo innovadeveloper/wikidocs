@@ -165,6 +165,20 @@ UNLISTEN permissions_changed;
 UNLISTEN *;
 ```
 
+### Ver sesiones activas de SQL
+
+```sql
+SELECT
+    pid,
+    usename,
+    application_name,
+    client_addr,
+    state,
+    backend_start
+FROM pg_stat_activity
+WHERE datname = 'monitor_system_3';
+```
+
 ### Ver sesiones sospechosas (idle con LISTEN)
 
 ```sql
