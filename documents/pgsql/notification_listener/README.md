@@ -179,6 +179,15 @@ FROM pg_stat_activity
 WHERE datname = 'monitor_system_3';
 ```
 
+
+### Ver sesiones activas de SQL con LISTEN activo (IMPORTANTE)
+
+```sql
+SELECT pid, usename, application_name, state, query
+FROM pg_stat_activity
+WHERE query LIKE 'LISTEN%';
+```
+
 ### Ver sesiones sospechosas (idle con LISTEN)
 
 ```sql
