@@ -52,7 +52,7 @@ The random B is d8 59 57 4c 1d 14 19 c1 80 35 f2 4d 12 0d 2b ab
 **WRITE/READ STD FILE**
 
 ```
-############ PROCESS WRITE ############
+############ PROCESS WRITE (PLAIN) ############
 
 >> 90 5a 00 00 03 0a 0b 0c 00 (SELECT_APPLICATION)
 << 91 00 (OPERATION_OK)
@@ -73,6 +73,7 @@ The random B is ad bf 7c 6b be c1 c2 8d d5 9e 3f e1 43 f4 90 35
 << 9e 55 98 75 ec 09 ba 9c 91 00 (OPERATION_OK)
 
 Escritura exitosa: 00100010 en offset 0
+
 
 ############ PROCESS READ ############
 
@@ -95,6 +96,54 @@ The random B is b7 1a 71 60 43 00 b7 09 43 16 92 62 e1 48 de 81
 << 00 10 00 10 8c cf df c1 61 d3 8e 52 91 00 (OPERATION_OK)
 Lectura exitosa (4 bytes): 00100010
 ```
+**Nota**
+| Campo  | Valor       | Significado            |
+| ------ | ----------- | ---------------------- |
+| CLA    | 90          | Native wrapped ISO7816 |
+| INS    | 3D          | WRITE_DATA             |
+| P1 P2  | 00 00       | —                      |
+| Lc     | 0B          | 11 bytes de data       |
+| FileNo | 02          | Archivo 2              |
+| Offset | 00 00 00    | posición 0             |
+| Length | 04 00 00    | 4 bytes                |
+| Data   | 00 10 00 10 | **datos en claro**     |
+| Le     | 00          |                        |
+
+
+```
+############ PROCESS WRITE (ENCIPHERED) ############
+
+>> 90 5a 00 00 03 0a 0b 0c 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+>> 90 aa 00 00 01 02 00 (AUTHENTICATE_AES)
+<< e8 3c 9a b5 fb 33 f6 0c b5 83 7a 54 a9 60 8e e8 91 af (ADDITIONAL_FRAME)
+
+>> 90 af 00 00 20 6c 7b 5b 3a 9a a9 18 f9 73 4b cb 65 9b 19 ba aa 22 73 58 ce 6b f4 17 c1 9d e4 0c 04 68 a1 67 a0 00 (MORE)
+<< 29 94 0f 5a 7a 9c 59 c4 23 b4 7d 03 4d 45 12 a5 91 00 (OPERATION_OK)
+
+The random A is de 24 aa cd 49 a2 ed d4 16 b2 79 dc 9c 5e c1 45
+The random B is 73 eb 38 73 c5 bc d3 21 f1 53 26 87 b2 c8 aa 7f
+
+>> 90 f5 00 00 01 02 00 (GET_FILE_SETTINGS)
+<< 00 03 21 00 20 00 00 29 ae 9b 4d 97 29 cf 25 91 00 (OPERATION_OK)
+
+>> 90 3d 00 00 17 02 00 00 00 04 00 00 46 df 06 b5 99 42 29 9e c7 54 d2 ec 82 6e 0a e3 00 (WRITE_DATA)
+<< 83 54 ee 74 f1 cb 51 13 91 00 (OPERATION_OK)
+```
+
+**Nota**
+| Campo           | Valor         |
+| --------------- | ------------- |
+| CLA             | 90            |
+| INS             | 3D            |
+| Lc              | 17 (23 bytes) |
+| FileNo          | 02            |
+| Offset          | 00 00 00      |
+| Length          | 04 00 00      |
+| Encrypted Block | 16 bytes      |
+| Le              | 00            |
+
 
 **FORMAT PICC**
 
