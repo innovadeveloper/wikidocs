@@ -1,3 +1,123 @@
+```
+Connected to the target VM, address: '127.0.0.1:56542', transport: 'socket'
+=== SETUP DATA STORAGE (Standard Data File 32 bytes AES) ===
+
+
+1. Seleccionando aplicación PICC master...
+>> 90 5a 00 00 03 00 00 00 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+2. Autenticando con clave maestra PICC (AES)...
+>> 90 aa 00 00 01 00 00 (AUTHENTICATE_AES)
+<< 50 7a 54 3f f6 62 98 e6 14 7e cb 5a b3 2e fd 83 91 af (ADDITIONAL_FRAME)
+>> 90 af 00 00 20 36 9c 22 72 1c 23 64 14 b8 94 86 46 23 a3 0e b1 04 38 68 f3 ac 30 1a 8c f1 1a c4 7d 38 e2 2b a1 00 (MORE)
+<< 64 ba 2a 01 e8 c0 0b 0f 60 ec cd c0 aa 98 3a 5b 91 00 (OPERATION_OK)
+The random A is b6 f0 86 b4 dd 32 86 62 92 c3 5d 17 0c 84 1c 17
+The random B is 27 51 9f 9e 02 73 00 56 0f c4 71 71 6b 5b 9e 1d
+
+3. Creando aplicación de almacenamiento de datos...
+>> 90 ca 00 00 05 0a 0b 0c 0f 83 00 (CREATE_APPLICATION)
+<< 1b e7 c6 41 e7 4a df 6b 91 00 (OPERATION_OK)
+
+4. Seleccionando nueva aplicación de datos...
+>> 90 5a 00 00 03 0a 0b 0c 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+5. Autenticando con clave por defecto de aplicación (AES)...
+>> 90 aa 00 00 01 00 00 (AUTHENTICATE_AES)
+<< ae a8 59 c6 58 05 7d c4 9f c0 2a 3c 83 02 32 37 91 af (ADDITIONAL_FRAME)
+>> 90 af 00 00 20 dd 94 cd cc 65 b1 aa fb 41 25 96 fd 25 54 12 d8 78 db 03 41 86 7e 2d 77 08 00 b0 60 b3 9f 40 50 00 (MORE)
+<< cf 94 b2 fd 01 6b 87 4d c7 2d d4 33 29 eb e5 12 91 00 (OPERATION_OK)
+The random A is d8 56 bb 53 b8 b4 19 8f dc b8 0b e4 17 8d 4f d0
+The random B is d8 59 57 4c 1d 14 19 c1 80 35 f2 4d 12 0d 2b ab
+
+6. Configurando claves de escritura y lectura...
+>> 90 c4 00 00 21 01 e4 0b a5 57 8b 8d da c7 4e 08 f4 69 fa b1 c0 b4 ab e9 41 bc ee 63 61 19 21 04 b4 13 73 9a 3d 12 00 (CHANGE_KEY)
+<< 7c c8 2f f4 08 44 88 67 91 00 (OPERATION_OK)
+>> 90 c4 00 00 21 02 67 2a 58 d7 c8 bc aa 26 df 78 c0 9c 18 a3 9e f7 9f cb 5b 26 50 a4 b4 fa f4 aa 39 9f 42 f7 b1 a0 00 (CHANGE_KEY)
+<< c7 53 87 86 25 dd 2a f9 91 00 (OPERATION_OK)
+
+7. Creando fichero estándar de 32 bytes...(6to bit : 0 -> PLAIN, 1 -> MACED, 2 -> enciphered)...
+>> 90 cd 00 00 07 02 00 21 00 20 00 00 00 (CREATE_STD_DATA_FILE)
+<< ce 2b e9 e4 42 3d 45 01 91 00 (OPERATION_OK)
+
+
+¡Almacenamiento de datos configurado exitosamente!
+- AID: 0A0B0C
+- File ID: 0x02
+- Tamaño: 32 bytes
+- Seguridad: AES 128-bit (3 claves)
+```
+
+**WRITE/READ STD FILE**
+
+```
+############ PROCESS WRITE ############
+
+>> 90 5a 00 00 03 0a 0b 0c 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+>> 90 aa 00 00 01 02 00 (AUTHENTICATE_AES)
+<< 86 51 24 8c 95 33 f9 47 5b 0a a6 b7 df a4 cb f3 91 af (ADDITIONAL_FRAME)
+
+>> 90 af 00 00 20 b9 57 6c 0b e0 2f 6b 2e c7 d6 67 1a d0 a6 95 9f 71 d2 b9 5f 96 8d e1 69 cd 07 c7 cc 89 89 da f0 00 (MORE)
+<< fb c8 db 43 32 d2 bc c8 f3 7d a9 48 30 30 be 22 91 00 (OPERATION_OK)
+
+The random A is db 35 a3 29 31 74 8d 1b eb 87 0d cf de fd f8 23
+The random B is ad bf 7c 6b be c1 c2 8d d5 9e 3f e1 43 f4 90 35
+
+>> 90 f5 00 00 01 02 00 (GET_FILE_SETTINGS)
+<< 00 00 21 00 20 00 00 fd 05 92 91 8f a7 2c 57 91 00 (OPERATION_OK)
+
+>> 90 3d 00 00 0b 02 00 00 00 04 00 00 00 10 00 10 00 (WRITE_DATA)
+<< 9e 55 98 75 ec 09 ba 9c 91 00 (OPERATION_OK)
+
+Escritura exitosa: 00100010 en offset 0
+
+############ PROCESS READ ############
+
+>> 90 5a 00 00 03 0a 0b 0c 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+>> 90 aa 00 00 01 02 00 (AUTHENTICATE_AES)
+<< df 15 c7 fe 23 06 b2 5f b5 9f f4 df ec 4d b6 97 91 af (ADDITIONAL_FRAME)
+
+>> 90 af 00 00 20 6b 52 97 14 24 2a 57 99 c6 72 e0 3f 23 12 17 2c 21 76 c9 68 90 69 e5 66 11 af 40 eb 96 1e 4c c2 00 (MORE)
+<< e1 cc 0d 30 94 78 56 f4 e8 04 44 3c a9 ec 1c dd 91 00 (OPERATION_OK)
+
+The random A is 7f b8 b5 1a d0 ce d9 96 02 70 9e 81 6a ae 9a 4a
+The random B is b7 1a 71 60 43 00 b7 09 43 16 92 62 e1 48 de 81
+
+>> 90 f5 00 00 01 02 00 (GET_FILE_SETTINGS)
+<< 00 00 21 00 20 00 00 74 8d 3b f5 f5 95 8e 31 91 00 (OPERATION_OK)
+
+>> 90 bd 00 00 07 02 00 00 00 04 00 00 00 (READ_DATA)
+<< 00 10 00 10 8c cf df c1 61 d3 8e 52 91 00 (OPERATION_OK)
+Lectura exitosa (4 bytes): 00100010
+```
+
+**FORMAT PICC**
+
+```
+>> 90 5a 00 00 03 00 00 00 00 (SELECT_APPLICATION)
+<< 91 00 (OPERATION_OK)
+
+>> 90 aa 00 00 01 00 00 (AUTHENTICATE_AES)
+<< 9e ef d5 6f 02 e6 18 58 65 6e cf 35 3c 6b ff 33 91 af (ADDITIONAL_FRAME)
+
+>> 90 af 00 00 20 dc e4 f8 6f e5 6f a6 ce 23 55 d1 ad 10 51 5f fa 53 7a 9e e8 6c d9 4d bb ee 9c 38 0c d7 34 1a 5b 00 (MORE)
+<< 37 c1 87 2f 4e 57 d1 5f 0c e3 de d3 89 f6 09 2d 91 00 (OPERATION_OK)
+
+The random A is 2d 1b 68 9d bd ec b4 6b bf a0 ed 58 10 ab 2b b6
+The random B is 35 25 f9 ea ab e5 7d fa 31 4e 5c 10 eb f7 a3 03
+
+>> 90 fc 00 00 00 (FORMAT_PICC)
+<< e0 5b c2 05 1a e2 84 01 91 00 (OPERATION_OK)
+```
+
+
+
+
 # DESFire EV1 — 5 Flujos APDU a Alto Nivel (AES + Enciphered)
 
 ## Datos previos
