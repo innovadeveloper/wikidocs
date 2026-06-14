@@ -216,3 +216,57 @@ Este tipo de configuración es muy común en electrónica moderna, especialmente
   <w x="288 176 288 240" f="0"/>
 </cir>
 ```
+
+# CIRCUITOS PRACTICOS
+## FILTRO DE SUAVIZADO DE SEÑALES (EFECTO DEBOUNCE) CON RC
+
+![filtro de suavizado](circuito.png)
+
+```sh
+<cir f="1" ts="0.000005" ic="32.755850052045055" cb="50" pb="50" vr="5" mts="5e-11">
+  <v x="112 80 112 32" f="0" wf="1" fr="200" maxv="5"/>
+  <r x="112 80 208 80" f="0" r="100"/>
+  <w x="208 80 304 80" f="0"/>
+  <c x="208 80 208 160" f="0" c="0.00001" iv="0.001" sr="0" vd="2.5912589861277677"/>
+  <g x="208 160 208 192" f="0"/>
+  <w x="112 32 112 16" f="0"/>
+  <g x="112 16 112 0" f="0"/>
+  <TestPoint x="304 80 336 0" f="0" me="0"/>
+  <TestPoint x="112 80 64 176" f="0" me="0"/>
+  <o en="8" sp="64" f="x102" p="0">
+    <p v="0" sc="5"/>
+    <p v="3" sc="6.4"/>
+  </o>
+  <o en="7" sp="64" f="x102" p="1">
+    <p v="0" sc="5"/>
+  </o>
+</cir>
+```
+
+
+# Tus valores
+
+De tu circuito:
+
+* Frecuencia: **200 Hz**
+* R = **100 Ω**
+* C = **10 µF**
+
+---
+
+#  Tiempo RC
+$$
+\tau = R \cdot C = 100 \cdot 0.00001 = 0.001\,s = 1\,ms
+$$
+
+Tu filtro responde en **1 ms**
+
+---
+
+# Periodo de la señal
+
+$$
+T = \frac{1}{200} = 0.005\,s = 5\,ms
+$$
+
+Cada ciclo dura **5 ms**
