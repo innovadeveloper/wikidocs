@@ -34,6 +34,8 @@ Los diodos son dispositivos semiconductores que permiten el paso de corriente el
 ## Steering — Diodo OR (selección de fuente)
 Dos fuentes, el diodo con mayor tensión "gana" y alimenta la carga.
 
+![alt text](steering_diodo.png)
+
 ```sh
 <cir f="1" ts="0.000005" ic="10.20027730826997" cb="50" pb="43" vr="5" mts="5e-11">
   <v x="96 336 96 160" f="0" wf="0" maxv="9"/>
@@ -50,7 +52,7 @@ Dos fuentes, el diodo con mayor tensión "gana" y alimenta la carga.
 
 ## Rectificador de media onda (Switching básico)
 
-
+![alt text](diodo_rectificador_media_onda.png)
 ```sh
 $ 1 0.000005 10.20027730826997 50 5 43 5e-11
 v 80 304 80 144 0 1 60 10 0 0 0.5
@@ -63,6 +65,8 @@ g 80 304 80 336 0 0
 
 ## Diodo Schottky — Convertidor Buck simplificado
 El diodo Schottky actúa como "freewheeling" cuando el switch abre.
+
+![alt text](diodo_schottky.png)
 
 ```sh
 $ 1 0.000005 10.20027730826997 50 5 43 5e-11
@@ -79,6 +83,8 @@ g 64 320 64 352 0 0
 
 ## Protección de polaridad inversa
 Un diodo en serie bloquea si conectas la batería al revés.
+
+![alt text](diodo_polaridad_inversa.png)
 
 ```sh
 $ 1 0.000005 10.20027730826997 50 5 43 5e-11
@@ -136,6 +142,8 @@ El circuito permite que una señal pequeña controle una carga alimentada con ma
 ### Conclusión
 
 Este tipo de circuito es fundamental en electrónica porque permite separar el control de la potencia. Es la base de sistemas donde un microcontrolador o señal débil maneja dispositivos más grandes como luces, motores o relés.
+
+![alt text](transistor_bjt_npn_carga_descarga.png)
 
 ```sh
 <cir f="1" ts="0.000005" ic="10.20027730826997" cb="50" pb="43" vr="5" mts="5e-11">
@@ -197,6 +205,7 @@ El circuito muestra cómo un MOSFET puede utilizarse como un interruptor control
 
 Este tipo de configuración es muy común en electrónica moderna, especialmente cuando se necesita eficiencia en el control. Permite que señales pequeñas controlen cargas más grandes con menor pérdida de energía, siendo ideal para aplicaciones con microcontroladores.
 
+![alt text](mosfet_carga_descarga.png)
 
 ```sh
 <cir f="1" ts="0.000005" ic="10.20027730826997" cb="50" pb="43" vr="5" mts="5e-11">
